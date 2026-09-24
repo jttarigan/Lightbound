@@ -7,7 +7,7 @@ for the human as possible, then push your fixes and results back so the Mac can 
 The human only needs to do what you physically can't: sign in to GitHub once, swap GPUs, toggle
 ReBAR in the BIOS, answer questions. Everything else is yours.
 
-**Repository:** `REPO_URL_PLACEHOLDER` (private, branch `main`).
+**Repository:** `https://github.com/jttarigan/Lightbound.git` (private, branch `main`).
 **Your branch:** `pc/m0-m1` — all your commits go there; never push to `main`.
 
 ---
@@ -18,7 +18,7 @@ ReBAR in the BIOS, answer questions. Everything else is yours.
    - check `git --version`; if Git for Windows is missing, ask the human to install it
      (`winget install --id Git.Git -e`) and restart the session;
    - pick a short path without spaces, e.g. `C:\dev` (ask the human if unsure) and run
-     `git clone REPO_URL_PLACEHOLDER C:\dev\Lightbound`. The first clone opens a GitHub sign-in
+     `git clone https://github.com/jttarigan/Lightbound.git C:\dev\Lightbound`. The first clone opens a GitHub sign-in
      (Git Credential Manager) — tell the human to complete it in the browser;
    - `cd` into the clone.
 2. `git checkout pc/m0-m1` if that branch exists on the remote (a previous session already worked),
