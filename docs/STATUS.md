@@ -4,7 +4,7 @@ _Last updated 2026-09-24 (session 2)._
 
 - **M0 — Scaffold:** accepted on Mac (Metal + MoltenVK). **[PC] checks deferred** (DECISIONS #16).
 - **M1 — Round-trip microbenchmark (GO/NO-GO gate):** implemented on both backends and verified
-  on the Mac. **Not closed:** needs (1) a Mac re-run on AC power, (2) PC runs on the 3060 Ti and the
+  on the Mac. **Not closed:** Mac AC re-run done (still fails run-to-run, see below); needs (2) PC runs on the 3060 Ti and the
   4060 Ti, (3) the human's go/no-go decision. Do not start M2 before that.
 
 ## M1 report (Mac side, preliminary)
@@ -46,6 +46,24 @@ Metal, chain/spin, pooled over 6 runs, round trip p50 / p99 (µs):
 
 Raw GPU copy 16 MiB (median of runs): ≈ 38–39 GB/s each direction. Fast-mode floor (p10) of the
 empty round trip ≈ 90 µs. MoltenVK control (3 runs): empty 242 µs p50, similar shape.
+
+### AC-power re-run (2026-09-24, 3 runs, commit 055d696, thermal "fair" throughout) — `results/m1_mac_ac/`
+Metal, chain/spin, round trip p50 / p99 (µs):
+
+| path | empty | 4K | 64K | 256K | 1M | 4M | 16M |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| empty | 214 / 316 | | | | | | |
+| s2_direct | | 201 / 317 | 276 / 319 | 283 / 327 | 305 / 349 | 316 / 493 | 842 / 1814 |
+| s1_copy | | 292 / 344 | 294 / 359 | 305 / 379 | 352 / 442 | 393 / 739 | 1587 / 3001 |
+
+- 0 failures; raw GPU copy 16 MiB ≈ 55–58 GB/s (vs ≈ 38 on battery: battery was throttling).
+- Run-to-run: 26/52 cells ≥ 10 % (worst primary-condition cell 29 %) → still **FAIL**, but many cells
+  now repeat within 1–3 % (e.g. s2_direct chain/spin 4K 201/200/202, 1M 304/303/309).
+- g2c ≈ 32–40 µs. c2g is bimodal: ≈ 50 µs (fast path, 35–45 % of iterations) or ≈ 235 µs.
+- Key observation: for 64K–4M the round trip stays ≈ 280–316 µs while the CPU's read+write time
+  grows from 2 to 124 µs — c2g shrinks as CPU time grows. The GPU appears to resume on a coarse
+  ≈ 250–300 µs schedule after it starts waiting on the event, not promptly when the CPU signals,
+  except on the fast path. Floor (p10) of the empty round trip ≈ 80 µs.
 
 ### Findings the human needs to see
 1. **Sync latency on M5 is dominated by the CPU→GPU hand-off and is multimodal.** GPU→CPU (g2c) is
