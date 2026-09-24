@@ -1,0 +1,6 @@
+# Keep LF in the repository and working trees on every OS (PC commits must not rewrite line endings).
+* text=auto eol=lf
+*.bat text eol=crlf
+*.png binary
+*.pdf binary
+*.gz binary

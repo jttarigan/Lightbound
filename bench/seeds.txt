@@ -1,0 +1,7 @@
+# Lightbound fixed benchmark seeds (run_seed values). One per line. Do not reorder.
+# Floors for bench runs are always generated at depth-5 size (200x200), see docs/06 §3.
+101
+211
+307
+401
+503
