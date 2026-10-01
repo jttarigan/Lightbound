@@ -1,11 +1,14 @@
 # Work status (resume here)
 
-_Last updated 2026-09-24 (session 2)._
+_Last updated 2026-10-01 (session 3)._
 
 - **M0 — Scaffold:** accepted on Mac (Metal + MoltenVK). **[PC] checks deferred** (DECISIONS #16).
 - **M1 — Round-trip microbenchmark (GO/NO-GO gate):** implemented on both backends and verified
   on the Mac. **Not closed:** Mac AC re-run done (still fails run-to-run, see below); needs (2) PC runs on the 3060 Ti and the
   4060 Ti, (3) the human's go/no-go decision. Do not start M2 before that.
+- **PC session:** the human started the PC work on 2026-10-01 (`docs/PC_CLAUDE_TASK.md`, section B
+  below). On resume: check `origin/pc/m0-m1`; once the PC side reports done, merge it and combine
+  (section C).
 
 ## M1 report (Mac side, preliminary)
 
@@ -93,7 +96,7 @@ extra micro.csv columns/rows, Vulkan variant definitions, one command buffer per
 
 ## What the human must run
 
-### A. Mac, plugged in (AC power, Low Power Mode off, no other apps, display on)
+### A. Mac, plugged in (AC power, Low Power Mode off, no other apps, display on) — DONE 2026-09-24 (`results/m1_mac_ac`)
 ```
 export PATH="$HOME/Library/Python/3.9/bin:$PATH"
 cd ~/Project/Lightbound
@@ -136,7 +139,9 @@ Paste back `results/m1_report/report.md` and any errors. Keep ReBAR-off runs in 
 (runs of one platform are pooled).
 
 ## Housekeeping
-- Git: repository initialised 2026-09-24 on `main` (local identity jostarigan). The preliminary
+- Git: repository initialised 2026-09-24 on `main` (local identity jostarigan). On 2026-10-01 SSH
+  to github.com timed out from the Mac's network (ports 22 and 443); HTTPS fetch works (the repo is
+  readable without sign-in, although `PC_CLAUDE_TASK.md` calls it private), pushing needs SSH. The preliminary
   `results/m1_prelim` runs predate it (their CSVs say `nogit`).
 - Build dirs: `build/` (Metal), `build-vk/` (Vulkan via MoltenVK). Toolchain PATH:
   `export PATH="$HOME/Library/Python/3.9/bin:$PATH"`. Python analysis deps are installed (user site).
