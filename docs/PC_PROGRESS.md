@@ -15,15 +15,21 @@ _Last updated 2026-10-02 (session 1, started 2026-10-01)._
 - [ ] §3 M1 [PC] timing runs — card 2: RTX 4060 Ti (after swap).
 - [ ] §4 Report (`docs/PC_REPORT.md`), gzipped results, push.
 
-## Waiting on the human (session 1)
+## Human decisions (session 1, 2026-10-02)
 
-1. **Vulkan SDK is not installed** (hard blocker: `cmake/LbDependencies.cmake` aborts with
+1. **Vulkan SDK was not installed** (hard blocker: `cmake/LbDependencies.cmake` aborts with
    "Vulkan SDK not found" on Windows, and the M0 checks need `VK_LAYER_KHRONOS_validation`).
-   Proposed: `winget install --id KhronosGroup.VulkanSDK -e` (winget lists 1.4.363.0).
-   Needs the human's OK (task rule: ask before installing system software).
-2. **Power plan is "Balanced"**; needs "High performance" (`powercfg /setactive SCHEME_MIN`) — asked.
+   Human approved installing it: `winget install --id KhronosGroup.VulkanSDK -e` (1.4.363.0).
+2. **Power plan** was "Balanced"; the human chose **Ultimate Performance**
+   (`powercfg /setactive 601bada7-b936-4131-9cc9-83e4d49842c6`) — active now.
 3. NVIDIA Control Panel → Manage 3D settings → Power management mode = Prefer maximum performance —
-   asked the human to confirm (cannot be checked from the shell).
+   **confirmed by the human** (cannot be checked from the shell).
+4. Note: the GitHub repository is **public** (the task file says private); the clone needed no
+   credentials. Pushing needed a one-time Git Credential Manager browser sign-in, which worked.
+
+A first `cmake -B build` (before the SDK) already fetched all dependencies (SDL3 3.4.16, doctest,
+miniaudio, Slang 2026.18.2 Windows zip, Vulkan-Headers, VMA) and detected MSVC 19.44.35225; it
+stopped only at the Vulkan SDK check, as expected.
 
 ## §1 Environment check (2026-10-01)
 
