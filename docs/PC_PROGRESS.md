@@ -97,16 +97,25 @@ Decisions taken by Claude (documented, reversible):
 - Background apps at launch (not closed — needs the human): Chrome, Edge, Teams, Epic Games Launcher
   (+ EOS overlay renderer), OneDrive, Voicemod, MSI Center, ChatGPT desktop, Task Manager. GPU 0 % util.
 
-Open questions for the human:
-1. `s2_rebar`: (a) skip (30-iteration validation data already characterises it), (b) reduced run
-   (e.g. `--micro-paths=s2_rebar --submit=chain --cpuwait=spin --frames=200 --warmup=20`, ≈ 35 min/run),
-   (c) reduced iterations but all 4 modes (≈ 2.3 h/run), (d) payloads ≤ 1 MiB at full iterations
-   (≈ 85 min/run), (e) full protocol (≈ 23 h/run).
-2. ReBAR: enable in BIOS ("Above 4G Decoding" + "Re-Size BAR Support", UEFI/CSM off) and re-run the
-   3060 Ti as `rebar-on`? Can be combined with the GPU-swap reboot.
-3. Close browsers/launchers for the timing series?
+**Human decisions (2026-10-02, while the rebar-off series was running):**
+1. `s2_rebar`: **full protocol** (200 + 2000 iterations, all modes, all payloads) — ≈ 23 h per run.
+2. **Enable Resizable BAR in the BIOS** and run the cards as `rebar-on` (primary condition).
+3. Background apps closed by the human at 10:2x (after the series had started; they will close
+   them again after every restart).
+
+### Revised plan
+| Step | What | Where | Est. |
+|---|---|---|---|
+| A (running) | 3060 Ti, ReBAR off, 5 fast paths, 3 runs | `results\m1_3060_rebar-off` | ≈ 3 h (started 10:13) |
+| B | Human: reboot → BIOS → Above 4G Decoding + Re-Size BAR on → boot → close apps → new session "Continue docs/PC_CLAUDE_TASK.md" | — | — |
+| C | Verify ReBAR on (probe: `sysinfo.rebar: on`, `bar_heap_mb` > 256). 3060 Ti **full protocol incl. `s2_rebar`**, 3 runs | `results\m1_3060` tag `rebar-on` | ≈ 24 h/run → **≈ 3 days** |
+| D | GPU swap → 4060 Ti, same as C | `results\m1_4060` tag `rebar-on` | ≈ 3 days |
+| E | §4 reports + push | `results\m1_pc_report` (+ `m1_3060_rebar-off` separately) | — |
+
+Not planned (gap to note in the report): `s2_rebar` with ReBAR off, and ReBAR-off runs on the 4060 Ti.
+Risk for the multi-day runs: Windows Update auto-restart — the human should pause updates.
 
 ## Next steps
-1. Main series (card 1, rebar-off) running → check logs, report, record numbers here.
-2. Human answers on `s2_rebar` / ReBAR / background apps → run `s2_rebar` accordingly.
-3. GPU swap message → card 2 (4060 Ti) → §4 report and push.
+1. Step A finishes (~13:15) → check logs, run the report, record numbers, commit + push.
+2. Tell the human to do step B (reboot into BIOS for ReBAR).
+3. Step C in the new session (resume here).
