@@ -129,3 +129,14 @@ Ambiguities resolved while building, per CLAUDE.md rule 4. Newest at the bottom.
 26. **`--frames`/`--warmup` in microbench mode** mean measured / warm-up iterations per cell and
     default to 2000 / 200 (protocol §6). Submit and CPU-wait modes are swept unless `--submit` /
     `--cpuwait` are given. Dev filters `--micro-paths`, `--micro-payloads` select subsets.
+
+## 2026-10-02 — M0 [PC] MSVC build (Windows 11, VS Build Tools 2022 17.14, MSVC 19.44)
+
+27. **`alignUp` is one constrained template** (`requires std::is_unsigned_v<T>`) instead of the
+    `u32` / `usize` / `u64` overloads. On MSVC x64 `size_t` and `uint64_t` are both
+    `unsigned long long`, so the `usize` and `u64` overloads were the same function (C2084,
+    only in the test TUs that include `Math.h` via `Arena.h`). Clang on macOS keeps them distinct
+    (`unsigned long` vs `unsigned long long`), which is why it never showed there. Both callers
+    (`Arena::alloc`, `test_math`) pass same-typed unsigned arguments; behaviour unchanged. This
+    was the only MSVC `/W4 /WX` failure: the rest of the tree (Vulkan backend included) compiled
+    warning-free on the first MSVC build.
