@@ -1,14 +1,46 @@
 # Work status (resume here)
 
-_Last updated 2026-10-01 (session 3)._
+_Last updated 2026-10-02 (session 4)._
 
 - **M0 — Scaffold:** accepted on Mac (Metal + MoltenVK). **[PC] checks deferred** (DECISIONS #16).
 - **M1 — Round-trip microbenchmark (GO/NO-GO gate):** implemented on both backends and verified
   on the Mac. **Not closed:** Mac AC re-run done (still fails run-to-run, see below); needs (2) PC runs on the 3060 Ti and the
   4060 Ti, (3) the human's go/no-go decision. Do not start M2 before that.
-- **PC session:** the human started the PC work on 2026-10-01 (`docs/PC_CLAUDE_TASK.md`, section B
-  below). On resume: check `origin/pc/m0-m1`; once the PC side reports done, merge it and combine
-  (section C).
+- **PC session:** in progress on branch `pc/m0-m1` (see "PC session progress" below). The
+  environment check is done; the build, M0 checks and M1 runs have not started yet. On resume: fetch the
+  branch (command below), read its `docs/PC_PROGRESS.md`, report progress, and wait. Merge only when
+  the human says so (section C).
+
+## Resume checklist (Mac)
+```
+export PATH="$HOME/Library/Python/3.9/bin:$PATH"
+cd ~/Project/Lightbound
+# SSH to github.com may time out on this network; the repo is public, so fetch over HTTPS:
+GIT_TERMINAL_PROMPT=0 git -c credential.helper= fetch https://github.com/jttarigan/Lightbound.git \
+    pc/m0-m1:refs/remotes/origin/pc/m0-m1
+git log --oneline main..origin/pc/m0-m1
+git show origin/pc/m0-m1:docs/PC_PROGRESS.md
+```
+(macOS has no GNU `timeout` command, so don't wrap git calls in it.)
+
+## PC session progress (as of 2026-10-02, branch head 1e91d25)
+Read from `origin/pc/m0-m1:docs/PC_PROGRESS.md`. So far the branch only adds that file; it has no
+code changes.
+- Done: clone into `C:\dev\Lightbound`, docs read, §1 environment check.
+- PC rig: i7-12700F (12C/20T), 32 GB, OEM MSI board MS-B9241 (BIOS 8.00, 2022), Windows 11 Home
+  10.0.26200, RTX 3060 Ti installed (driver 566.36). VS Build Tools 2022 17.14 (MSVC 19.44; CMake 3.31 + Ninja
+  1.12 via `vcvars64.bat`), Python 3.13 with pandas/matplotlib/scipy.
+- Human decisions recorded there (2026-10-02):
+  1. Install Vulkan SDK 1.4.363.0 via winget. It was missing, which blocked the configure step and
+     the validation layer.
+  2. Power plan **Ultimate Performance** (the task file asks for "High performance"). This is a minor
+     deviation, and `sysinfo.power_plan` will show it.
+  3. NVIDIA "Prefer maximum performance" confirmed by the human.
+- Next on the PC: §2 M0 checks (MSVC `/W4 /WX` fixes, ctest, play smoke with validation, bench stub),
+  §3 M1 runs on the 3060 Ti, a GPU swap, the 4060 Ti runs, and §4 `docs/PC_REPORT.md` with gzipped results.
+- DECISIONS.md entries for the PC deviations (power plan, PCIe gen3, MSVC fixes) are left to the
+  PC branch, or to the merge if the PC doesn't write them. Main does not touch DECISIONS.md meanwhile,
+  so the appended entry numbers don't collide.
 
 ## M1 report (Mac side, preliminary)
 
@@ -88,6 +120,19 @@ Metal, chain/spin, round trip p50 / p99 (µs):
    work during the CPU step, as it does in the real frame (docs/05 §3 "GPU may run independent work");
    (c) report latency modes/p10 alongside p50; (d) add a memory-polling sync path (GPU spins on a
    Shared-memory flag) as an alternative to `MTLSharedEvent` — a spec change, needs approval.
+5. **Open: the PC's PCIe link is gen3, not gen4.** Protocol §2 specifies P-3060 = PCIe 4.0 x16 and
+   P-4060 = PCIe 4.0 x8. On the PC, nvidia-smi reports `pcie.link.gen.max` = 3 and `width.max` = 16,
+   so the platform caps the link at gen3. Expected links: 3060 Ti at gen3 x16 (≈ 15.8 GB/s theoretical,
+   the same as gen4 x8), and 4060 Ti probably at gen3 x8 (≈ 7.9 GB/s). The x16-vs-x8 ratio that H5
+   compares is unchanged, but absolute transfer costs will be higher than on gen4, and the "P-3060" and
+   "P-4060" labels won't match §2. `docs/PC_CLAUDE_TASK.md` §3 step 3 expects to see `gen4 x16` /
+   `gen4 x8` in the CSV header, so the PC Claude should treat gen3 as known, not as a failure. The
+   PC Claude flagged it to the human; **no decision is recorded yet.** Options: (a) accept and record
+   the measured gen3 links as the platform definition (protocol §2 already says "**measured** link
+   gen/width"); (b) find a gen4 board/slot; (c) treat it as a limitation in the write-up. This needs a
+   human decision at go/no-go (CLAUDE.md rule 5).
+6. `docs/PC_CLAUDE_TASK.md` calls the GitHub repo private, but it is public (confirmed from the Mac
+   and the PC). The human decides whether that's intended.
 
 ### Deviations from spec
 Recorded in `docs/DECISIONS.md` #17–#26 (ReBAR read policy, binding convention, headless microbench,
@@ -105,7 +150,7 @@ python3 tools/run_microbench.py --exe build/lightbound --out results/m1_mac_ac
 ```
 (~7 min. Check the log header says `power_source: AC Power`.)
 
-### B. PC (Windows 11) — M0 checks + M1 runs in one session
+### B. PC (Windows 11) — M0 checks + M1 runs in one session — IN PROGRESS since 2026-10-01 (branch `pc/m0-m1`)
 Automated: copy only `docs/PC_CLAUDE_TASK.md` to the PC and tell Claude Code there: *Read
 PC_CLAUDE_TASK.md and do it.* It clones the repo, works on branch `pc/m0-m1`, keeps
 `docs/PC_PROGRESS.md` (resumable across the GPU-swap reboot), writes `docs/PC_REPORT.md`, and pushes
@@ -139,10 +184,13 @@ Paste back `results/m1_report/report.md` and any errors. Keep ReBAR-off runs in 
 (runs of one platform are pooled).
 
 ## Housekeeping
-- Git: repository initialised 2026-09-24 on `main` (local identity jostarigan). On 2026-10-01 SSH
-  to github.com timed out from the Mac's network (ports 22 and 443); HTTPS fetch works (the repo is
-  readable without sign-in, although `PC_CLAUDE_TASK.md` calls it private), pushing needs SSH. The preliminary
-  `results/m1_prelim` runs predate it (their CSVs say `nogit`).
+- Git: repository initialised 2026-09-24 on `main` (local identity jostarigan), remote
+  `git@github.com:jttarigan/Lightbound.git` (Mac pushes with a deploy key over SSH). On 2026-10-01 SSH
+  to github.com timed out from the Mac's network (ports 22 and 443). HTTPS fetch works (see the
+  resume checklist), but pushing needs SSH. **Local `main` is ahead of `origin/main` (baf605a)** with
+  the session-3 and session-4 status commits, which are unpushed. Push with `git push origin main`
+  when SSH works. The PC branch doesn't depend on them. The preliminary
+  `results/m1_prelim` runs predate the repo (their CSVs say `nogit`).
 - Build dirs: `build/` (Metal), `build-vk/` (Vulkan via MoltenVK). Toolchain PATH:
   `export PATH="$HOME/Library/Python/3.9/bin:$PATH"`. Python analysis deps are installed (user site).
 - Preliminary data: `results/m1_prelim/` (6 Metal + 3 MoltenVK runs, battery) — not valid for the study.
