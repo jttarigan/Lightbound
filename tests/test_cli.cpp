@@ -131,3 +131,17 @@ TEST_CASE("describeOptions round-trips key fields") {
     CHECK(d.find("agents=5000") != std::string::npos);
     CHECK(d.find("tag=t1") != std::string::npos);
 }
+
+TEST_CASE("--platform overrides the platform id and is validated") {
+    Options o;
+    std::string err;
+    REQUIRE(parse({"--mode=microbench", "--platform=P-3060-narrow"}, o, err) == ParseStatus::Ok);
+    CHECK(o.platform == "P-3060-narrow");
+    CHECK(describeOptions(o).find("platform=P-3060-narrow") != std::string::npos);
+
+    o = Options{};
+    CHECK(describeOptions(o).find("platform=") == std::string::npos);  // absent unless given
+    CHECK(parse({"--platform=P 3060"}, o, err) == ParseStatus::Error);  // goes into CSV columns
+    CHECK(parse({"--platform=a,b"}, o, err) == ParseStatus::Error);
+    CHECK(parse({"--platform="}, o, err) == ParseStatus::Error);
+}

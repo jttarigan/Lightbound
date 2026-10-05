@@ -51,6 +51,7 @@ struct Options {
     std::string microPaths;     // microbench: comma list of paths to run (default all)
     std::string microPayloads;  // microbench: comma list of payload sizes, e.g. 4K,1M (default protocol set)
     bool resume = false;        // microbench: continue the interrupted run in `out` (keeps its complete cells)
+    std::string platform;       // overrides the detected platform id, e.g. P-3060-narrow (empty = detected)
     u8 logLevel = 1;            // 0 trace, 1 info, 2 warn, 3 error
     bool help = false;
     bool version = false;

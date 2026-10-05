@@ -35,7 +35,9 @@ import pandas as pd  # noqa: E402
 PRIMARY_SUBMIT = "chain"
 PRIMARY_WAIT = "spin"
 VARIATION_LIMIT = 0.10  # M1 acceptance: p50 spread across 3 restarts < 10 %
-RTX_PLATFORMS = ("P-3060", "P-4060")
+# PCIe platforms for the go criterion. P-3060-narrow is the 3060 Ti at a reduced link, standing in for
+# P-4060 (x8) when no 4060 Ti is available (human decision 2026-10-05, docs/STATUS.md finding 8).
+RTX_PLATFORMS = ("P-3060", "P-3060-narrow", "P-4060")
 
 # Fixed path -> color assignment (color follows the entity; reference categorical order).
 PATH_ORDER = ["s2_direct", "s1_copy", "s2_hostcached", "s2_rebar", "s2_coherent"]
@@ -222,8 +224,8 @@ def go_criterion(s: pd.DataFrame, v: pd.DataFrame) -> str:
     platforms = set(s.platform)
     rtx = [p for p in RTX_PLATFORMS if p in platforms]
     if "P-M5" not in platforms or not rtx:
-        missing = [p for p in ("P-M5",) + RTX_PLATFORMS if p not in platforms]
-        return f"**PENDING** — needs data from {', '.join(missing)}."
+        return (f"**PENDING** — needs P-M5 and at least one PCIe platform ({', '.join(RTX_PLATFORMS)}); "
+                f"have: {', '.join(sorted(platforms)) or 'none'}.")
 
     def cell(platform, path, payload):
         r = s[(s.platform == platform) & (s.path == path) & (s.submit == PRIMARY_SUBMIT) &
@@ -254,7 +256,8 @@ def go_criterion(s: pd.DataFrame, v: pd.DataFrame) -> str:
             lines.append(f"- {label}: P-M5 {m5:.1f} µs vs {p} best ({best[1]}) {best[0]:.1f} µs, "
                          f"noise margin ±{margin * 100:.1f} % → {'M5 clearly lower' if ok else 'NOT clearly lower'}")
     head = "**GO**" if verdict else "**NO-GO** (protocol §6: stop and re-scope)"
-    return head + " — criterion: empty and 1 MB round-trip p50 on M5 lower than both RTX cards under their best " \
+    return head + " — criterion: empty and 1 MB round-trip p50 on M5 lower than every PCIe platform present " \
+                  f"({', '.join(rtx)}) under its best " \
                   "Vulkan path by more than run-to-run noise.\n\n" + "\n".join(lines)
 
 

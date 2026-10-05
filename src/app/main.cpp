@@ -128,6 +128,7 @@ int runMicrobench(const lb::app::Options& opt, int argc, char** argv) {
     cfg.options = app::describeOptions(opt);
     cfg.tag = opt.tag;
     cfg.resume = opt.resume;
+    cfg.platform = opt.platform;
 
     // Headless: no window or swapchain, only the compute/copy queue (DECISIONS #19).
     const char* base = SDL_GetBasePath();

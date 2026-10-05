@@ -128,7 +128,10 @@ public:
         if (!caps.gpuTimestamps) LB_LOG_WARN("GPU timestamps unavailable: rt/g2c/c2g will be NaN");
         if (!setup()) return 2;
 
-        m_platform = platformId(caps);
+        m_platform = m_cfg.platform.empty() ? platformId(caps) : m_cfg.platform;
+        if (!m_cfg.platform.empty()) {
+            LB_LOG_INFO("platform id overridden: %s (detected %s)", m_platform.c_str(), platformId(caps).c_str());
+        }
         const KeyValues sys = collectSysInfo(caps);
         if (sys.get("power_source") == "Battery Power") {
             LB_LOG_WARN("running on battery power: protocol §2 requires the Mac to be plugged in; "
@@ -551,7 +554,14 @@ private:
         h.add("start", isoTimestampUtc());
         h.add("iterations", std::to_string(m_cfg.iterations));
         h.add("warmup", std::to_string(m_cfg.warmup));
-        for (const auto& kv : collectSysInfo(m_g.caps()).items) h.add("sysinfo." + kv.first, kv.second);
+        for (const auto& kv : collectSysInfo(m_g.caps()).items) {
+            if (kv.first == "platform" && kv.second != m_platform) {
+                h.add("sysinfo.platform", m_platform);  // --platform override; the detected id is kept below
+                h.add("sysinfo.platform_detected", kv.second);
+            } else {
+                h.add("sysinfo." + kv.first, kv.second);
+            }
+        }
         h.add("sysinfo.pcie_link", pcie);
         h.add("columns.extra", "copy_g2c_us,copy_c2g_us,gpu_write_us,gpu_read_us appended after the §12 columns "
                                "(DECISIONS #20); bw_* rows: rt_us = GPU copy time");

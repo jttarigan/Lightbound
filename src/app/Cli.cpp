@@ -45,6 +45,17 @@ bool parseOnOff(const std::string& s, bool& out) {
     return false;
 }
 
+// Platform ids go into CSV columns and file names: keep them to [A-Za-z0-9._-], 1..32 chars.
+bool isPlatformId(const std::string& s) {
+    if (s.empty() || s.size() > 32) return false;
+    for (char c : s) {
+        const bool ok = (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '-' ||
+                        c == '_' || c == '.';
+        if (!ok) return false;
+    }
+    return true;
+}
+
 template <class E>
 struct EnumName { const char* name; E value; };
 
@@ -85,7 +96,7 @@ constexpr FlagSpec kFlags[] = {
     {"memvariant", true}, {"audit", true}, {"audio", true}, {"preset", true}, {"out", true},
     {"tag", true}, {"power", true},
     {"vsync", true}, {"validation", true}, {"width", true}, {"height", true}, {"exit-after", true},
-    {"log", true}, {"micro-paths", true}, {"micro-payloads", true}, {"resume", false},
+    {"log", true}, {"micro-paths", true}, {"micro-payloads", true}, {"resume", false}, {"platform", true},
     {"help", false}, {"version", false},
 };
 
@@ -159,6 +170,7 @@ ParseStatus parseCommandLine(int argc, const char* const* argv, Options& out, st
         else if (name == "micro-paths") out.microPaths = value;
         else if (name == "micro-payloads") out.microPayloads = value;
         else if (name == "resume") out.resume = true;
+        else if (name == "platform") { out.platform = value; ok = isPlatformId(value); }
         else if (name == "log") {
             u32 lvl = 0;
             if (ieq(value.c_str(), "trace")) lvl = 0;
@@ -233,6 +245,8 @@ void printUsage(FILE* to) {
         "  --micro-payloads=4K,1M        microbench: only these payload sizes\n"
         "  --resume                      microbench: continue the interrupted run in --out (keeps the\n"
         "                                cells it completed, measures the missing ones)\n"
+        "  --platform=ID                 override the detected platform id in CSVs, e.g.\n"
+        "                                P-3060-narrow (letters, digits, '-', '_', '.')\n"
         "  --log=trace|info|warn|error   log level (default info)\n"
         "  --help  --version\n",
         to);
@@ -262,6 +276,7 @@ std::string describeOptions(const Options& o) {
     s += std::string(" validation=") + (o.validation ? "on" : "off");
     if (!o.microPaths.empty()) s += " micro-paths=" + o.microPaths;
     if (!o.microPayloads.empty()) s += " micro-payloads=" + o.microPayloads;
+    if (!o.platform.empty()) s += " platform=" + o.platform;
     return s;
 }
 
