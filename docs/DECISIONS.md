@@ -140,3 +140,40 @@ Ambiguities resolved while building, per CLAUDE.md rule 4. Newest at the bottom.
     (`Arena::alloc`, `test_math`) pass same-typed unsigned arguments; behaviour unchanged. This
     was the only MSVC `/W4 /WX` failure: the rest of the tree (Vulkan backend included) compiled
     warning-free on the first MSVC build.
+
+## 2026-10-05 — M1 [PC] interruptible runs (human request)
+
+28. **Microbench runs can be interrupted and resumed** (`lightbound --resume`,
+    `tools/run_microbench.py --resume`). With the full `s2_rebar` protocol one run on the PC takes
+    about a day (the 16 MiB `s2_rebar` cells alone are ≈ 4.3 h each), and the human needs to be able
+    to switch the PC off. What a resumed run keeps and what it changes:
+    - The unit of resumption is the **cell** (path × submit × cpuwait × payload). A cell was already
+      measured independently (own warm-up, own clock calibration) and written to the CSV as one
+      block followed by a flush; nothing inside a cell or inside a timed interval changed.
+    - `--resume` reads the CSV in `--out`, keeps the cells that have exactly `iterations` rows,
+      drops the rows of a cell that was being written when the process died, and measures only the
+      missing cells, in the usual order. It refuses to continue (exit 2) if the binary
+      (`version`, `git_commit`), the options, the tag or any `sysinfo.*` value (GPU, driver, ReBAR,
+      BAR heap, power plan, …) differs from the header of the interrupted run; only a different
+      PCIe link reading is a warning. A file without a complete header is started over.
+    - Every process still starts with the raw copy bandwidth pass (it ramps the PCIe link up for
+      the link query); a resuming process discards those rows because the file already has them.
+      Path buffers are created as usual (same sizes) for a path that still has cells to measure.
+    - The CSV gets one `# resumed: <UTC time>, <n> complete cells kept, …` line per restart, at the
+      position where the restart happened, so analysis can tell which cells ran after a restart
+      (cold machine, new process). The header (`start`, `cli`) stays that of the first process.
+    - Verification/R7 failures of a cell are written as `# cell_failures: path,submit,cpuwait,
+      payload,count` in front of that cell's rows (only when non-zero), and a resuming process
+      adds them to its own count, so `# failures:` and the exit code still cover the whole run.
+      API errors are per process: check every part of the log for `ERROR` lines.
+    - Runner: an unfinished run stays in `_running_run<i>.csv/.log`; the runner then stops with
+      exit 3 instead of renaming a partial CSV to its final name. Without `--resume` it refuses to
+      start in a directory that holds such a file. With `--resume`, finished runs are skipped.
+    - A resumed run is therefore one protocol "process run" split over several processes at cell
+      boundaries. Run-to-run variation is still computed per run file.
+29. **Runner log and report encoding.** `run_microbench.py` now sends lightbound's output straight
+    to the run's log file instead of collecting it in memory (the log of an interrupted run was
+    lost otherwise); `printSummary` flushes stdout so the table still precedes the closing
+    `microbench done` line. `micro_report.py` reads and writes UTF-8 explicitly: on Windows the
+    default code page (cp1252) cannot encode "→", which left `report.md` empty after the first PC
+    series.

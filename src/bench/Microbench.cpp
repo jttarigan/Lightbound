@@ -3,6 +3,7 @@
 #include "GitInfo.h"
 #include "app/Version.h"
 #include "bench/MicroPattern.h"
+#include "bench/MicroResume.h"
 #include "bench/SysInfo.h"
 #include "core/Log.h"
 #include "core/Time.h"
@@ -28,6 +29,7 @@ namespace {
 
 constexpr u64 kWaitTimeoutNs = 5'000'000'000ull;
 constexpr u32 kRecalibrateEvery = 500;
+constexpr u32 kBandwidthRows = 100;  // measured copies per bw_* direction
 constexpr f64 kNaN = std::numeric_limits<f64>::quiet_NaN();
 
 // Timestamp slots per iteration.
@@ -91,6 +93,25 @@ void writeF(std::FILE* f, f64 v) {
     else std::fprintf(f, ",%.3f", v);
 }
 
+const char* submitName(bool chain) {
+    return chain ? "chain" : "perpass";
+}
+
+const char* waitName(CpuWaitMode wait) {
+    return wait == CpuWaitMode::Spin ? "spin" : "block";
+}
+
+bool readFile(const std::string& path, std::string& out) {
+    std::FILE* f = std::fopen(path.c_str(), "rb");
+    if (f == nullptr) return false;
+    char buf[1 << 16];
+    usize n = 0;
+    while ((n = std::fread(buf, 1, sizeof(buf), f)) > 0) out.append(buf, n);
+    const bool ok = std::ferror(f) == 0;
+    std::fclose(f);
+    return ok;
+}
+
 class Microbench {
 public:
     Microbench(Gfx& g, const MicrobenchConfig& cfg) : m_g(g), m_cfg(cfg) {}
@@ -121,9 +142,15 @@ public:
         runBandwidth(bwRows, pcie);
 
         if (!openCsv(pcie)) return 2;
-        for (auto& [name, rows] : bwRows) writeRows(name, "na", "na", m_maxPayload, rows);
+        for (auto& [name, rows] : bwRows) {
+            if (!m_resume.has(name, "na", "na", m_maxPayload)) writeRows(name, "na", "na", m_maxPayload, rows);
+        }
 
         for (const PathDef& def : pathList()) {
+            if (pathDone(def)) {
+                LB_LOG_INFO("path %s: every cell was measured before the restart; skipped", def.name.c_str());
+                continue;
+            }
             PathBuffers pb;
             if (!createPathBuffers(def, pb)) {
                 ++m_failures;
@@ -273,7 +300,28 @@ private:
         return s;
     }
 
+    bool cellDone(const PathDef& def, u64 bytes, bool chain, CpuWaitMode wait) const {
+        return m_resume.has(def.name, submitName(chain), waitName(wait), bytes);
+    }
+
+    bool pathDone(const PathDef& def) const {
+        if (m_resume.cells.empty()) return false;
+        for (bool chain : m_cfg.chainModes) {
+            for (CpuWaitMode wait : m_cfg.waitModes) {
+                if (def.empty) {
+                    if (!cellDone(def, 0, chain, wait)) return false;
+                } else {
+                    for (u64 p : m_cfg.payloads) {
+                        if (!cellDone(def, p, chain, wait)) return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
     void runCell(const PathDef& def, const PathBuffers& pb, u64 bytes, bool chain, CpuWaitMode wait) {
+        if (cellDone(def, bytes, chain, wait)) return;  // measured before the restart (--resume)
         const u32 elements = static_cast<u32>(bytes / 16);
         const u32 total = m_cfg.warmup + m_cfg.iterations;
         const u32 copiesPerIter = (pb.mem.copy && bytes > 0) ? 2u : 0u;
@@ -383,9 +431,13 @@ private:
         }
         m_failures += cellFailures;
 
-        const char* submitName = chain ? "chain" : "perpass";
-        const char* waitName = wait == CpuWaitMode::Spin ? "spin" : "block";
-        writeRows(def.name, submitName, waitName, bytes, rows);
+        const char* submit = submitName(chain);
+        const char* cpuwait = waitName(wait);
+        if (cellFailures != 0 && m_csv != nullptr) {
+            // In front of the rows, so a resumed run (--resume) still counts this cell's failures.
+            std::fprintf(m_csv, "%s\n", cellFailureNote(def.name, submit, cpuwait, bytes, cellFailures).c_str());
+        }
+        writeRows(def.name, submit, cpuwait, bytes, rows);
 
         std::vector<f64> rt, g2c, c2g;
         for (const Row& r : rows) {
@@ -393,11 +445,11 @@ private:
             g2c.push_back(r.g2cUs);
             c2g.push_back(r.c2gUs);
         }
-        Summary s{def.name, submitName, waitName, bytes, percentile(rt, 0.5), percentile(rt, 0.99),
+        Summary s{def.name, submit, cpuwait, bytes, percentile(rt, 0.5), percentile(rt, 0.99),
                   percentile(g2c, 0.5), percentile(c2g, 0.5)};
         m_summaries.push_back(s);
         LB_LOG_INFO("%-13s %-7s %-5s %5s  rt p50 %9.1f us  p99 %9.1f  | g2c p50 %8.1f  c2g p50 %8.1f  | calib ±%.1f us%s",
-                    def.name.c_str(), submitName, waitName, payloadLabel(bytes).c_str(), s.rt50, s.rt99, s.g2c50,
+                    def.name.c_str(), submit, cpuwait, payloadLabel(bytes).c_str(), s.rt50, s.rt99, s.g2c50,
                     s.c2g50, worstCalibNs * 1e-3, cellFailures != 0 ? "  FAILURES" : "");
     }
 
@@ -422,7 +474,7 @@ private:
 
         struct Dir { const char* name; BufferHandle src, dst; };
         const Dir dirs[] = {{"bw_d2h", dev, hostDown}, {"bw_h2d", hostUp, dev}};
-        constexpr u32 kMeasured = 100, kWarm = 10;
+        constexpr u32 kMeasured = kBandwidthRows, kWarm = 10;
         for (const Dir& d : dirs) {
             std::vector<Row> rows(kMeasured);
             if (queryPcie && !pcieThread.joinable()) {
@@ -474,11 +526,6 @@ private:
         const std::filesystem::path path(m_cfg.outPath);
         std::error_code ec;
         if (path.has_parent_path()) std::filesystem::create_directories(path.parent_path(), ec);
-        m_csv = std::fopen(m_cfg.outPath.c_str(), "w");
-        if (m_csv == nullptr) {
-            LB_LOG_ERROR("cannot open %s for writing", m_cfg.outPath.c_str());
-            return false;
-        }
         KeyValues h;
         h.add("file", "micro.csv (docs/06 §12)");
         h.add("version", kVersion);
@@ -495,10 +542,70 @@ private:
         h.add("sysinfo.pcie_link", pcie);
         h.add("columns.extra", "copy_g2c_us,copy_c2g_us,gpu_write_us,gpu_read_us appended after the §12 columns "
                                "(DECISIONS #20); bw_* rows: rt_us = GPU copy time");
+
+        std::string interrupted;
+        if (m_cfg.resume && readFile(m_cfg.outPath, interrupted)) {
+            if (scanResumeCsv(interrupted, m_cfg.iterations, kBandwidthRows, m_resume)) return reopenCsv(h);
+            LB_LOG_WARN("--resume: %s has no complete header; starting the run over", m_cfg.outPath.c_str());
+        }
+        m_csv = std::fopen(m_cfg.outPath.c_str(), "w");
+        if (m_csv == nullptr) {
+            LB_LOG_ERROR("cannot open %s for writing", m_cfg.outPath.c_str());
+            return false;
+        }
         for (const auto& kv : h.items) std::fprintf(m_csv, "# %s: %s\n", kv.first.c_str(), kv.second.c_str());
         std::fputs("platform,path,submit,cpuwait,payload_bytes,iter,rt_us,g2c_us,c2g_us,cpu_read_us,cpu_write_us,"
                    "copy_g2c_us,copy_c2g_us,gpu_write_us,gpu_read_us\n",
                    m_csv);
+        return true;
+    }
+
+    // --resume (DECISIONS #28): keeps the header and the complete cells of the interrupted run
+    // and appends to them. Refuses when the run would continue under different conditions.
+    bool reopenCsv(const KeyValues& now) {
+        for (const auto& kv : now.items) {
+            // Per-process values; everything else describes the binary, the options and the machine.
+            if (kv.first == "cli" || kv.first == "start" || kv.first == "sysinfo.thermal_state_start") continue;
+            const std::string before = m_resume.headerValue(kv.first);
+            if (before == kv.second) continue;
+            if (kv.first == "sysinfo.pcie_link") {
+                LB_LOG_WARN("--resume: PCIe link was '%s', now '%s'", before.c_str(), kv.second.c_str());
+                continue;
+            }
+            LB_LOG_ERROR("--resume: %s was started with %s = '%s', now '%s'; not resumed", m_cfg.outPath.c_str(),
+                         kv.first.c_str(), before.c_str(), kv.second.c_str());
+            return false;
+        }
+
+        // Rewrite without the rows of the cell that was being written, then swap the file in.
+        const std::string tmp = m_cfg.outPath + ".tmp";
+        std::FILE* f = std::fopen(tmp.c_str(), "w");
+        if (f == nullptr) {
+            LB_LOG_ERROR("cannot open %s for writing", tmp.c_str());
+            return false;
+        }
+        for (const std::string& line : m_resume.kept) std::fprintf(f, "%s\n", line.c_str());
+        std::fprintf(f, "# resumed: %s, %llu complete cells kept, %u rows of an interrupted cell dropped\n",
+                     isoTimestampUtc().c_str(), static_cast<unsigned long long>(m_resume.cells.size()),
+                     m_resume.droppedRows);
+        const bool written = std::ferror(f) == 0;
+        const bool closed = std::fclose(f) == 0;
+        std::error_code ec;
+        if (written && closed) std::filesystem::rename(tmp, m_cfg.outPath, ec);
+        if (!written || !closed || ec) {
+            LB_LOG_ERROR("cannot rewrite %s for --resume", m_cfg.outPath.c_str());
+            return false;
+        }
+        m_csv = std::fopen(m_cfg.outPath.c_str(), "a");
+        if (m_csv == nullptr) {
+            LB_LOG_ERROR("cannot open %s for appending", m_cfg.outPath.c_str());
+            return false;
+        }
+        m_failures += m_resume.failures;
+        LB_LOG_INFO("resuming %s: %llu complete cells kept, %u rows of an interrupted cell dropped, "
+                    "%llu earlier verification/R7 failures",
+                    m_cfg.outPath.c_str(), static_cast<unsigned long long>(m_resume.cells.size()),
+                    m_resume.droppedRows, static_cast<unsigned long long>(m_resume.failures));
         return true;
     }
 
@@ -544,6 +651,7 @@ private:
             }
             std::printf("\n");
         }
+        std::fflush(stdout);  // keeps the table in front of the closing log line when both go to one file
     }
 
     Gfx& m_g;
@@ -558,6 +666,7 @@ private:
     u64 m_value = 0;
     u64 m_failures = 0;
     std::FILE* m_csv = nullptr;
+    ResumeScan m_resume;  // complete cells of the interrupted run (--resume); empty otherwise
     std::vector<Summary> m_summaries;
 };
 

@@ -26,6 +26,12 @@ TEST_CASE("CLAUDE.md sample command lines parse") {
     REQUIRE(parse({"--mode=microbench", "--out=results/micro.csv"}, o, err) == ParseStatus::Ok);
     CHECK(o.mode == Mode::Microbench);
     CHECK(o.out == "results/micro.csv");
+    CHECK_FALSE(o.resume);
+
+    o = Options{};
+    REQUIRE(parse({"--mode=microbench", "--resume", "--out=results/micro.csv"}, o, err) == ParseStatus::Ok);
+    CHECK(o.resume);
+    CHECK(parse({"--resume=on"}, o, err) == ParseStatus::Error);  // takes no value
 
     o = Options{};
     REQUIRE(parse({"--mode=bench", "--strategy=S2", "--k=2", "--agents=20000", "--seed=101",
