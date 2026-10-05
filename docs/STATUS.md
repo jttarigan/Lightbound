@@ -1,13 +1,15 @@
 # Work status (resume here)
 
-_Last updated 2026-10-02 (session 4)._
+_Last updated 2026-10-05 (session 5)._
 
-- **M0 — Scaffold:** accepted on Mac (Metal + MoltenVK). **[PC] checks deferred** (DECISIONS #16).
+- **M0 — Scaffold:** accepted on Mac (Metal + MoltenVK). **[PC] checks: ALL PASS** on the branch
+  `pc/m0-m1` (2026-10-02; one MSVC fix, DECISIONS #27 on that branch). M0 is fully closed once the branch is merged.
 - **M1 — Round-trip microbenchmark (GO/NO-GO gate):** implemented on both backends and verified
   on the Mac. **Not closed:** Mac AC re-run done (still fails run-to-run, see below); needs (2) PC runs on the 3060 Ti and the
   4060 Ti, (3) the human's go/no-go decision. Do not start M2 before that.
-- **PC session:** in progress on branch `pc/m0-m1` (see "PC session progress" below). The
-  environment check is done; the build, M0 checks and M1 runs have not started yet. On resume: fetch the
+- **PC session:** in progress on branch `pc/m0-m1` (see "PC session progress" below). M0 checks
+  pass. M1 runs have started, but the plan grew to **about 6 days of runs** because of the human's choice of the full `s2_rebar`
+  protocol. On resume: fetch the
   branch (command below), read its `docs/PC_PROGRESS.md`, report progress, and wait. Merge only when
   the human says so (section C).
 
@@ -23,24 +25,38 @@ git show origin/pc/m0-m1:docs/PC_PROGRESS.md
 ```
 (macOS has no GNU `timeout` command, so don't wrap git calls in it.)
 
-## PC session progress (as of 2026-10-02, branch head 1e91d25)
-Read from `origin/pc/m0-m1:docs/PC_PROGRESS.md`. So far the branch only adds that file; it has no
-code changes.
-- Done: clone into `C:\dev\Lightbound`, docs read, §1 environment check.
+## PC session progress (as of 2026-10-05, branch head 5faba40, last push 2026-10-02 11:01 +0700)
+Read from `origin/pc/m0-m1:docs/PC_PROGRESS.md`. The branch changes `src/core/Math.h` (MSVC fix)
+and `docs/DECISIONS.md` (#27), and adds `docs/PC_PROGRESS.md`.
 - PC rig: i7-12700F (12C/20T), 32 GB, OEM MSI board MS-B9241 (BIOS 8.00, 2022), Windows 11 Home
   10.0.26200, RTX 3060 Ti installed (driver 566.36). VS Build Tools 2022 17.14 (MSVC 19.44; CMake 3.31 + Ninja
   1.12 via `vcvars64.bat`), Python 3.13 with pandas/matplotlib/scipy.
-- Human decisions recorded there (2026-10-02):
-  1. Install Vulkan SDK 1.4.363.0 via winget. It was missing, which blocked the configure step and
-     the validation layer.
-  2. Power plan **Ultimate Performance** (the task file asks for "High performance"). This is a minor
-     deviation, and `sysinfo.power_plan` will show it.
-  3. NVIDIA "Prefer maximum performance" confirmed by the human.
-- Next on the PC: §2 M0 checks (MSVC `/W4 /WX` fixes, ctest, play smoke with validation, bench stub),
-  §3 M1 runs on the 3060 Ti, a GPU swap, the 4060 Ti runs, and §4 `docs/PC_REPORT.md` with gzipped results.
-- DECISIONS.md entries for the PC deviations (power plan, PCIe gen3, MSVC fixes) are left to the
-  PC branch, or to the merge if the PC doesn't write them. Main does not touch DECISIONS.md meanwhile,
-  so the appended entry numbers don't collide.
+- Human decisions (2026-10-02): Vulkan SDK 1.4.363.0 installed; power plan **Ultimate Performance**
+  (the task asks for "High performance"); NVIDIA "Prefer maximum performance"; background apps
+  closed; **`s2_rebar` at the full protocol** (≈ 23 h per run, see below); **ReBAR enabled in the BIOS**
+  for the primary `rebar-on` runs.
+- **§2 M0 [PC]: ALL PASS.** MSVC `/W4 /WX` build clean after one fix (`alignUp` overloads collided
+  because `size_t` == `uint64_t` on MSVC x64. They are now one `requires std::is_unsigned_v<T>` template, DECISIONS
+  #27. Both call sites pass same-typed args, so it also compiles on macOS clang). ctest 36/36 including
+  `microbench_smoke`. Play with validation: exit 0, layer enabled, no `ERROR [vk]`. The bench stub exits 2.
+  Microbench with validation: 0 failures, 0 errors, 0 warnings.
+- Facts from the validation run: ReBAR was **off** (BAR heap 214 MB); link **gen3 x16** under load;
+  raw copy 16 MiB d2h 12.4 / h2d 13.2 GB/s; **empty round trip p50 ≈ 76 µs with validation ON**
+  (g2c ≈ 45, c2g ≈ 31). The timing runs should come in lower. See finding #4.
+- **`s2_rebar` is very slow by design.** The CPU reads uncached BAR memory: ≈ 7.1 s per iteration at 16 MiB,
+  ≈ 23 h per protocol run, while all the other paths take ≈ 55 min per run (`s2_coherent` ≈ 49 min of it).
+- PC plan (from `PC_PROGRESS.md`): **A** 3060 Ti ReBAR off, 5 fast paths × 3 runs →
+  `results\m1_3060_rebar-off` (started 2026-10-02 10:13, ≈ 3 h). **B** human reboots to the BIOS to enable ReBAR.
+  **C** 3060 Ti ReBAR on, full protocol incl. `s2_rebar`, 3 runs → `results\m1_3060` (≈ 3 days).
+  **D** GPU swap to the 4060 Ti, same as C → `results\m1_4060` (≈ 3 days). **E** `PC_REPORT.md` + push.
+  Known gaps: no `s2_rebar` with ReBAR off, and no ReBAR-off runs on the 4060 Ti.
+  Risk: a Windows Update auto-restart during the multi-day runs (the human should pause updates).
+- **Nothing has been pushed since 2026-10-02 11:01** (before step A finished). From the Mac I can't tell whether
+  step C is running now (that fits the ≈ 3-day estimate) or the PC session stalled. Ask the human.
+  Earliest full PC results: ≈ 2026-10-08/09 if C started on 10-02 and D follows immediately.
+- The PCIe gen3 question (finding #5) still has **no recorded human decision** on the branch.
+- DECISIONS.md: the PC branch appended #27. Main still doesn't touch DECISIONS.md, so the numbers
+  don't collide at merge.
 
 ## M1 report (Mac side, preliminary)
 
@@ -115,7 +131,10 @@ Metal, chain/spin, round trip p50 / p99 (µs):
    faster than S1 (864 vs 1669 µs) — early support for H5's direction.
 4. The go criterion cannot be evaluated without PC data. If the RTX round trips land around
    50–150 µs (my expectation for timeline semaphores over PCIe — not measured), the M5 as measured here would **not** be
-   "clearly lower" → NO-GO by the letter of protocol §6. Options for the human (not implemented):
+   "clearly lower" → NO-GO by the letter of protocol §6. **Early PC evidence (2026-10-02,
+   validation ON, not a timing run): the 3060 Ti's empty round trip p50 ≈ 76 µs vs M5 ≈ 214 µs (AC).**
+   If the timing runs confirm this, M1 points to NO-GO on the protocol's criterion unless the human
+   takes one of the options below. Options for the human (not implemented):
    (a) re-run plugged in first; (b) add a "hot GPU" microbench variant where the GPU has independent
    work during the CPU step, as it does in the real frame (docs/05 §3 "GPU may run independent work");
    (c) report latency modes/p10 alongside p50; (d) add a memory-polling sync path (GPU spins on a
@@ -188,7 +207,7 @@ Paste back `results/m1_report/report.md` and any errors. Keep ReBAR-off runs in 
   `git@github.com:jttarigan/Lightbound.git` (Mac pushes with a deploy key over SSH). On 2026-10-01 SSH
   to github.com timed out from the Mac's network (ports 22 and 443). HTTPS fetch works (see the
   resume checklist), but pushing needs SSH. **Local `main` is ahead of `origin/main` (baf605a)** with
-  the session-3 and session-4 status commits, which are unpushed. Push with `git push origin main`
+  the session-3, 4 and 5 status commits, which are unpushed. Push with `git push origin main`
   when SSH works. The PC branch doesn't depend on them. The preliminary
   `results/m1_prelim` runs predate the repo (their CSVs say `nogit`).
 - Build dirs: `build/` (Metal), `build-vk/` (Vulkan via MoltenVK). Toolchain PATH:
