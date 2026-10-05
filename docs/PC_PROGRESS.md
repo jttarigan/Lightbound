@@ -16,8 +16,9 @@ _Last updated 2026-10-05 (session 2; session 1 was 2026-10-01/02)._
       `results\m1_3060_rebar-off_old-calibration`.
 - [x] Runs are **interruptible and resumable** (DECISIONS #28) — see "If the PC has to be switched off".
 - [x] Clock-drift fix (human decision 2026-10-05, DECISIONS #30).
-- [ ] §3 step A2 — **repeat step A with the fixed binary** (human decision 2026-10-05), ReBAR still
-      off → `results\m1_3060_rebar-off`, tag `rebar-off`, ≈ 2 h 40 min.
+- [x] §3 step A2 — step A repeated with the fixed binary `6962eff` (human decision 2026-10-05),
+      ReBAR off → `results\m1_3060_rebar-off`, tag `rebar-off` (done 2026-10-05, **these are the
+      ReBAR-off numbers to use**, see "Step A2 results").
 - [ ] §3 step B — human enables Resizable BAR in the BIOS (**still OFF on 2026-10-05**: probe says
       `sysinfo.rebar: off`, `bar_heap_mb: 214`).
 - [ ] §3 step C — RTX 3060 Ti, ReBAR on, full protocol incl. `s2_rebar` → `results\m1_3060`.
@@ -187,11 +188,41 @@ cell, block drift gone (2.1 → 0.2 µs for `empty`, 74 → 0 µs at 16 MiB), no
 Slow paths now give plausible splits (e.g. `s2_rebar` 4M at 1.75 s per iteration: g2c p50 64 µs,
 c2g p50 177 µs; c2g is ≈ 150–180 µs after second-long CPU phases, 30–35 µs on the fast paths).
 
+### Step A2 results (2026-10-05, 10:26–13:03) — RTX 3060 Ti, ReBAR off, fixed clock mapping
+
+- 3 runs, 3185 / 3078 / 3085 s; every log has `0 verification/R7 failures, 0 API errors`, exit 0,
+  no `ERROR`/`WARN` lines, no restarts. Binary `6962eff` (clean).
+- Header: `sysinfo.pcie_link: gen3 x16 (max gen3 x16)`, `power_plan: Ultimate Performance`,
+  `rebar: off`, `bar_heap_mb: 214`.
+- Background apps closed by the human before the start; still present at launch: MSI Center
+  services, `ms-teams`, `OneDrive.Sync.Service`, `Voicemod` (CPU load 2 %, GPU 0 %).
+- Round trip p50 / p99 (µs), chain/spin, 3 runs pooled:
+
+  | path | 0 | 4K | 64K | 256K | 1M | 4M | 16M |
+  |---|---:|---:|---:|---:|---:|---:|---:|
+  | empty | 60 / 99 | | | | | | |
+  | s2_direct | | 59 / 88 | 65 / 89 | 80 / 114 | 142 / 212 | 388 / 530 | 1392 / 1684 |
+  | s1_copy | | 74 / 120 | 90 / 129 | 131 / 178 | 312 / 408 | 1074 / 1298 | 3983 / 4583 |
+  | s2_hostcached | | 59 / 93 | 67 / 106 | 85 / 146 | 157 / 239 | 470 / 606 | 1806 / 2134 |
+  | s2_coherent | | 117 / 152 | 991 / 1168 | 3810 / 4296 | 15063 / 16251 | 60172 / 64126 | 239800 / 254593 |
+
+- g2c / c2g p50 (µs), chain/spin: empty 32.3 / 28.3; s2_direct 1 MiB 32.5 / 28.6, 16 MiB
+  45.2 / 32.5; s1_copy 1 MiB 116.3 / 114.8; s2_hostcached 1 MiB 30.9 / 29.8; s2_coherent 1 MiB
+  36.2 / 55.9, 16 MiB 59.2 / 82.5.
+- Empty round trip modes: g2c 30–35 µs (81 %); c2g 25–30 µs (48 %) and 35–40 µs (29 %).
+- Raw copy 16 MiB: d2h 12.55 GB/s, h2d 13.17 GB/s.
+- Run-to-run variation: **PASS** — 100 cells, none ≥ 10 %; worst 9.6 % (s2_direct perpass/spin
+  16M), worst in the primary condition 6.9 %.
+- Clock drift check: no trend of g2c/c2g inside the former calibration blocks, **0 of 100 cells
+  with a negative g2c sample** (26 of 100 in step A).
+- `rt` agrees with step A (old calibration, 2026-10-02) within a few percent in every primary
+  cell (e.g. empty 61 → 60, s2_direct 1 MiB 142 → 142, 16 MiB 1411 → 1392 µs).
+
 ### Revised plan
 | Step | What | Where | Est. |
 |---|---|---|---|
 | A (done) | 3060 Ti, ReBAR off, 5 fast paths, 3 runs, old calibration | `results\m1_3060_rebar-off_old-calibration` | took 2 h 37 min |
-| A2 | same as A with the fixed binary (`--micro-paths=empty,s1_copy,s2_direct,s2_hostcached,s2_coherent`) | `results\m1_3060_rebar-off` | ≈ 2 h 40 min |
+| A2 (done) | same as A with the fixed binary (`--micro-paths=empty,s1_copy,s2_direct,s2_hostcached,s2_coherent`) | `results\m1_3060_rebar-off` | took 2 h 37 min |
 | B | Human: reboot → BIOS → Above 4G Decoding + Re-Size BAR on → boot → close apps → new session "Continue docs/PC_CLAUDE_TASK.md" | — | — |
 | C | Verify ReBAR on (probe: `sysinfo.rebar: on`, `bar_heap_mb` > 256). 3060 Ti **full protocol incl. `s2_rebar`**, 3 runs | `results\m1_3060` tag `rebar-on` | ≈ 24 h/run → **≈ 3 days** |
 | D | GPU swap → 4060 Ti, same as C | `results\m1_4060` tag `rebar-on` | ≈ 3 days |
@@ -201,12 +232,11 @@ Not planned (gap to note in the report): `s2_rebar` with ReBAR off, and ReBAR-of
 Risk for the multi-day runs: Windows Update auto-restart — the human should pause updates.
 
 ## Next steps
-1. Step A2: human closes the background apps; start (or continue) the ReBAR-off series:
-   ```
-   python tools\run_microbench.py --exe build\lightbound.exe --out results\m1_3060_rebar-off --tag rebar-off --resume -- --micro-paths=empty,s1_copy,s2_direct,s2_hostcached,s2_coherent
-   ```
-   Then check logs and report, record the numbers here, gzip, commit, push.
-2. Human does step B (reboot into BIOS: Above 4G Decoding + Re-Size BAR on), pauses Windows
-   Update, closes the background apps.
-3. New session: run the probe (`sysinfo.rebar: on`, `bar_heap_mb` > 256), then start step C with
-   the detached `--resume` command above. Check the first cells, then leave it running.
+1. Human does step B (reboot into BIOS: Above 4G Decoding + Re-Size BAR on), pauses Windows
+   Update, closes the background apps (Teams and Voicemod from the tray as well).
+2. New session: run the probe (`sysinfo.rebar: on`, `bar_heap_mb` > 256), then start step C with
+   the detached `--resume` command above (binary `6962eff`; do not rebuild unless the source
+   changed). Check the first cells, then leave it running: ≈ 24 h per run, 3 runs.
+   A background waiter in Claude Code is stopped after 2 h, so check on request instead; note
+   that a directory listing shows a stale size for the CSV/log being written (open the file).
+3. After step C: check, record, gzip, commit, push; then ask for the GPU swap (step D).
