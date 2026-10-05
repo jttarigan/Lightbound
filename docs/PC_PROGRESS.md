@@ -242,6 +242,20 @@ Expected: run 1 done ≈ 2026-10-06 14:15, run 2 ≈ 10-07 14:00, run 3 and the 
 about one day before the Windows Update pause ends. If the series is interrupted and resumed
 later, extend the pause first.
 
+Early observation from run 1 (not a failure; to be confirmed by the three pooled runs): with
+ReBAR on, `s2_direct` and `empty` put the CPU→GPU buffer in ReBAR memory
+(`up=DeviceLocalHostVisible` instead of `HostVisibleCoherent`, as designed, DECISIONS #17), and
+the `s2_direct` round trip is slower than with ReBAR off from 64K up. Chain/spin rt p50, 4K … 16M:
+61 / 72 / 98 / 208 / 678 / 2506 µs, against 60 / 65 / 81 / 142 / 411 / 1428 µs in step A2 run 1.
+g2c and c2g are unchanged at 1 MiB (32 / 30 µs), so the extra time is presumably in the CPU write
+to, or the GPU read from, the ReBAR buffer (the `copy_c2g_us` / `gpu_read_us` columns will tell).
+`s1_copy` and `s2_hostcached` are close to A2 (1 MiB chain/spin 313 and 165 µs; A2 pooled 312 and
+157); the probe's `empty` chain/spin was 60 µs (A2: 60).
+
+Note: the first progress-log commit and push (≈ 14:36) fell into run 1's `s2_direct` chain/block
+cells, and the log was read several times during run 1's first three minutes. Runs 2 and 3 are
+undisturbed; the run-to-run check will show whether it mattered.
+
 ### Revised plan
 | Step | What | Where | Est. |
 |---|---|---|---|
