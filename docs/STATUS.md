@@ -8,6 +8,8 @@ _Last updated 2026-10-05 (session 5)._
   on the Mac. **Not closed:** Mac AC re-run done (still fails run-to-run, see below); needs (2) PC runs on the 3060 Ti at the full link
   (running) and at a **narrowed link** (`P-3060-narrow`, which replaces the 4060 Ti, finding 8), (3) the human's go/no-go decision. Do not start M2 before that. New evidence for that
   decision: the M5 sync probe, finding 7. A hot GPU gives a round trip ≈ 55 µs, stable, and polling isn't viable.
+- **Open human decisions:** go/no-go (the data so far says NO-GO by the letter, findings 4 and 7); whether to add
+  a hot-GPU microbench cell (finding 7); the PCIe gen3 link (finding 5); whether the repo should be public (finding 6).
 - **PC session:** in progress on branch `pc/m0-m1` (see "PC session progress" below). M0 checks
   pass. On 2026-10-05 the PC is re-running the ReBAR-off series (A2) after a clock-drift fix. The ReBAR-on full-link
   series (C, ≈ 3 days with full `s2_rebar`) and the narrowed-link series (D′, ≈ 3+ days) are still ahead. The PC needs the
@@ -24,8 +26,11 @@ GIT_TERMINAL_PROMPT=0 git -c credential.helper= fetch https://github.com/jttarig
     pc/m0-m1:refs/remotes/origin/pc/m0-m1
 git log --oneline main..origin/pc/m0-m1
 git show origin/pc/m0-m1:docs/PC_PROGRESS.md
+# Has the PC applied the narrow-link bundle (finding 8)?
+git merge-base --is-ancestor mac/narrow-link origin/pc/m0-m1 && echo "bundle merged on PC" || echo "bundle not merged yet"
 ```
-(macOS has no GNU `timeout` command, so don't wrap git calls in it.)
+(macOS has no GNU `timeout` command, so don't wrap git calls in it.) Always fetch before saying what the PC
+is doing. `PC_PROGRESS.md` on the branch is the only source; on 2026-10-05 a guess from the old plan turned out wrong.
 
 ## PC session progress (as of 2026-10-05, branch head 6962eff, pushed 2026-10-05 10:24 +0700)
 Read from `origin/pc/m0-m1:docs/PC_PROGRESS.md`. Since 5faba40 the PC has added three commits:
