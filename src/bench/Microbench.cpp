@@ -29,6 +29,9 @@ namespace {
 
 constexpr u64 kWaitTimeoutNs = 5'000'000'000ull;
 constexpr u32 kRecalibrateEvery = 500;
+// The GPU timestamp clock and the host clock drift apart (≈ 32 ppm on the RTX 3060 Ti PC), so a
+// clock mapping is only used for this long (DECISIONS #30).
+constexpr u64 kMaxCalibrationAgeNs = 20'000'000ull;
 constexpr u32 kBandwidthRows = 100;  // measured copies per bw_* direction
 constexpr f64 kNaN = std::numeric_limits<f64>::quiet_NaN();
 
@@ -328,12 +331,15 @@ private:
         std::vector<Row> rows(m_cfg.iterations);
         u64 cellFailures = 0;
         f64 worstCalibNs = 0.0;
+        u64 calibratedNs = 0;
+        const auto calibrate = [&] {
+            const ClockCalibration c = m_g.calibrateClocks();
+            if (c.valid) worstCalibNs = std::max(worstCalibNs, c.maxDeviationNs);
+            calibratedNs = nowNs();
+        };
 
         for (u32 it = 0; it < total; ++it) {
-            if (it % kRecalibrateEvery == 0) {
-                const ClockCalibration c = m_g.calibrateClocks();
-                if (c.valid) worstCalibNs = std::max(worstCalibNs, c.maxDeviationNs);
-            }
+            if (it % kRecalibrateEvery == 0 || nowNs() - calibratedNs > kMaxCalibrationAgeNs) calibrate();
             const u64 vGpu = ++m_value;   // GPU produced
             const u64 vCpu = ++m_value;   // CPU produced
             const u64 vEnd = ++m_value;   // GPU consumed
@@ -419,7 +425,14 @@ private:
             r.iter = it - m_cfg.warmup;
             r.rtUs = usBetween(ts[kTsWriteEnd], ts[kTsReadBegin]);
             r.g2cUs = usBetween(ts[kTsWriteEnd], tWake);
-            r.c2gUs = usBetween(tSignal, ts[kTsReadBegin]);
+            // g2c lies at the start of the iteration and c2g at its end: after a long iteration the
+            // mapping made before it is stale, so the consuming kernel's start is mapped again.
+            u64 readBegin = ts[kTsReadBegin];
+            if (nowNs() - calibratedNs > kMaxCalibrationAgeNs) {
+                calibrate();
+                m_g.readTimestamps(m_ts, kTsReadBegin, 1, &readBegin);
+            }
+            r.c2gUs = usBetween(tSignal, readBegin);
             r.cpuReadUs = usBetween(tWake, tRead);
             r.cpuWriteUs = usBetween(tRead, tSignal);
             r.gpuWriteUs = usBetween(ts[kTsWriteBegin], ts[kTsWriteEnd]);

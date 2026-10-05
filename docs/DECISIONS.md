@@ -177,3 +177,33 @@ Ambiguities resolved while building, per CLAUDE.md rule 4. Newest at the bottom.
     `microbench done` line. `micro_report.py` reads and writes UTF-8 explicitly: on Windows the
     default code page (cp1252) cannot encode "→", which left `report.md` empty after the first PC
     series.
+
+## 2026-10-05 — M1 clock mapping (human decision; amends #23)
+
+30. **The GPU→host clock mapping is refreshed by elapsed time, not only by iteration count.**
+    Finding (first PC series, RTX 3060 Ti, Vulkan calibrated timestamps, QPC): the GPU timestamp
+    clock and the host clock drift apart by ≈ 32 ppm, and the Vulkan mapping uses the nominal
+    `timestampPeriod`. With a recalibration only every 500 iterations (#23), `g2c` fell and `c2g`
+    rose linearly inside every calibration block by the same amount and jumped back at the next
+    recalibration. `rt` (GPU clock only) and `g2c + c2g` were not affected, but the split was:
+    ≈ 1 µs off for `empty`, ≈ 3 µs at 1 MiB, wrong at 16 MiB (`s2_direct` g2c p50 16 µs instead of
+    57 µs, 34 % of samples negative), milliseconds off for `s2_coherent`, and it would have been
+    ≈ 100 ms off for `s2_rebar` 16 MiB (7 s per iteration).
+    Change, in `Microbench::runCell` only (shared code, nothing inside a timed interval):
+    - before an iteration the clocks are recalibrated when `it % 500 == 0` (as before) **or** the
+      last calibration is older than 20 ms (`kMaxCalibrationAgeNs`; 20 ms × 32 ppm = 0.64 µs);
+    - `g2c` uses that mapping (the hand-off is at the start of the iteration); if the calibration
+      is older than 20 ms when the iteration ends (long CPU read/write), the clocks are calibrated
+      again and the consuming kernel's start timestamp is read again for `c2g` (the hand-off at
+      the end). `rt` is still computed from one mapping, i.e. purely on the GPU clock. For such
+      iterations `rt = g2c + cpu_read + cpu_write + c2g` no longer holds to the nanosecond.
+    Check on the PC (old schedule vs new, three interleaved process runs each, chain/spin):
+    `rt` p50 within ±1.3 % for every cell (run-to-run noise), block drift of g2c 2.1 → 0.2 µs
+    (`empty`) and 74 → 0 µs (16 MiB), no negative samples. Fast cells now recalibrate about every
+    130 iterations instead of 500; cells slower than 20 ms per iteration recalibrate every
+    iteration.
+    Metal: GPU timestamps and `sampleTimestamps` share mach_absolute_time and the backend already
+    fits a slope, so no drift is expected there and the Mac results should not move; to check any
+    CSV, compare the g2c median of the first and last 50 iterations of each block
+    (`(iter + warmup) % 500`). The first PC series (binary `6a2d02e`, kept as
+    `results/m1_3060_rebar-off_old-calibration`) has valid `rt` and biased g2c/c2g.

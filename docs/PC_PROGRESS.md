@@ -11,9 +11,13 @@ _Last updated 2026-10-05 (session 2; session 1 was 2026-10-01/02)._
 - [x] §0 Docs read (CLAUDE.md, STATUS.md, DECISIONS.md #11–#26, 07_MILESTONES.md, protocol §2/§6/§12).
 - [x] §1 Environment check done; human decisions taken; Vulkan SDK 1.4.363.0 installed.
 - [x] §2 M0 [PC] checks — **ALL PASS** (see "§2 M0 [PC] checks").
-- [x] §3 step A — RTX 3060 Ti, **ReBAR OFF**, 5 fast paths, 3 runs → `results\m1_3060_rebar-off`
-      (done 2026-10-02, numbers below; g2c/c2g carry the clock-drift caveat, see "Open question").
+- [x] §3 step A — RTX 3060 Ti, **ReBAR OFF**, 5 fast paths, 3 runs (done 2026-10-02 with binary
+      `6a2d02e`; `rt` valid, g2c/c2g biased by clock drift) → kept as
+      `results\m1_3060_rebar-off_old-calibration`.
 - [x] Runs are **interruptible and resumable** (DECISIONS #28) — see "If the PC has to be switched off".
+- [x] Clock-drift fix (human decision 2026-10-05, DECISIONS #30).
+- [ ] §3 step A2 — **repeat step A with the fixed binary** (human decision 2026-10-05), ReBAR still
+      off → `results\m1_3060_rebar-off`, tag `rebar-off`, ≈ 2 h 40 min.
 - [ ] §3 step B — human enables Resizable BAR in the BIOS (**still OFF on 2026-10-05**: probe says
       `sysinfo.rebar: off`, `bar_heap_mb: 214`).
 - [ ] §3 step C — RTX 3060 Ti, ReBAR on, full protocol incl. `s2_rebar` → `results\m1_3060`.
@@ -163,24 +167,31 @@ Session 1 ended a few minutes before the series finished; checked in session 2:
   16M), worst in the primary condition 8.4 %.
 - Run 1 had the background apps open for its first ≈ 10 minutes (closed by the human at 10:2x).
 
-### Open question (2026-10-05): GPU↔CPU clock drift between recalibrations
+### Finding (2026-10-05): GPU↔CPU clock drift between recalibrations — fixed (DECISIONS #30)
 
 Found while checking step A: `g2c` falls and `c2g` rises linearly inside every 500-iteration
 calibration block, by equal amounts, and jump back at each recalibration (iterations 300, 800,
 1300, 1800). The GPU timestamp clock and QPC drift apart by ≈ 32 ppm, and the microbench
-recalibrates by iteration count, not by elapsed time (DECISIONS #23). Consequences:
+recalibrated by iteration count, not by elapsed time (DECISIONS #23). Consequences in step A:
 - `rt` (GPU clock only) and the sum `g2c + c2g` are **not** affected.
 - The g2c/c2g split is off by half the drift accumulated over a block: ≈ 1 µs for `empty`,
-  ≈ 3 µs at 1 MiB (s2_direct: 32 → 26 µs across a block), tens of µs at 16 MiB (s2_direct 16M
-  g2c p50 reads 7 µs, ≈ 38 µs right after a calibration), milliseconds for `s2_coherent`
-  (16M: g2c p50 = −1.8 ms), and it would be ≈ 100 ms for `s2_rebar` 16M (7 s per iteration).
+  ≈ 3 µs at 1 MiB (s2_direct: 32 → 26 µs across a block), tens of µs at 16 MiB, milliseconds for
+  `s2_coherent` (16M: g2c p50 = −1.8 ms), and it would be ≈ 100 ms for `s2_rebar` 16M.
 - 26 of 100 cells have negative g2c samples.
-A fix changes how g2c/c2g are computed, so it needs the human's decision (asked 2026-10-05).
+
+**Human decisions (2026-10-05):** (1) fix it now; (2) repeat the ReBAR-off series with the fixed
+binary before the BIOS change. Fix: the mapping is refreshed when older than 20 ms, and c2g of a
+long iteration uses a calibration taken at its end. Checked against the old schedule with three
+interleaved runs each (background apps open, so indicative): `rt` p50 within ±1.3 % in every
+cell, block drift gone (2.1 → 0.2 µs for `empty`, 74 → 0 µs at 16 MiB), no negative samples.
+Slow paths now give plausible splits (e.g. `s2_rebar` 4M at 1.75 s per iteration: g2c p50 64 µs,
+c2g p50 177 µs; c2g is ≈ 150–180 µs after second-long CPU phases, 30–35 µs on the fast paths).
 
 ### Revised plan
 | Step | What | Where | Est. |
 |---|---|---|---|
-| A (done) | 3060 Ti, ReBAR off, 5 fast paths, 3 runs | `results\m1_3060_rebar-off` | took 2 h 37 min |
+| A (done) | 3060 Ti, ReBAR off, 5 fast paths, 3 runs, old calibration | `results\m1_3060_rebar-off_old-calibration` | took 2 h 37 min |
+| A2 | same as A with the fixed binary (`--micro-paths=empty,s1_copy,s2_direct,s2_hostcached,s2_coherent`) | `results\m1_3060_rebar-off` | ≈ 2 h 40 min |
 | B | Human: reboot → BIOS → Above 4G Decoding + Re-Size BAR on → boot → close apps → new session "Continue docs/PC_CLAUDE_TASK.md" | — | — |
 | C | Verify ReBAR on (probe: `sysinfo.rebar: on`, `bar_heap_mb` > 256). 3060 Ti **full protocol incl. `s2_rebar`**, 3 runs | `results\m1_3060` tag `rebar-on` | ≈ 24 h/run → **≈ 3 days** |
 | D | GPU swap → 4060 Ti, same as C | `results\m1_4060` tag `rebar-on` | ≈ 3 days |
@@ -190,7 +201,11 @@ Not planned (gap to note in the report): `s2_rebar` with ReBAR off, and ReBAR-of
 Risk for the multi-day runs: Windows Update auto-restart — the human should pause updates.
 
 ## Next steps
-1. Human decides the clock-drift question (see "Open question").
+1. Step A2: human closes the background apps; start (or continue) the ReBAR-off series:
+   ```
+   python tools\run_microbench.py --exe build\lightbound.exe --out results\m1_3060_rebar-off --tag rebar-off --resume -- --micro-paths=empty,s1_copy,s2_direct,s2_hostcached,s2_coherent
+   ```
+   Then check logs and report, record the numbers here, gzip, commit, push.
 2. Human does step B (reboot into BIOS: Above 4G Decoding + Re-Size BAR on), pauses Windows
    Update, closes the background apps.
 3. New session: run the probe (`sysinfo.rebar: on`, `bar_heap_mb` > 256), then start step C with
