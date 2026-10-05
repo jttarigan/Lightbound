@@ -6,7 +6,8 @@ _Last updated 2026-10-05 (session 5)._
   `pc/m0-m1` (2026-10-02; one MSVC fix, DECISIONS #27 on that branch). M0 is fully closed once the branch is merged.
 - **M1 — Round-trip microbenchmark (GO/NO-GO gate):** implemented on both backends and verified
   on the Mac. **Not closed:** Mac AC re-run done (still fails run-to-run, see below); needs (2) PC runs on the 3060 Ti and the
-  4060 Ti, (3) the human's go/no-go decision. Do not start M2 before that.
+  4060 Ti, (3) the human's go/no-go decision. Do not start M2 before that. New evidence for that
+  decision: the M5 sync probe, finding 7. A hot GPU gives a round trip ≈ 55 µs, stable, and polling isn't viable.
 - **PC session:** in progress on branch `pc/m0-m1` (see "PC session progress" below). M0 checks
   pass. M1 runs have started, but the plan grew to **about 6 days of runs** because of the human's choice of the full `s2_rebar`
   protocol. On resume: fetch the
@@ -55,6 +56,9 @@ and `docs/DECISIONS.md` (#27), and adds `docs/PC_PROGRESS.md`.
   step C is running now (that fits the ≈ 3-day estimate) or the PC session stalled. Ask the human.
   Earliest full PC results: ≈ 2026-10-08/09 if C started on 10-02 and D follows immediately.
 - The PCIe gen3 question (finding #5) still has **no recorded human decision** on the branch.
+- **Merge rehearsal (2026-10-05):** a trial merge of `origin/pc/m0-m1` (5faba40) into `main` in a scratch worktree
+  was clean (no conflicts). The merged tree builds with 0 warnings and passes ctest 36/36 on both Metal and MoltenVK.
+  The real merge (section C) should therefore need no code fixes on the Mac side.
 - DECISIONS.md: the PC branch appended #27. Main still doesn't touch DECISIONS.md, so the numbers
   don't collide at merge.
 
@@ -123,7 +127,7 @@ Metal, chain/spin, round trip p50 / p99 (µs):
    `setSignaledValue` itself takes 1–2 µs, so the time is spent in the driver/GPU resume path. Thread
    QoS makes no difference. Putting both segments in one command buffer makes no difference. A
    concurrent process doing event round trips pulled c2g to ≈ 50 µs (observed accidentally), a
-   same-process GPU compute load did not. This is consistent with GPU idle-state exit latency under
+   same-process GPU compute load did not (**superseded by finding 7:** sustained load on a second queue does bring c2g to ≈ 31 µs; how the earlier test differed was not recorded). This is consistent with GPU idle-state exit latency under
    power management; battery power + thermal "fair" (later runs) may make it worse.
 2. **Run-to-run acceptance (< 10 %) fails** on battery: per-run p50s jump between ≈ 195, ≈ 270 and
    ≈ 450 µs plateaus (the 45/155/235 c2g levels). Block-wait cells are more stable than spin.
@@ -139,6 +143,8 @@ Metal, chain/spin, round trip p50 / p99 (µs):
    work during the CPU step, as it does in the real frame (docs/05 §3 "GPU may run independent work");
    (c) report latency modes/p10 alongside p50; (d) add a memory-polling sync path (GPU spins on a
    Shared-memory flag) as an alternative to `MTLSharedEvent` — a spec change, needs approval.
+   **Update 2026-10-05 (finding 7): (b) is strongly supported by a probe (hot GPU → M5 round trip
+   ≈ 53–57 µs, run-to-run within 2 %); (d) does not work on M5 (the GPU never sees the CPU's write).**
 5. **Open: the PC's PCIe link is gen3, not gen4.** Protocol §2 specifies P-3060 = PCIe 4.0 x16 and
    P-4060 = PCIe 4.0 x8. On the PC, nvidia-smi reports `pcie.link.gen.max` = 3 and `width.max` = 16,
    so the platform caps the link at gen3. Expected links: 3060 Ti at gen3 x16 (≈ 15.8 GB/s theoretical,
@@ -152,6 +158,41 @@ Metal, chain/spin, round trip p50 / p99 (µs):
    human decision at go/no-go (CLAUDE.md rule 5).
 6. `docs/PC_CLAUDE_TASK.md` calls the GitHub repo private, but it is public (confirmed from the Mac
    and the PC). The human decides whether that's intended.
+7. **M5 sync probe (2026-10-05): the slow c2g is a GPU power-state effect, and polling cannot
+   replace the event.** `tools/probes/sync_probe.cpp` is a standalone metal-cpp program, not part of the build or the
+   research pipeline. It uses the same timing definitions as the microbench (empty payload, chain, CPU spin).
+   Variants are interleaved in rotating blocks, 10 rounds × 300 iterations per variant, 3 processes, AC
+   power, no thermal warning. Data: `results/probe_sync_2026-10-05/` (local). Round trip p50 per process run (µs):
+
+   | variant | what runs alongside | rt p50 runs 1/2/3 | rt p99 | g2c p50 | c2g p50 |
+   |---|---|---|---|---|---|
+   | idle | nothing (= microbench) | 170 / 67 / 67 | ≈ 220 | 31 | 37–111 |
+   | busy | 2nd queue: small ALU kernel back to back | 54 / 54 / 53 | ≈ 85 | 23 | 31 |
+   | heavy | 2nd queue: whole-GPU kernels back to back | 57 / 57 / 57 | ≈ 102 | 25 | 32 |
+   | half | busy kernel at ≈ 50 % duty | 61 / 61 / 60 | ≈ 209 | 25 | 32 |
+   | light | tiny kernel every ≈ 200 µs | 72 / 71 / 71 | ≈ 200 | 33 | 39 |
+   | pingpong | 2nd thread doing event round trips | 68 / 67 / 68 | ≈ 215 | 33 | 35 |
+
+   - With sustained GPU load the hand-off is fast and stable: c2g ≈ 31 µs at 100 % of iterations, round trip
+     ≈ 53–57 µs, and run-to-run within 2 %. Even a load that fills the whole GPU adds only ≈ 3 µs. So the
+     45/155/235 µs c2g levels come from the GPU's power state, not the event mechanism.
+   - "Idle" is bimodal per block (≈ 62–67 or ≈ 196 µs). It is slow at every process start (round 0) and in some
+     later blocks. Here it is fast more often than in the microbench, probably because the neighbouring
+     load blocks keep the GPU clocked up (hysteresis). That is why idle must be measured in isolation, as M1 does.
+   - **Memory polling does not work:** a kernel spinning on a Shared-buffer flag never saw the CPU's
+     store (atomic load or atomic RMW). It hit the 20 ms bound in 298 of 300 iterations, and a GPU flag write
+     reached the CPU only when its command buffer completed. This fits Metal's coherence model (Shared
+     memory is coherent at command-buffer boundaries). Option (d) is not viable on M5.
+   - Also seen: an `encodeSignalEvent` in the middle of a command buffer reached the CPU only when the whole
+     command buffer finished, not when the preceding encoder did. Producer and consumer need separate command buffers
+     (the microbench already does this).
+   - **What it means for go/no-go:** the microbench as specified measures the M5 with a cold GPU. A real frame keeps
+     the GPU busy (render passes, vsync off), so the hot regime is the realistic one for the game. Hot M5 ≈ 55 µs is
+     about the same as the 3060 Ti's ≈ 76 µs *with validation on*. The PC's timing runs (no validation) will decide whether
+     the M5 is "clearly lower", and that looks like a close call, not a clear win. A fair hot-GPU condition would also have
+     to run on the RTX cards (R1: same algorithm on both backends). The 3060 Ti may also speed up when hot, although
+     "Prefer maximum performance" already holds its clocks. Adding a hot-GPU cell to `--mode=microbench` is a
+     protocol change and needs the human's approval.
 
 ### Deviations from spec
 Recorded in `docs/DECISIONS.md` #17–#26 (ReBAR read policy, binding convention, headless microbench,
