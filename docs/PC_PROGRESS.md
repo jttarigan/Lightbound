@@ -3,7 +3,8 @@
 Claude Code session log for `docs/PC_CLAUDE_TASK.md` on the Windows 11 PC. Newest entry at the
 bottom of each section. Clone: `C:\dev\Lightbound`, branch `pc/m0-m1`.
 
-_Last updated 2026-10-05 (session 2; session 1 was 2026-10-01/02)._
+_Last updated 2026-10-05 14:40 (session 3: step C started; session 2 was earlier the same day,
+session 1 was 2026-10-01/02)._
 
 ## Where we are
 
@@ -19,9 +20,11 @@ _Last updated 2026-10-05 (session 2; session 1 was 2026-10-01/02)._
 - [x] §3 step A2 — step A repeated with the fixed binary `6962eff` (human decision 2026-10-05),
       ReBAR off → `results\m1_3060_rebar-off`, tag `rebar-off` (done 2026-10-05, **these are the
       ReBAR-off numbers to use**, see "Step A2 results").
-- [ ] §3 step B — human enables Resizable BAR in the BIOS (**still OFF on 2026-10-05**: probe says
-      `sysinfo.rebar: off`, `bar_heap_mb: 214`).
-- [ ] §3 step C — RTX 3060 Ti, ReBAR on, full protocol incl. `s2_rebar` → `results\m1_3060`.
+- [x] §3 step B — human enabled Resizable BAR in the BIOS (2026-10-05; probe says
+      `sysinfo.rebar: on`, `bar_heap_mb: 8024`).
+- [ ] §3 step C — RTX 3060 Ti, ReBAR on, full protocol incl. `s2_rebar` → `results\m1_3060`
+      (**RUNNING since 2026-10-05 14:34**, expected to finish 2026-10-08 early afternoon; see
+      "Step C").
 - [ ] §3 step D — card 2: RTX 4060 Ti (after swap) → `results\m1_4060`.
 - [ ] §4 Report (`docs/PC_REPORT.md`), gzipped results, push.
 
@@ -218,13 +221,34 @@ c2g p50 177 µs; c2g is ≈ 150–180 µs after second-long CPU phases, 30–35 
 - `rt` agrees with step A (old calibration, 2026-10-02) within a few percent in every primary
   cell (e.g. empty 61 → 60, s2_direct 1 MiB 142 → 142, 16 MiB 1411 → 1392 µs).
 
+### Step C (started 2026-10-05 14:34) — RTX 3060 Ti, ReBAR on, full protocol — RUNNING
+
+Checks before the start (session 3, right after the BIOS change; boot at 14:27):
+- Probe: `sysinfo.rebar: on`, `bar_heap_mb: 8024` (was `off` / 214), `pcie_link: gen3 x16 (max
+  gen3 x16)`, `power_plan: Ultimate Performance`, driver 566.36, binary `6962eff` (not rebuilt).
+- `s2_rebar` works with ReBAR on: a 4 + 1 iteration pass over all payloads and modes took 187 s,
+  `0 verification/R7 failures, 0 API errors`. Per iteration p50 is the same as with ReBAR off:
+  1.7 ms (4K), 27 ms (64K), 108 ms (256K), 0.44 s (1M), 1.75 s (4M), 7.0 s (16M) → ≈ 22.8 h per
+  run for this path, ≈ 23.7 h per run in total.
+- Windows Update paused until 2026-10-09 14:20 local time, no reboot pending; sleep and hibernate
+  "never" on AC; 493 GB free; CPU load 0–3 %, GPU 1 %; no `lightbound.exe` running.
+- Still present at launch (same as step A2): MSI Center services, `ms-teams`,
+  `OneDrive.Sync.Service`, `Voicemod` — all idle in a 10 s sample.
+
+Launched detached at 14:34:45 with the `--resume` command above (tag `rebar-on`). First 15 cells
+of run 1 agree with step A2 (`s1_copy` chain/spin 1 MiB 313 µs, 16 MiB 4067 µs; A2: 312 / 3983),
+no `ERROR`/`WARN` lines; CSV header: 2000 + 200 iterations, `rebar: on`, `6962eff`.
+Expected: run 1 done ≈ 2026-10-06 14:15, run 2 ≈ 10-07 14:00, run 3 and the report ≈ 10-08 13:45,
+about one day before the Windows Update pause ends. If the series is interrupted and resumed
+later, extend the pause first.
+
 ### Revised plan
 | Step | What | Where | Est. |
 |---|---|---|---|
 | A (done) | 3060 Ti, ReBAR off, 5 fast paths, 3 runs, old calibration | `results\m1_3060_rebar-off_old-calibration` | took 2 h 37 min |
 | A2 (done) | same as A with the fixed binary (`--micro-paths=empty,s1_copy,s2_direct,s2_hostcached,s2_coherent`) | `results\m1_3060_rebar-off` | took 2 h 37 min |
-| B | Human: reboot → BIOS → Above 4G Decoding + Re-Size BAR on → boot → close apps → new session "Continue docs/PC_CLAUDE_TASK.md" | — | — |
-| C | Verify ReBAR on (probe: `sysinfo.rebar: on`, `bar_heap_mb` > 256). 3060 Ti **full protocol incl. `s2_rebar`**, 3 runs | `results\m1_3060` tag `rebar-on` | ≈ 24 h/run → **≈ 3 days** |
+| B (done) | Human: reboot → BIOS → Above 4G Decoding + Re-Size BAR on → boot → close apps → new session "Continue docs/PC_CLAUDE_TASK.md" | — | — |
+| C (running) | Verify ReBAR on (probe: `sysinfo.rebar: on`, `bar_heap_mb` > 256). 3060 Ti **full protocol incl. `s2_rebar`**, 3 runs | `results\m1_3060` tag `rebar-on` | ≈ 24 h/run → **≈ 3 days** |
 | D | GPU swap → 4060 Ti, same as C | `results\m1_4060` tag `rebar-on` | ≈ 3 days |
 | E | §4 reports + push | `results\m1_pc_report` (+ `m1_3060_rebar-off` separately) | — |
 
@@ -232,11 +256,11 @@ Not planned (gap to note in the report): `s2_rebar` with ReBAR off, and ReBAR-of
 Risk for the multi-day runs: Windows Update auto-restart — the human should pause updates.
 
 ## Next steps
-1. Human does step B (reboot into BIOS: Above 4G Decoding + Re-Size BAR on), pauses Windows
-   Update, closes the background apps (Teams and Voicemod from the tray as well).
-2. New session: run the probe (`sysinfo.rebar: on`, `bar_heap_mb` > 256), then start step C with
-   the detached `--resume` command above (binary `6962eff`; do not rebuild unless the source
-   changed). Check the first cells, then leave it running: ≈ 24 h per run, 3 runs.
+1. Step C is running (started 2026-10-05 14:34, ≈ 24 h per run, 3 runs). Leave the PC alone:
+   do not rebuild, do not start other GPU/CPU work. Progress: `results\m1_3060\run_microbench.out`
+   (series) and `_running_run<i>.log` (cells of the current run).
    A background waiter in Claude Code is stopped after 2 h, so check on request instead; note
    that a directory listing shows a stale size for the CSV/log being written (open the file).
-3. After step C: check, record, gzip, commit, push; then ask for the GPU swap (step D).
+   If it was interrupted: follow "If the PC has to be switched off" (same command, `--resume`).
+2. After step C: check, record, gzip, commit, push; then ask for the GPU swap (step D).
+   Step D needs the Windows Update pause extended again (it ends 2026-10-09 14:20).
