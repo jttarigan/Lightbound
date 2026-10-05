@@ -5,12 +5,13 @@ _Last updated 2026-10-05 (session 5)._
 - **M0 — Scaffold:** accepted on Mac (Metal + MoltenVK). **[PC] checks: ALL PASS** on the branch
   `pc/m0-m1` (2026-10-02; one MSVC fix, DECISIONS #27 on that branch). M0 is fully closed once the branch is merged.
 - **M1 — Round-trip microbenchmark (GO/NO-GO gate):** implemented on both backends and verified
-  on the Mac. **Not closed:** Mac AC re-run done (still fails run-to-run, see below); needs (2) PC runs on the 3060 Ti and the
-  4060 Ti, (3) the human's go/no-go decision. Do not start M2 before that. New evidence for that
+  on the Mac. **Not closed:** Mac AC re-run done (still fails run-to-run, see below); needs (2) PC runs on the 3060 Ti at the full link
+  (running) and at a **narrowed link** (`P-3060-narrow`, which replaces the 4060 Ti, finding 8), (3) the human's go/no-go decision. Do not start M2 before that. New evidence for that
   decision: the M5 sync probe, finding 7. A hot GPU gives a round trip ≈ 55 µs, stable, and polling isn't viable.
 - **PC session:** in progress on branch `pc/m0-m1` (see "PC session progress" below). M0 checks
-  pass. M1 runs have started, but the plan grew to **about 6 days of runs** because of the human's choice of the full `s2_rebar`
-  protocol. On resume: fetch the
+  pass. On 2026-10-05 the PC is re-running the ReBAR-off series (A2) after a clock-drift fix. The ReBAR-on full-link
+  series (C, ≈ 3 days with full `s2_rebar`) and the narrowed-link series (D′, ≈ 3+ days) are still ahead. The PC needs the
+  bundle `~/Desktop/lightbound-narrow-link-2026-10-05.bundle` (finding 8) before C. On resume: fetch the
   branch (command below), read its `docs/PC_PROGRESS.md`, report progress, and wait. Merge only when
   the human says so (section C).
 
@@ -26,7 +27,33 @@ git show origin/pc/m0-m1:docs/PC_PROGRESS.md
 ```
 (macOS has no GNU `timeout` command, so don't wrap git calls in it.)
 
-## PC session progress (as of 2026-10-05, branch head 5faba40, last push 2026-10-02 11:01 +0700)
+## PC session progress (as of 2026-10-05, branch head 6962eff, pushed 2026-10-05 10:24 +0700)
+Read from `origin/pc/m0-m1:docs/PC_PROGRESS.md`. Since 5faba40 the PC has added three commits:
+- **#28 Resumable microbench runs** (human request: one full run takes ≈ a day). `lightbound --resume` and
+  `run_microbench.py --resume` resume at **cell** boundaries. The run refuses to continue if the binary, options, tag or any
+  `sysinfo.*` value differs (the PCIe link only gives a warning), and each restart writes a `# resumed:` line in the CSV.
+  The runner keeps unfinished runs as `_running_run<i>.csv`. (This is what "resume from iteration 40000" was about.)
+- **#29** The runner streams lightbound's output to the log, and `micro_report.py` writes UTF-8 (on Windows the
+  first `report.md` came out empty because of the "→" character).
+- **#30 Clock-mapping fix (human decision, amends #23).** On the 3060 Ti the GPU timestamp clock and QPC drift
+  ≈ 32 ppm apart. With recalibration only every 500 iterations, g2c fell and c2g rose linearly inside each block.
+  `rt` and `g2c + c2g` were unaffected, but the split was biased: ≈ 1 µs for empty, ≈ 3 µs at 1 MiB, badly at 16 MiB, and
+  milliseconds for `s2_coherent`. Now the clocks are recalibrated whenever the last calibration is older than 20 ms, and a
+  long iteration gets a fresh calibration for c2g. `rt` p50 moved by at most ±1.3 % (noise). The first series is kept as
+  `results/m1_3060_rebar-off_old-calibration` (valid `rt`, biased split).
+  **Mac check (2026-10-05):** `results/m1_mac_ac` shows no such drift. The g2c median of the first vs last 50
+  iterations of each 500-iteration block differs by +0.0 µs on average (|Δ| median 0.8 µs, mixed sign), with 0 negative g2c samples
+  in 156 cells. Metal's shared mach clock plus the fitted slope already avoid it, so the Mac data stands.
+- **Step A results (3060 Ti, ReBAR off, gen3 x16, old calibration: `rt` valid), round trip p50 / p99 µs, chain/spin:**
+  empty **61 / 109**; s2_direct 4K 61, 64K 67, 256K 82, **1M 142**, 4M 408, 16M 1411; s1_copy 1M 314, 16M 4014;
+  s2_hostcached 1M 157; s2_coherent 1M 15085. Raw copy 16 MiB d2h 12.3 / h2d 13.2 GB/s. **Run-to-run: PASS**
+  (100 cells, worst 9.3 %; worst primary-condition cell 8.4 %).
+- **Current PC plan:** A2 = A again with the fixed binary (running on 2026-10-05, ≈ 2 h 40 min) → B: human enables ReBAR
+  in the BIOS → C: 3060 Ti full link, ReBAR on, full protocol incl. `s2_rebar`, 3 runs (≈ 3 days, resumable) →
+  ~~D: 4060 Ti~~ **D′: narrowed link** (finding 8) → E: report + push.
+- DECISIONS.md on the PC branch now goes up to #30.
+
+### Earlier PC notes (2026-10-02)
 Read from `origin/pc/m0-m1:docs/PC_PROGRESS.md`. The branch changes `src/core/Math.h` (MSVC fix)
 and `docs/DECISIONS.md` (#27), and adds `docs/PC_PROGRESS.md`.
 - PC rig: i7-12700F (12C/20T), 32 GB, OEM MSI board MS-B9241 (BIOS 8.00, 2022), Windows 11 Home
@@ -46,21 +73,15 @@ and `docs/DECISIONS.md` (#27), and adds `docs/PC_PROGRESS.md`.
   (g2c ≈ 45, c2g ≈ 31). The timing runs should come in lower. See finding #4.
 - **`s2_rebar` is very slow by design.** The CPU reads uncached BAR memory: ≈ 7.1 s per iteration at 16 MiB,
   ≈ 23 h per protocol run, while all the other paths take ≈ 55 min per run (`s2_coherent` ≈ 49 min of it).
-- PC plan (from `PC_PROGRESS.md`): **A** 3060 Ti ReBAR off, 5 fast paths × 3 runs →
-  `results\m1_3060_rebar-off` (started 2026-10-02 10:13, ≈ 3 h). **B** human reboots to the BIOS to enable ReBAR.
-  **C** 3060 Ti ReBAR on, full protocol incl. `s2_rebar`, 3 runs → `results\m1_3060` (≈ 3 days).
-  **D** GPU swap to the 4060 Ti, same as C → `results\m1_4060` (≈ 3 days). **E** `PC_REPORT.md` + push.
-  Known gaps: no `s2_rebar` with ReBAR off, and no ReBAR-off runs on the 4060 Ti.
-  Risk: a Windows Update auto-restart during the multi-day runs (the human should pause updates).
-- **Nothing has been pushed since 2026-10-02 11:01** (before step A finished). From the Mac I can't tell whether
-  step C is running now (that fits the ≈ 3-day estimate) or the PC session stalled. Ask the human.
-  Earliest full PC results: ≈ 2026-10-08/09 if C started on 10-02 and D follows immediately.
+- The 2026-10-02 plan (A → B → C → D: 4060 Ti → E) is superseded by the current plan above. Risk for the multi-day
+  runs: a Windows Update auto-restart (the human should pause updates). Since #28 an interrupted run can be resumed.
 - The PCIe gen3 question (finding #5) still has **no recorded human decision** on the branch.
-- **Merge rehearsal (2026-10-05):** a trial merge of `origin/pc/m0-m1` (5faba40) into `main` in a scratch worktree
-  was clean (no conflicts). The merged tree builds with 0 warnings and passes ctest 36/36 on both Metal and MoltenVK.
-  The real merge (section C) should therefore need no code fixes on the Mac side.
-- DECISIONS.md: the PC branch appended #27. Main still doesn't touch DECISIONS.md, so the numbers
-  don't collide at merge.
+- **Merge rehearsal (2026-10-05):** a trial merge of `origin/pc/m0-m1` at 5faba40 into `main` was clean, and
+  ctest passed 36/36 on Metal and MoltenVK. The PC has since changed `src/bench`, `src/app` and the tools (#28–#30). The
+  branch `mac/narrow-link` (PC head + the `--platform` commit) builds and passes ctest 38/38 on both Mac backends,
+  so the PC's new code compiles and passes on macOS too. `main` has touched only docs and `tools/probes` since, so
+  the final merge should stay simple.
+- DECISIONS.md: see the current section above (the PC is at #30).
 
 ## M1 report (Mac side, preliminary)
 
@@ -135,10 +156,12 @@ Metal, chain/spin, round trip p50 / p99 (µs):
    faster than S1 (864 vs 1669 µs) — early support for H5's direction.
 4. The go criterion cannot be evaluated without PC data. If the RTX round trips land around
    50–150 µs (my expectation for timeline semaphores over PCIe — not measured), the M5 as measured here would **not** be
-   "clearly lower" → NO-GO by the letter of protocol §6. **Early PC evidence (2026-10-02,
-   validation ON, not a timing run): the 3060 Ti's empty round trip p50 ≈ 76 µs vs M5 ≈ 214 µs (AC).**
-   If the timing runs confirm this, M1 points to NO-GO on the protocol's criterion unless the human
-   takes one of the options below. Options for the human (not implemented):
+   "clearly lower" → NO-GO by the letter of protocol §6. **PC timing data (2026-10-05, 3060 Ti,
+   ReBAR off, step A): empty round trip p50 61 µs vs M5 214 µs (AC); 1 MiB s2_direct 142 µs vs M5 305 µs.**
+   As specified (cold GPU), the M5 is clearly *slower* on both criterion cells, so M1 is **NO-GO by the letter of
+   protocol §6** unless the human takes one of the options below. With a hot GPU (finding 7), the M5's empty round trip is
+   ≈ 53–57 µs vs 61 µs, about 10 % lower and probably not beyond run-to-run noise. The hot 1 MiB case is
+   unmeasured, because the probe ran the empty payload only. Options for the human (not implemented):
    (a) re-run plugged in first; (b) add a "hot GPU" microbench variant where the GPU has independent
    work during the CPU step, as it does in the real frame (docs/05 §3 "GPU may run independent work");
    (c) report latency modes/p10 alongside p50; (d) add a memory-polling sync path (GPU spins on a
@@ -193,6 +216,31 @@ Metal, chain/spin, round trip p50 / p99 (µs):
      to run on the RTX cards (R1: same algorithm on both backends). The 3060 Ti may also speed up when hot, although
      "Prefer maximum performance" already holds its clocks. Adding a hot-GPU cell to `--mode=microbench` is a
      protocol change and needs the human's approval.
+8. **No RTX 4060 Ti (2026-10-05).** The human has only the 3060 Ti. P-4060 (protocol §2) exists to give
+   H5 an x8 link ("on PCIe the S1–S2 gap depends on link width (x16 vs x8)"). **Human decision
+   2026-10-05: replace P-4060 with the 3060 Ti at a narrowed link**, platform id `P-3060-narrow`. Same GPU,
+   so only the link changes. The order of preference for narrowing (feasibility check on the PC, with the human)
+   is: a CPU-attached x8 slot (gen3 x8), then the BIOS forcing Gen2 on the primary slot (gen2 x16 ≈ gen3 x8 bandwidth, slightly
+   different per-transfer latency), then a chipset x4 slot only with the human's explicit OK (it adds a hop). If none
+   works, the fallback is to drop P-4060. PC instructions: `docs/PC_TASK_NARROW_LINK.md`.
+   - Spec text this changes (not edited; recorded here and in DECISIONS at merge): CLAUDE.md "RTX 4060 Ti x8",
+     protocol §2 P-4060 row, M1 acceptance "[PC with 4060 Ti]", and go criterion "both RTX cards", which now means
+     both PCIe conditions (P-3060, P-3060-narrow). H5's link-width part is tested as link *bandwidth* on one card.
+   - **Tooling lives on local branch `mac/narrow-link`** (ec93327 = PC head 6962eff + one commit), not on `main`, so that
+     the PC can fast-forward and `main` picks it up with the eventual merge of `pc/m0-m1`. It adds a new dev flag
+     `--platform=ID` that overrides the detected platform id in CSV rows, in `sysinfo.platform` (the header keeps the
+     detected id as `sysinfo.platform_detected`) and in the run script's file names. The flag is part of the options
+     that `--resume` compares: tested that the same value resumes, and a different or missing value is refused.
+     `micro_report.py` counts `P-3060-narrow` as a PCIe platform for the go criterion and names the platforms it compared.
+     ctest 38/38 on Metal and MoltenVK. The task file `docs/PC_TASK_NARROW_LINK.md` is on that branch too.
+   - **Delivered by git bundle** (SSH push blocked): `~/Desktop/lightbound-narrow-link-2026-10-05.bundle` (branch
+     `mac/narrow-link`, full history, ≈ 10 MB). Tested on a fresh clone of `pc/m0-m1`: fetch + merge is a fast-forward.
+     The PC should merge it only when no series is unfinished (a rebuild changes `git_commit`, and `--resume` then refuses);
+     the natural moment is after A2 and before C.
+   - **DECISIONS.md entries** for the P-4060 → P-3060-narrow replacement and for the `--platform` flag are written by the PC
+     on its branch (task file step 8), after its #30. `main` still doesn't touch DECISIONS.md.
+   - Optional, still undecided: a hot-GPU microbench cell (finding 7). With only one card it would also need
+     both link configurations. The narrow-link session is the cheapest moment to add it, but only with approval.
 
 ### Deviations from spec
 Recorded in `docs/DECISIONS.md` #17–#26 (ReBAR read policy, binding convention, headless microbench,
@@ -227,8 +275,8 @@ build\lightbound.exe --mode=play --validation=on --exit-after=300
 echo exit code: %ERRORLEVEL%
 python tools\run_microbench.py --exe build\lightbound.exe --out results\m1_3060 --tag rebar-on
 ```
-Then swap to the 4060 Ti (same slot) and run `python tools\run_microbench.py --exe build\lightbound.exe
---out results\m1_4060 --tag rebar-on`. Optional (protocol §9): ReBAR off in BIOS, repeat with
+~~Then swap to the 4060 Ti~~ (no 4060 Ti, finding 8). Then follow `docs/PC_TASK_NARROW_LINK.md` (delivered in the
+bundle, branch `mac/narrow-link`): narrowed link, `--resume -- --platform=P-3060-narrow`, into `results\m1_3060_narrow`. Optional (protocol §9): ReBAR off in BIOS, repeat with
 `--tag rebar-off` into separate directories. Note: `s2_rebar` at 16 MiB reads uncached PCIe memory
 from the CPU on purpose (the slow path); a full run may take tens of minutes.
 
@@ -238,7 +286,7 @@ MSVC), ctest all pass (the `microbench_smoke` test runs every path with validati
 
 ### C. Combine and decide
 ```
-python3 tools/analysis/micro_report.py results/m1_mac_ac results/m1_3060 results/m1_4060 --out results/m1_report
+python3 tools/analysis/micro_report.py results/m1_mac_ac results/m1_3060 results/m1_3060_narrow --out results/m1_report
 ```
 Paste back `results/m1_report/report.md` and any errors. Keep ReBAR-off runs in their own report
 (runs of one platform are pooled).
@@ -248,7 +296,9 @@ Paste back `results/m1_report/report.md` and any errors. Keep ReBAR-off runs in 
   `git@github.com:jttarigan/Lightbound.git` (Mac pushes with a deploy key over SSH). On 2026-10-01 SSH
   to github.com timed out from the Mac's network (ports 22 and 443). HTTPS fetch works (see the
   resume checklist), but pushing needs SSH. **Local `main` is ahead of `origin/main` (baf605a)** with
-  the session-3, 4 and 5 status commits, which are unpushed. Push with `git push origin main`
+  the session-3, 4 and 5 commits, which are unpushed. **2026-10-05: SSH still times out on ports 22 and 443
+  (ssh.github.com).** The PC gets the narrow-link tooling through the bundle instead (finding 8). Local branch
+  `mac/narrow-link` is unpushed too. When SSH works, push both: `git push origin main mac/narrow-link`. Push with `git push origin main`
   when SSH works. The PC branch doesn't depend on them. The preliminary
   `results/m1_prelim` runs predate the repo (their CSVs say `nogit`).
 - Build dirs: `build/` (Metal), `build-vk/` (Vulkan via MoltenVK). Toolchain PATH:
