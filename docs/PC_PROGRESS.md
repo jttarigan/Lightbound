@@ -252,9 +252,10 @@ to, or the GPU read from, the ReBAR buffer (the `copy_c2g_us` / `gpu_read_us` co
 `s1_copy` and `s2_hostcached` are close to A2 (1 MiB chain/spin 313 and 165 µs; A2 pooled 312 and
 157); the probe's `empty` chain/spin was 60 µs (A2: 60).
 
-Note: the first progress-log commit and push (≈ 14:36) fell into run 1's `s2_direct` chain/block
-cells, and the log was read several times during run 1's first three minutes. Runs 2 and 3 are
-undisturbed; the run-to-run check will show whether it mattered.
+Note: two progress-log commits with a push fell into run 1's fast-path cells (≈ 14:36:20 in
+`s2_direct` chain/block, ≈ 14:37:40 in `s2_hostcached` perpass/spin), and the log was read several
+times during run 1's first three minutes. Runs 2 and 3 are undisturbed; the run-to-run check will
+show whether it mattered.
 
 ### Revised plan
 | Step | What | Where | Est. |
