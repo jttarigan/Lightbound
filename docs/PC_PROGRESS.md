@@ -247,8 +247,16 @@ ReBAR on, `s2_direct` and `empty` put the CPU→GPU buffer in ReBAR memory
 (`up=DeviceLocalHostVisible` instead of `HostVisibleCoherent`, as designed, DECISIONS #17), and
 the `s2_direct` round trip is slower than with ReBAR off from 64K up. Chain/spin rt p50, 4K … 16M:
 61 / 72 / 98 / 208 / 678 / 2506 µs, against 60 / 65 / 81 / 142 / 411 / 1428 µs in step A2 run 1.
-g2c and c2g are unchanged at 1 MiB (32 / 30 µs), so the extra time is presumably in the CPU write
-to, or the GPU read from, the ReBAR buffer (the `copy_c2g_us` / `gpu_read_us` columns will tell).
+Per-phase medians from the CSV (checked 2026-10-06 while run 1 was still going) show where the
+time goes: g2c, c2g and `cpu_read_us` are unchanged (1 MiB: 32 / 29 / 50 µs in both), but
+`cpu_write_us` into the ReBAR buffer is ≈ 3× slower (1 MiB 96 vs 33 µs, 16 MiB 1541 vs 523 µs,
+i.e. ≈ 11 GB/s write-combined over PCIe vs ≈ 32 GB/s into system memory), and `rt` is the sum
+g2c + cpu_read + cpu_write + c2g. In exchange the GPU's read pass, which `rt` does not include,
+becomes almost free because it reads local VRAM: `gpu_read_us` 1 MiB 7 vs 86 µs, 16 MiB 49 vs
+1288 µs. Round trip plus GPU read is therefore slightly *lower* with ReBAR on from 256K up (1 MiB
+215 vs 228 µs, 16 MiB 2555 vs 2716 µs). Which of the two matters is for the report / the human.
+Unexplained so far (single run): `gpu_write_us` into system memory is +66 / +107 µs at 4M / 16M
+and g2c at 16M is 125 vs 54 µs with ReBAR on.
 `s1_copy` and `s2_hostcached` are close to A2 (1 MiB chain/spin 313 and 165 µs; A2 pooled 312 and
 157); the probe's `empty` chain/spin was 60 µs (A2: 60).
 
