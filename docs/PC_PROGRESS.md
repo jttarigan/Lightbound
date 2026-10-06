@@ -257,6 +257,12 @@ becomes almost free because it reads local VRAM: `gpu_read_us` 1 MiB 7 vs 86 µs
 215 vs 228 µs, 16 MiB 2555 vs 2716 µs). Which of the two matters is for the report / the human.
 Unexplained so far (single run): `gpu_write_us` into system memory is +66 / +107 µs at 4M / 16M
 and g2c at 16M is 125 vs 54 µs with ReBAR on.
+
+Run 1 finished 2026-10-06 14:18 after **85401 s (23.7 h)**, exit 0, `0 verification/R7 failures,
+0 API errors`, no `ERROR`/`WARN` → `micro_P-3060_rebar-on_run1.csv`. Run 2 started 14:18 (expected
+end ≈ 10-07 14:00; run 3 ≈ 10-08 13:45). Run 2's fast-path cells repeat run 1 within 1–4 % (1 MiB
+chain/spin: `s1_copy` 310 vs 313, `s2_direct` 207 vs 208, `s2_hostcached` 159 vs 165 µs); its p99s
+are lower (`empty` 73 vs 107 µs), consistent with run 1's first minutes having been disturbed.
 `s1_copy` and `s2_hostcached` are close to A2 (1 MiB chain/spin 313 and 165 µs; A2 pooled 312 and
 157); the probe's `empty` chain/spin was 60 µs (A2: 60).
 
