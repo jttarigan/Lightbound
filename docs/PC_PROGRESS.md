@@ -263,6 +263,12 @@ Run 1 finished 2026-10-06 14:18 after **85401 s (23.7 h)**, exit 0, `0 verificat
 end ≈ 10-07 14:00; run 3 ≈ 10-08 13:45). Run 2's fast-path cells repeat run 1 within 1–4 % (1 MiB
 chain/spin: `s1_copy` 310 vs 313, `s2_direct` 207 vs 208, `s2_hostcached` 159 vs 165 µs); its p99s
 are lower (`empty` 73 vs 107 µs), consistent with run 1's first minutes having been disturbed.
+
+Run 2 finished 2026-10-07 14:04 after **85550 s (23.8 h)**, exit 0, clean log →
+`micro_P-3060_rebar-on_run2.csv`. Run 3 started 14:04 (expected end ≈ 10-08 13:50, then the
+report is built). Key cells agree across runs 1 / 2 / 3 within 1–4 % (1 MiB chain/spin:
+`s2_direct` 208 / 207 / 207, `s2_hostcached` 165 / 159 / 159, `s2_coherent` 15008 / 14935 / – µs;
+`s2_rebar` 16 MiB 7.016 / 7.034 / – s). Windows Update pause unchanged (ends 10-09 14:20).
 `s1_copy` and `s2_hostcached` are close to A2 (1 MiB chain/spin 313 and 165 µs; A2 pooled 312 and
 157); the probe's `empty` chain/spin was 60 µs (A2: 60).
 
