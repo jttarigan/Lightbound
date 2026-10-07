@@ -268,7 +268,8 @@ Run 2 finished 2026-10-07 14:04 after **85550 s (23.8 h)**, exit 0, clean log �
 `micro_P-3060_rebar-on_run2.csv`. Run 3 started 14:04 (expected end ≈ 10-08 13:50, then the
 report is built). Key cells agree across runs 1 / 2 / 3 within 1–4 % (1 MiB chain/spin:
 `s2_direct` 208 / 207 / 207, `s2_hostcached` 165 / 159 / 159, `s2_coherent` 15008 / 14935 / – µs;
-`s2_rebar` 16 MiB 7.016 / 7.034 / – s). Windows Update pause unchanged (ends 10-09 14:20).
+`s2_rebar` 16 MiB 7.016 / 7.034 / – s). Human extended the Windows Update pause on 10-07 to
+**2026-10-16 14:28** local time, which covers step D as well.
 `s1_copy` and `s2_hostcached` are close to A2 (1 MiB chain/spin 313 and 165 µs; A2 pooled 312 and
 157); the probe's `empty` chain/spin was 60 µs (A2: 60).
 
@@ -298,4 +299,4 @@ Risk for the multi-day runs: Windows Update auto-restart — the human should pa
    that a directory listing shows a stale size for the CSV/log being written (open the file).
    If it was interrupted: follow "If the PC has to be switched off" (same command, `--resume`).
 2. After step C: check, record, gzip, commit, push; then ask for the GPU swap (step D).
-   Step D needs the Windows Update pause extended again (it ends 2026-10-09 14:20).
+   Windows Update is paused until 2026-10-16 14:28, enough for step D if it starts by 10-12.
