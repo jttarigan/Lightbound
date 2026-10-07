@@ -1,6 +1,6 @@
 # Work status (resume here)
 
-_Last updated 2026-10-05 (session 5)._
+_Last updated 2026-10-07 (session 6: no code work; PC progress recorded, human switched projects)._
 
 - **M0 — Scaffold:** accepted on Mac (Metal + MoltenVK). **[PC] checks: ALL PASS** on the branch
   `pc/m0-m1` (2026-10-02; one MSVC fix, DECISIONS #27 on that branch). M0 is fully closed once the branch is merged.
@@ -10,12 +10,13 @@ _Last updated 2026-10-05 (session 5)._
   decision: the M5 sync probe, finding 7. A hot GPU gives a round trip ≈ 55 µs, stable, and polling isn't viable.
 - **Open human decisions:** go/no-go (the data so far says NO-GO by the letter, findings 4 and 7); whether to add
   a hot-GPU microbench cell (finding 7); the PCIe gen3 link (finding 5); whether the repo should be public (finding 6).
-- **PC session:** in progress on branch `pc/m0-m1` (see "PC session progress" below). M0 checks
-  pass. On 2026-10-05 the PC is re-running the ReBAR-off series (A2) after a clock-drift fix. The ReBAR-on full-link
-  series (C, ≈ 3 days with full `s2_rebar`) and the narrowed-link series (D′, ≈ 3+ days) are still ahead. The PC needs the
-  bundle `~/Desktop/lightbound-narrow-link-2026-10-05.bundle` (finding 8) before C. On resume: fetch the
-  branch (command below), read its `docs/PC_PROGRESS.md`, report progress, and wait. Merge only when
-  the human says so (section C).
+- **PC session:** in progress on branch `pc/m0-m1` (see "PC session progress" below). M0 checks pass. A2 (ReBAR off,
+  fixed clock mapping) is done and ReBAR is on. The ReBAR-on full-link series (C) has been running since 2026-10-05 14:34:
+  runs 1 and 2 are done and clean, run 3 ends ≈ **2026-10-08 13:50**, then the PC builds the report and pushes. **The PC
+  has not received the narrow-link bundle** (finding 8) and still plans "step D = swap to the 4060 Ti": after C the human
+  must hand it `~/Desktop/lightbound-narrow-link-2026-10-05.bundle` and point it at `docs/PC_TASK_NARROW_LINK.md` (not
+  during C: a rebuild breaks `--resume`). On resume: fetch the branch (command below), read its `docs/PC_PROGRESS.md`,
+  report progress, and wait. Merge only when the human says so (section C).
 
 ## Resume checklist (Mac)
 ```
@@ -32,8 +33,55 @@ git merge-base --is-ancestor mac/narrow-link origin/pc/m0-m1 && echo "bundle mer
 (macOS has no GNU `timeout` command, so don't wrap git calls in it.) Always fetch before saying what the PC
 is doing. `PC_PROGRESS.md` on the branch is the only source; on 2026-10-05 a guess from the old plan turned out wrong.
 
-## PC session progress (as of 2026-10-05, branch head 6962eff, pushed 2026-10-05 10:24 +0700)
-Read from `origin/pc/m0-m1:docs/PC_PROGRESS.md`. Since 5faba40 the PC has added three commits:
+## PC session progress (as of 2026-10-07 21:00, branch head 8ce9af6, pushed 2026-10-07 14:29 +0700)
+Read from `origin/pc/m0-m1:docs/PC_PROGRESS.md`. Since 6962eff the PC pushed seven docs/results commits and no code;
+DECISIONS on the branch is still at #30.
+- **A2 done (2026-10-05 10:26–13:03):** 3060 Ti, ReBAR off, fixed clock mapping, gen3 x16, Ultimate Performance;
+  3 runs, 0 failures, no restarts; `results/m1_3060_rebar-off` (+ report) is on the branch. **These are the ReBAR-off
+  numbers to use.** Round trip p50 / p99 (µs), chain/spin, 3 runs pooled:
+
+  | path | 0 | 4K | 64K | 256K | 1M | 4M | 16M |
+  |---|---:|---:|---:|---:|---:|---:|---:|
+  | empty | 60 / 99 | | | | | | |
+  | s2_direct | | 59 / 88 | 65 / 89 | 80 / 114 | 142 / 212 | 388 / 530 | 1392 / 1684 |
+  | s1_copy | | 74 / 120 | 90 / 129 | 131 / 178 | 312 / 408 | 1074 / 1298 | 3983 / 4583 |
+  | s2_hostcached | | 59 / 93 | 67 / 106 | 85 / 146 | 157 / 239 | 470 / 606 | 1806 / 2134 |
+  | s2_coherent | | 117 / 152 | 991 / 1168 | 3810 / 4296 | 15063 / 16251 | 60172 / 64126 | 239800 / 254593 |
+
+  g2c / c2g p50 for empty 32 / 28 µs; raw copy 16 MiB d2h 12.55 / h2d 13.17 GB/s. **Run-to-run PASS** (100 cells, none
+  ≥ 10 %; worst 9.6 %, worst primary cell 6.9 %). 0 of 100 cells with a negative g2c sample (26 in step A), so the clock
+  fix works; `rt` agrees with step A within a few percent.
+- **B done:** the human enabled ReBAR in the BIOS on 2026-10-05 (`sysinfo.rebar: on`, `bar_heap_mb: 8024`).
+- **C running (3060 Ti, ReBAR on, full protocol incl. `s2_rebar`, binary 6962eff, tag `rebar-on`, `results\m1_3060`):**
+  started 2026-10-05 14:34. Run 1 finished 10-06 14:18 (23.7 h) and run 2 finished 10-07 14:04 (23.8 h), both exit 0,
+  0 failures, clean logs. Run 3 started 10-07 14:04, expected end ≈ **2026-10-08 13:50**, after which the PC builds the
+  report, gzips, commits and pushes. Key cells agree across runs within 1–4 % (1 MiB chain/spin: `s2_direct`
+  208 / 207 / 207 µs, `s2_hostcached` 165 / 159 / 159; `s2_rebar` 16 MiB ≈ 7.0 s per iteration). Two progress-log pushes
+  fell into run 1's first three minutes (fast-path cells); run 1's p99s are higher than run 2's (`empty` 107 vs 73 µs).
+  Runs 2 and 3 are undisturbed.
+- **ReBAR on makes `s2_direct` slower from 64K up** (chain/spin rt p50 4K…16M: 61 / 72 / 98 / 208 / 678 / 2506 µs vs
+  60 / 65 / 81 / 142 / 411 / 1428 with ReBAR off), as designed by DECISIONS #17 (the CPU→GPU buffer sits in ReBAR memory).
+  The PC's per-phase breakdown (run 1): g2c, c2g and `cpu_read_us` are unchanged; `cpu_write_us` into the ReBAR buffer is
+  ≈ 3× slower (1 MiB 96 vs 33 µs, 16 MiB 1541 vs 523 µs: ≈ 11 GB/s write-combined over PCIe vs ≈ 32 GB/s into system
+  memory). In exchange the GPU's read pass, which `rt` does not include, becomes almost free (`gpu_read_us` 1 MiB 7 vs
+  86 µs, 16 MiB 49 vs 1288), so rt + GPU read is slightly *lower* with ReBAR on from 256K up (1 MiB 215 vs 228 µs).
+  **Which figure the comparison should use (rt alone, or rt + the GPU read) is a question for the report and the human.**
+  Unexplained in a single run: `gpu_write_us` into system memory +66 / +107 µs at 4M / 16M, and g2c at 16M 125 vs 54 µs
+  with ReBAR on.
+- The human extended the Windows Update pause to **2026-10-16 14:28** local, which covers the narrow-link series if it
+  starts by 10-12.
+- **The PC has not merged the narrow-link bundle** (`git merge-base --is-ancestor mac/narrow-link origin/pc/m0-m1` says
+  no) and its plan still ends with "ask for the GPU swap (step D)". The bundle was meant to go in between A2 and C (task
+  file step 2), but C started first. Consequences: (1) after C the human hands over the bundle and
+  `docs/PC_TASK_NARROW_LINK.md`; (2) the PC branch has moved past 6962eff, so `git merge bundle/narrow-link` is a real
+  merge, not a fast-forward — a trial merge on the Mac (2026-10-07) was clean and no file is touched by both sides;
+  (3) C runs on 6962eff and D′ will run on the merge commit, which differ only by the `--platform` plumbing (no measurement
+  path changes); the write-up should say so.
+- **PC plan now:** C run 3 (→ 10-08 ≈ 13:50) → PC report, gzip, push → human: bundle + narrow-link task → D′ (3 runs,
+  ≈ 3 days, `--platform=P-3060-narrow`, `results\m1_3060_narrow`) → E: `PC_REPORT.md` + push → Mac: merge (section C).
+
+### PC notes from 2026-10-05 (branch head 6962eff, pushed 2026-10-05 10:24 +0700)
+Read from `origin/pc/m0-m1:docs/PC_PROGRESS.md`. Since 5faba40 the PC had added three commits:
 - **#28 Resumable microbench runs** (human request: one full run takes ≈ a day). `lightbound --resume` and
   `run_microbench.py --resume` resume at **cell** boundaries. The run refuses to continue if the binary, options, tag or any
   `sysinfo.*` value differs (the PCIe link only gives a warning), and each restart writes a `# resumed:` line in the CSV.
@@ -53,7 +101,7 @@ Read from `origin/pc/m0-m1:docs/PC_PROGRESS.md`. Since 5faba40 the PC has added 
   empty **61 / 109**; s2_direct 4K 61, 64K 67, 256K 82, **1M 142**, 4M 408, 16M 1411; s1_copy 1M 314, 16M 4014;
   s2_hostcached 1M 157; s2_coherent 1M 15085. Raw copy 16 MiB d2h 12.3 / h2d 13.2 GB/s. **Run-to-run: PASS**
   (100 cells, worst 9.3 %; worst primary-condition cell 8.4 %).
-- **Current PC plan:** A2 = A again with the fixed binary (running on 2026-10-05, ≈ 2 h 40 min) → B: human enables ReBAR
+- **PC plan as of 2026-10-05 (superseded above):** A2 = A again with the fixed binary (running on 2026-10-05, ≈ 2 h 40 min) → B: human enables ReBAR
   in the BIOS → C: 3060 Ti full link, ReBAR on, full protocol incl. `s2_rebar`, 3 runs (≈ 3 days, resumable) →
   ~~D: 4060 Ti~~ **D′: narrowed link** (finding 8) → E: report + push.
 - DECISIONS.md on the PC branch now goes up to #30.
@@ -161,11 +209,12 @@ Metal, chain/spin, round trip p50 / p99 (µs):
    faster than S1 (864 vs 1669 µs) — early support for H5's direction.
 4. The go criterion cannot be evaluated without PC data. If the RTX round trips land around
    50–150 µs (my expectation for timeline semaphores over PCIe — not measured), the M5 as measured here would **not** be
-   "clearly lower" → NO-GO by the letter of protocol §6. **PC timing data (2026-10-05, 3060 Ti,
-   ReBAR off, step A): empty round trip p50 61 µs vs M5 214 µs (AC); 1 MiB s2_direct 142 µs vs M5 305 µs.**
+   "clearly lower" → NO-GO by the letter of protocol §6. **PC timing data (3060 Ti, gen3 x16): empty round
+   trip p50 60 µs vs M5 214 µs (AC); 1 MiB s2_direct 142 µs with ReBAR off (A2, pooled) and ≈ 207 µs with ReBAR on
+   (C, runs 1–2) vs M5 305 µs.**
    As specified (cold GPU), the M5 is clearly *slower* on both criterion cells, so M1 is **NO-GO by the letter of
    protocol §6** unless the human takes one of the options below. With a hot GPU (finding 7), the M5's empty round trip is
-   ≈ 53–57 µs vs 61 µs, about 10 % lower and probably not beyond run-to-run noise. The hot 1 MiB case is
+   ≈ 53–57 µs vs 60 µs, about 10 % lower and probably not beyond run-to-run noise. The hot 1 MiB case is
    unmeasured, because the probe ran the empty payload only. Options for the human (not implemented):
    (a) re-run plugged in first; (b) add a "hot GPU" microbench variant where the GPU has independent
    work during the CPU step, as it does in the real frame (docs/05 §3 "GPU may run independent work");
@@ -301,7 +350,7 @@ Paste back `results/m1_report/report.md` and any errors. Keep ReBAR-off runs in 
   `git@github.com:jttarigan/Lightbound.git` (Mac pushes with a deploy key over SSH). On 2026-10-01 SSH
   to github.com timed out from the Mac's network (ports 22 and 443). HTTPS fetch works (see the
   resume checklist), but pushing needs SSH. **Local `main` is ahead of `origin/main` (baf605a)** with
-  the session-3, 4 and 5 commits, which are unpushed. **2026-10-05: SSH still times out on ports 22 and 443
+  the session-3 to 6 commits, which are unpushed. **2026-10-06: SSH still times out on ports 22 and 443
   (ssh.github.com).** The PC gets the narrow-link tooling through the bundle instead (finding 8). Local branch
   `mac/narrow-link` is unpushed too. When SSH works, push both: `git push origin main mac/narrow-link`. Push with `git push origin main`
   when SSH works. The PC branch doesn't depend on them. The preliminary
