@@ -314,6 +314,17 @@ report is built). Key cells agree across runs 1 / 2 / 3 within 1–4 % (1 MiB ch
   PC otherwise idle and Windows Update is paused until 10-16). Claude recommends (b) if a day can
   be spared before the GPU swap; otherwise (a).
 
+### Step C, run 1 replacement (started 2026-10-12 10:45) — RUNNING
+
+Human decision 2026-10-12: replace run 1. Preparation committed as `e47f435`. Checks before the
+start: no `lightbound.exe`, Chrome / Task Manager closed by the human (still present, idle:
+MSI Center services, `OneDrive.Sync.Service`, `Voicemod`), GPU 1 %, Ultimate Performance,
+Windows Update paused until 10-16 14:28, no reboot pending, 489 GB free, binary `6962eff`
+unchanged. Launched detached at 10:45:14 with the usual `--resume` command; the runner redoes
+run 1 only (runs 2 and 3 are "already complete") and rebuilds `report\` at the end, expected
+≈ 2026-10-13 10:30. Nothing was done on the PC during the fast-path cells this time; this
+section was committed only after `s2_rebar` had started.
+
 Lesson (applies to every future series): **no git commit/push, no log reads, nothing at all on
 the PC during the first ≈ 4 minutes of each run** (the fast paths) and during `s2_coherent`
 (the last ≈ 50 min). Record findings in the log only while `s2_rebar` is running (cells of
