@@ -22,9 +22,10 @@ session 1 was 2026-10-01/02)._
       ReBAR-off numbers to use**, see "Step A2 results").
 - [x] §3 step B — human enabled Resizable BAR in the BIOS (2026-10-05; probe says
       `sysinfo.rebar: on`, `bar_heap_mb: 8024`).
-- [ ] §3 step C — RTX 3060 Ti, ReBAR on, full protocol incl. `s2_rebar` → `results\m1_3060`
-      (**RUNNING since 2026-10-05 14:34**, expected to finish 2026-10-08 early afternoon; see
-      "Step C").
+- [x] §3 step C — RTX 3060 Ti, ReBAR on, full protocol incl. `s2_rebar` → `results\m1_3060`
+      (ran 2026-10-05 14:34 → 10-08 13:50, 3 clean runs; see "Step C results"). Run-to-run
+      check says **FAIL** because two secondary cells of run 1 were disturbed by Claude's own
+      git activity — see "Step C results" for the options (human decision pending).
 - [ ] §3 step D — card 2: RTX 4060 Ti (after swap) → `results\m1_4060`.
 - [ ] §4 Report (`docs/PC_REPORT.md`), gzipped results, push.
 
@@ -270,6 +271,51 @@ report is built). Key cells agree across runs 1 / 2 / 3 within 1–4 % (1 MiB ch
 `s2_direct` 208 / 207 / 207, `s2_hostcached` 165 / 159 / 159, `s2_coherent` 15008 / 14935 / – µs;
 `s2_rebar` 16 MiB 7.016 / 7.034 / – s). Human extended the Windows Update pause on 10-07 to
 **2026-10-16 14:28** local time, which covers step D as well.
+
+### Step C results (checked 2026-10-12) — RTX 3060 Ti, ReBAR on, full protocol
+
+- 3 runs, 85401 / 85550 / 85545 s (23.7–23.8 h each); every log ends with `0 verification/R7
+  failures, 0 API errors`, exit 0, no `ERROR`/`WARN`, no restarts. Binary `6962eff`.
+- Header: `sysinfo.rebar: on`, `bar_heap_mb: 8024`, `pcie_link: gen3 x16 (max gen3 x16)`,
+  `power_plan: Ultimate Performance`, driver 566.36. No reboot during the series.
+- `report\report.md` built by the runner on 10-08 13:50. CSVs gzipped and committed.
+- Round trip p50 / p99 (µs), chain/spin, 3 runs pooled:
+
+  | path | 0 | 4K | 64K | 256K | 1M | 4M | 16M |
+  |---|---:|---:|---:|---:|---:|---:|---:|
+  | empty | 60 / 86 | | | | | | |
+  | s2_direct | | 60 / 85 | 69 / 106 | 97 / 138 | 207 / 283 | 651 / 965 | 2408 / 2768 |
+  | s1_copy | | 73 / 94 | 89 / 118 | 131 / 162 | 311 / 426 | 1060 / 1252 | 3973 / 4582 |
+  | s2_hostcached | | 62 / 99 | 69 / 101 | 87 / 132 | 160 / 238 | 466 / 646 | 1759 / 2208 |
+  | s2_rebar | | 1748 / 1926 | 27129 / 27895 | 108471 / 110358 | 434967 / 442314 | 1755536 / 1769449 | 7029474 / 7063888 |
+  | s2_coherent | | 119 / 146 | 991 / 1210 | 3823 / 4334 | 14976 / 16092 | 59888 / 63639 | 239384 / 252008 |
+
+- g2c / c2g p50 (µs), chain/spin: empty 31.0 / 28.8; s2_direct 1 MiB 33.0 / 29.3, 16 MiB
+  50.8 / 33.7; s1_copy 1 MiB 115.2 / 114.7; s2_hostcached 1 MiB 33.0 / 30.1; s2_coherent 1 MiB
+  35.5 / 60.9; s2_rebar 1 MiB 53.6 / 155.0, 16 MiB 43.2 / 189.4.
+- Empty round trip modes: g2c 30–35 µs (72 %); c2g 25–30 µs (49 %) and 35–40 µs (34 %).
+- Raw copy 16 MiB: d2h 12.40 GB/s, h2d 13.26 GB/s.
+- ReBAR on vs off, `s2_direct` pooled (chain/spin): 1 MiB rt 207 vs 142 µs, `cpu_write` 96 vs
+  33 µs; 16 MiB rt 2408 vs 1392 µs, `cpu_write` 1541 vs 514 µs. g2c / c2g unchanged. The split
+  analysis above (run 1) holds for the pooled data.
+- **Run-to-run variation: FAIL by the tool's rule** — 124 cells, 2 cells ≥ 10 %: `s2_hostcached`
+  perpass/spin 1M (run 1 191.5 µs vs 162.8 / 162.8 in runs 2 and 3 → 17.6 %) and 4M (513.0 vs
+  459.0 / 461.8 → 11.8 %). Worst in the primary condition (chain/spin) 8.5 % → the primary
+  condition passes. **Cause: Claude.** Both cells were measured 179–183 s into run 1
+  (14:37:44–14:37:48 on 10-05), exactly when the second progress-log commit + push ran
+  (≈ 14:37:40). Runs 2 and 3 agree on these cells within 0.1 %, and every other cell of the
+  path is within 3 %. The disturbed run's slow paths (`s2_rebar`, `s2_coherent`, 23 of its 24
+  hours) are unaffected.
+  Options for the human: (a) keep the data as is and document the cause in `PC_REPORT.md`; (b)
+  replace run 1 (move `micro_P-3060_rebar-on_run1.csv/.log` to `results\m1_3060_run1_disturbed`,
+  start the same `--resume` command: the runner redoes run 1 only and rebuilds the report; ≈ 24 h,
+  PC otherwise idle and Windows Update is paused until 10-16). Claude recommends (b) if a day can
+  be spared before the GPU swap; otherwise (a).
+
+Lesson (applies to every future series): **no git commit/push, no log reads, nothing at all on
+the PC during the first ≈ 4 minutes of each run** (the fast paths) and during `s2_coherent`
+(the last ≈ 50 min). Record findings in the log only while `s2_rebar` is running (cells of
+seconds; shown to be insensitive: runs 1–3 agree within 0.3 % there).
 `s1_copy` and `s2_hostcached` are close to A2 (1 MiB chain/spin 313 and 165 µs; A2 pooled 312 and
 157); the probe's `empty` chain/spin was 60 µs (A2: 60).
 
@@ -284,7 +330,7 @@ show whether it mattered.
 | A (done) | 3060 Ti, ReBAR off, 5 fast paths, 3 runs, old calibration | `results\m1_3060_rebar-off_old-calibration` | took 2 h 37 min |
 | A2 (done) | same as A with the fixed binary (`--micro-paths=empty,s1_copy,s2_direct,s2_hostcached,s2_coherent`) | `results\m1_3060_rebar-off` | took 2 h 37 min |
 | B (done) | Human: reboot → BIOS → Above 4G Decoding + Re-Size BAR on → boot → close apps → new session "Continue docs/PC_CLAUDE_TASK.md" | — | — |
-| C (running) | Verify ReBAR on (probe: `sysinfo.rebar: on`, `bar_heap_mb` > 256). 3060 Ti **full protocol incl. `s2_rebar`**, 3 runs | `results\m1_3060` tag `rebar-on` | ≈ 24 h/run → **≈ 3 days** |
+| C (done) | Verify ReBAR on (probe: `sysinfo.rebar: on`, `bar_heap_mb` > 256). 3060 Ti **full protocol incl. `s2_rebar`**, 3 runs | `results\m1_3060` tag `rebar-on` | took 2 d 23 h 16 min |
 | D | GPU swap → 4060 Ti, same as C | `results\m1_4060` tag `rebar-on` | ≈ 3 days |
 | E | §4 reports + push | `results\m1_pc_report` (+ `m1_3060_rebar-off` separately) | — |
 
@@ -292,11 +338,14 @@ Not planned (gap to note in the report): `s2_rebar` with ReBAR off, and ReBAR-of
 Risk for the multi-day runs: Windows Update auto-restart — the human should pause updates.
 
 ## Next steps
-1. Step C is running (started 2026-10-05 14:34, ≈ 24 h per run, 3 runs). Leave the PC alone:
-   do not rebuild, do not start other GPU/CPU work. Progress: `results\m1_3060\run_microbench.out`
-   (series) and `_running_run<i>.log` (cells of the current run).
-   A background waiter in Claude Code is stopped after 2 h, so check on request instead; note
-   that a directory listing shows a stale size for the CSV/log being written (open the file).
-   If it was interrupted: follow "If the PC has to be switched off" (same command, `--resume`).
-2. After step C: check, record, gzip, commit, push; then ask for the GPU swap (step D).
-   Windows Update is paused until 2026-10-16 14:28, enough for step D if it starts by 10-12.
+1. Human decides on run 1 of step C: keep (a) or replace (b), see "Step C results". For (b):
+   move `results\m1_3060\micro_P-3060_rebar-on_run1.csv`, `.csv.gz` and `.log` to
+   `results\m1_3060_run1_disturbed\` (git mv for the committed `.gz` and `.log`), delete the
+   old `report\`, then start the detached `--resume` command for `results\m1_3060` and **leave
+   the PC alone for the first 4 minutes**; ≈ 24 h; the runner rebuilds the report.
+2. GPU swap (step D): shut down, install the 4060 Ti, boot, close apps, new session "Continue
+   docs/PC_CLAUDE_TASK.md". Then probe (ReBAR on expected), start `results\m1_4060` with
+   `--tag rebar-on --resume`, nothing to rebuild. Windows Update is paused until 2026-10-16
+   14:28; step D needs ≈ 3 days, so extend the pause if D starts after 10-13.
+3. Step E: combined report (`micro_report.py results\m1_3060 results\m1_4060 --out
+   results\m1_pc_report`), `docs/PC_REPORT.md`, gzip, commit, push.
