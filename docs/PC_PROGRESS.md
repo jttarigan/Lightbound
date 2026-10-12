@@ -24,8 +24,10 @@ session 1 was 2026-10-01/02)._
       `sysinfo.rebar: on`, `bar_heap_mb: 8024`).
 - [x] §3 step C — RTX 3060 Ti, ReBAR on, full protocol incl. `s2_rebar` → `results\m1_3060`
       (ran 2026-10-05 14:34 → 10-08 13:50, 3 clean runs; see "Step C results"). Run-to-run
-      check says **FAIL** because two secondary cells of run 1 were disturbed by Claude's own
-      git activity — see "Step C results" for the options (human decision pending).
+      check said **FAIL** because two secondary cells of run 1 were disturbed by Claude's own
+      git activity → **human decision 2026-10-12: replace run 1** (option b). Old run 1 kept in
+      `results\m1_3060_run1_disturbed\` (with a README), old report deleted; run 1 is being
+      redone with the same command (see "Step C, run 1 replacement").
 - [ ] §3 step D — card 2: RTX 4060 Ti (after swap) → `results\m1_4060`.
 - [ ] §4 Report (`docs/PC_REPORT.md`), gzipped results, push.
 
@@ -338,11 +340,11 @@ Not planned (gap to note in the report): `s2_rebar` with ReBAR off, and ReBAR-of
 Risk for the multi-day runs: Windows Update auto-restart — the human should pause updates.
 
 ## Next steps
-1. Human decides on run 1 of step C: keep (a) or replace (b), see "Step C results". For (b):
-   move `results\m1_3060\micro_P-3060_rebar-on_run1.csv`, `.csv.gz` and `.log` to
-   `results\m1_3060_run1_disturbed\` (git mv for the committed `.gz` and `.log`), delete the
-   old `report\`, then start the detached `--resume` command for `results\m1_3060` and **leave
-   the PC alone for the first 4 minutes**; ≈ 24 h; the runner rebuilds the report.
+1. Run 1 replacement (see "Step C, run 1 replacement"): when it is done (≈ 24 h after the
+   start), check the log and the rebuilt `report\` (variation check should PASS now), gzip the
+   new run 1 CSV, `git add -f` the `.csv.gz`, `.log` and `report\*`, update this file, commit,
+   push. The human also wants everything **perfect before the hand-over to the Mac**: re-read
+   §4 of the task file and `PC_REPORT.md` requirements before step E.
 2. GPU swap (step D): shut down, install the 4060 Ti, boot, close apps, new session "Continue
    docs/PC_CLAUDE_TASK.md". Then probe (ReBAR on expected), start `results\m1_4060` with
    `--tag rebar-on --resume`, nothing to rebuild. Windows Update is paused until 2026-10-16
