@@ -282,6 +282,26 @@ Metal, chain/spin, round trip p50 / p99 (µs):
    - Optional, still undecided: a hot-GPU microbench cell (finding 7). It would also need to run in the second PCIe
      condition. The session that sets that condition up is the cheapest moment to add it, but only with approval.
 
+9. **Payload crossover (analysis of existing data, 2026-10-13, at the human's request "moving data is the strength, evaluate
+   and exploit it").** Chain/spin p50, `results/m1_report*/summary.csv`. Per round trip, the CPU's read + write of the payload
+   costs on the M5 4K…16M = 0 / 2 / 7 / 30 / 124 / 647 µs, and on the 3060 Ti (ReBAR off, s2_direct) 1 / 6 / 21 / 82 / 322 / 1300 µs.
+   The M5's whole deficit is the fixed hand-off cost (cold c2g ≈ 170–230 µs at small payloads).
+   - **Cold M5 (as measured):** the round trip crosses below the 3060 Ti at ≈ **2.0 MiB** (vs ReBAR-on s2_hostcached) to
+     **2.6 MiB** (vs ReBAR-off s2_direct) per direction, by log-log interpolation between the 1M and 4M points. No point was measured
+     in between.
+   - **Hot M5 (estimate, not measured):** the probe's hot hand-offs (g2c 23 + c2g 31 µs), plus the measured payload growth of g2c,
+     plus the measured CPU read + write give 54 / 60 / 73 / 108 / 215 / 743 µs. Against the 3060 Ti's 59 / 65 / 80 / 142 / 388 / 1392 µs,
+     that is ≈ 1.1× faster up to 256K (within noise) and **≈ 1.3× at 1 MiB, ≈ 1.8× at 4–16 MiB**. This must be measured
+     before it is used (hot-GPU cell).
+   - **In game terms:** round trip 1 moves ≈ 36 B/agent GPU→CPU (Perception 32 + SortedIds 4, plus CellRange and events) and
+     ≈ 16–20 B/agent CPU→GPU (Intent 16, plus RefineRequest ≤ 4 at K ≥ 2). With ≈ 28 B/agent per direction on average, 1 MiB ≈ 37k
+     agents and the cold crossover ≈ 75k–100k agents. The planned N levels go to 100k, and capacity is 131,072. A per-round-trip
+     win is paid K times per frame, which is the H3 mechanism.
+   - **What it means:** H1 as written ("lower for all payload sizes") is refuted by M1. The data instead shows the crossover
+     the protocol already calls the expected honest outcome (§1: "a crossover (H2 + H3), not a universal win") and supports
+     H5's direction. Any exploitation must stay within R1: the same pipeline on both backends. The lever is the workload (N,
+     bytes per agent, K), not an M5-only optimization.
+
 ### Deviations from spec
 Recorded in `docs/DECISIONS.md` #17–#26 (ReBAR read policy, binding convention, headless microbench,
 extra micro.csv columns/rows, Vulkan variant definitions, one command buffer per segment, timestamp
