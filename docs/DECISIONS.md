@@ -207,3 +207,15 @@ Ambiguities resolved while building, per CLAUDE.md rule 4. Newest at the bottom.
     CSV, compare the g2c median of the first and last 50 iterations of each block
     (`(iter + warmup) % 500`). The first PC series (binary `6a2d02e`, kept as
     `results/m1_3060_rebar-off_old-calibration`) has valid `rt` and biased g2c/c2g.
+
+## 2026-10-13 — M1 [PC] report pooling
+
+31. **`micro_report.py` counts a run once when it exists both as `.csv` and as `.csv.gz`.** The
+    report pools every `micro*.csv` and `micro*.csv.gz` below a directory. On the PC the raw CSVs
+    stay next to their gzipped copies (the `.gz` is what gets committed), so after the ReBAR-on
+    series had been gzipped, the runner's report pooled runs 2 and 3 twice (`n` = 10000 instead
+    of 6000 per cell); the per-run variation check was unaffected, the pooled p50/p99 were weighted
+    towards those runs. `load()` now drops `x.csv.gz` when `x.csv` is present. The committed
+    `results/m1_3060/report` and `results/m1_pc_report` were rebuilt with the fix and are
+    identical to a build from the `.csv.gz` files alone (what a fresh checkout has). The other
+    PC reports were built before gzipping and were never affected.

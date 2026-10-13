@@ -3,8 +3,7 @@
 Claude Code session log for `docs/PC_CLAUDE_TASK.md` on the Windows 11 PC. Newest entry at the
 bottom of each section. Clone: `C:\dev\Lightbound`, branch `pc/m0-m1`.
 
-_Last updated 2026-10-05 14:40 (session 3: step C started; session 2 was earlier the same day,
-session 1 was 2026-10-01/02)._
+_Last updated 2026-10-13 (hand-over; sessions on 2026-10-01/02, 10-05, 10-06 … 10-13)._
 
 ## Where we are
 
@@ -26,8 +25,10 @@ session 1 was 2026-10-01/02)._
       — **DONE 2026-10-13**: 3 clean runs, run-to-run **PASS**, report built, gzipped and
       committed (see "Step C results"). Run 1 was redone on 10-12/13 after the first one had
       been disturbed by Claude's git activity (old run kept in `results\m1_3060_run1_disturbed\`).
-- [ ] §3 step D — card 2: RTX 4060 Ti (after swap) → `results\m1_4060`.
-- [ ] §4 Report (`docs/PC_REPORT.md`), gzipped results, push.
+- [x] §3 step D — card 2: RTX 4060 Ti — **CANCELLED 2026-10-13: the human has no 4060 Ti.**
+      `results\m1_4060` does not exist; the PC side covers the 3060 Ti only.
+- [x] §4 Report — **DONE 2026-10-13**: `results\m1_pc_report` (3060 Ti ReBAR on; the
+      ReBAR-off series has its own report), `docs/PC_REPORT.md`, everything gzipped and pushed.
 
 ## If the PC has to be switched off (or anything interrupts a series)
 
@@ -286,31 +287,35 @@ kept in `results\m1_3060_run1_disturbed\` (README there), the replacement ran 20
   `ERROR`/`WARN` lines, no restarts. Binary `6962eff`, no reboot since 10-05.
 - Header: `sysinfo.rebar: on`, `bar_heap_mb: 8024`, `pcie_link: gen3 x16 (max gen3 x16)`,
   `power_plan: Ultimate Performance`, driver 566.36.
+- Report bug found and fixed at hand-over time (DECISIONS #31): `micro_report.py` pooled runs 2
+  and 3 twice because their `.csv` and `.csv.gz` were both present (`n` = 10000 per cell). The
+  report below is the corrected one (`n` = 6000), identical to a build from the `.csv.gz` alone.
 - Round trip p50 / p99 (µs), chain/spin, 3 runs pooled (`report\report.md`):
 
   | path | 0 | 4K | 64K | 256K | 1M | 4M | 16M |
   |---|---:|---:|---:|---:|---:|---:|---:|
-  | empty | 60 / 83 | | | | | | |
-  | s2_direct | | 60 / 79 | 69 / 104 | 96 / 135 | 207 / 279 | 646 / 804 | 2387 / 2652 |
-  | s1_copy | | 73 / 98 | 89 / 113 | 131 / 166 | 311 / 383 | 1054 / 1259 | 3935 / 4395 |
-  | s2_hostcached | | 62 / 91 | 69 / 102 | 87 / 124 | 159 / 231 | 463 / 614 | 1742 / 2274 |
-  | s2_rebar | | 1748 / 1856 | 27163 / 27960 | 108712 / 110651 | 436651 / 442876 | 1758034 / 1769897 | 7032390 / 7064631 |
-  | s2_coherent | | 119 / 148 | 991 / 1217 | 3817 / 4324 | 14960 / 16269 | 59800 / 64968 | 239183 / 256932 |
+  | empty | 60 / 85 | | | | | | |
+  | s2_direct | | 60 / 80 | 69 / 103 | 97 / 134 | 207 / 278 | 648 / 810 | 2395 / 2650 |
+  | s1_copy | | 73 / 105 | 89 / 119 | 131 / 179 | 312 / 412 | 1053 / 1296 | 3940 / 4437 |
+  | s2_hostcached | | 62 / 94 | 69 / 102 | 87 / 123 | 160 / 230 | 466 / 612 | 1759 / 2343 |
+  | s2_rebar | | 1748 / 1853 | 27164 / 27964 | 108717 / 110729 | 436664 / 442832 | 1757962 / 1769825 | 7031791 / 7063888 |
+  | s2_coherent | | 119 / 145 | 991 / 1211 | 3813 / 4365 | 14960 / 16343 | 59824 / 65164 | 239149 / 260482 |
 
-- g2c / c2g p50 (µs), chain/spin: empty 30.9 / 29.0; s2_direct 1 MiB 33.1 / 29.2, 16 MiB
-  38.3 / 33.5; s1_copy 1 MiB 115.4 / 114.8; s2_hostcached 1 MiB 33.1 / 29.9; s2_coherent 1 MiB
-  34.9 / 60.2; s2_rebar 1 MiB 41.1 / 189.2, 16 MiB 42.8 / 198.9.
-- Empty round trip modes: g2c 30–35 µs (78 %); c2g 25–30 µs (48 %) and 35–40 µs (39 %).
-- Raw copy 16 MiB: d2h 12.36 GB/s, h2d 13.27 GB/s.
+- g2c / c2g p50 (µs), chain/spin: empty 31.0 / 28.9; s2_direct 1 MiB 33.0 / 29.2, 16 MiB
+  46.0 / 33.5; s1_copy 1 MiB 115.6 / 115.0; s2_hostcached 1 MiB 33.0 / 29.9; s2_coherent 1 MiB
+  35.0 / 59.7; s2_rebar 1 MiB 41.1 / 188.8, 16 MiB 42.9 / 198.7.
+- Empty round trip modes: g2c 30–35 µs (73 %); c2g 25–30 µs (48 %) and 35–40 µs (40 %).
+- Raw copy 16 MiB: d2h 12.38 GB/s, h2d 13.27 GB/s.
 - **Run-to-run variation: PASS** — 124 cells, none ≥ 10 %; worst 8.4 % (s2_hostcached
   perpass/block 16M), worst in the primary condition 7.4 %.
 - ReBAR on vs off, `s2_direct` pooled (chain/spin): 1 MiB rt 207 vs 142 µs, `cpu_write` 96 vs
-  33 µs; 16 MiB rt 2387 vs 1392 µs, `cpu_write` 1540 vs 514 µs; g2c / c2g unchanged. The
-  per-phase analysis above holds for the pooled data: the CPU write into the ReBAR buffer is
-  ≈ 3× slower, the GPU read pass (outside `rt`) becomes almost free.
+  33 µs, `gpu_read` 7 vs 86 µs; 16 MiB rt 2395 vs 1392 µs, `cpu_write` 1540 vs 514 µs,
+  `gpu_read` 49 vs 1285 µs; g2c / c2g unchanged. The per-phase analysis above holds for the
+  pooled data: the CPU write into the ReBAR buffer is ≈ 3× slower, the GPU read pass (outside
+  `rt`) becomes almost free.
 - `empty`, `s1_copy`, `s2_hostcached`, `s2_coherent` and `s2_rebar` agree with the ReBAR-off
-  series within a few percent (e.g. empty 60 / 60, s1_copy 1 MiB 311 / 312, s2_hostcached 1 MiB
-  159 / 157, s2_coherent 1 MiB 14960 / 15063 µs), so ReBAR only changes `s2_direct`, as expected.
+  series within a few percent (e.g. empty 60 / 60, s1_copy 1 MiB 312 / 312, s2_hostcached 1 MiB
+  160 / 157, s2_coherent 1 MiB 14960 / 15063 µs), so ReBAR only changes `s2_direct`, as expected.
 
 Lesson (applies to every future series): **no git commit/push, no log reads, nothing at all on
 the PC during the first ≈ 4 minutes of each run** (the fast paths) and during `s2_coherent`
@@ -331,21 +336,15 @@ show whether it mattered.
 | A2 (done) | same as A with the fixed binary (`--micro-paths=empty,s1_copy,s2_direct,s2_hostcached,s2_coherent`) | `results\m1_3060_rebar-off` | took 2 h 37 min |
 | B (done) | Human: reboot → BIOS → Above 4G Decoding + Re-Size BAR on → boot → close apps → new session "Continue docs/PC_CLAUDE_TASK.md" | — | — |
 | C (done) | Verify ReBAR on (probe: `sysinfo.rebar: on`, `bar_heap_mb` > 256). 3060 Ti **full protocol incl. `s2_rebar`**, 3 runs | `results\m1_3060` tag `rebar-on` | took 2 d 23 h 16 min |
-| D | GPU swap → 4060 Ti, same as C | `results\m1_4060` tag `rebar-on` | ≈ 3 days |
-| E | §4 reports + push | `results\m1_pc_report` (+ `m1_3060_rebar-off` separately) | — |
+| D (cancelled) | GPU swap → 4060 Ti, same as C | — (no 4060 Ti available, 2026-10-13) | — |
+| E (done) | §4 reports + push | `results\m1_pc_report` (+ `m1_3060_rebar-off` separately) | 2026-10-13 |
 
-Not planned (gap to note in the report): `s2_rebar` with ReBAR off, and ReBAR-off runs on the 4060 Ti.
+Not planned (gap noted in the report): `s2_rebar` with ReBAR off; no second card.
 Risk for the multi-day runs: Windows Update auto-restart — the human should pause updates.
 
 ## Next steps
-1. GPU swap (step D): human **extends the Windows Update pause** (it ends 2026-10-16 14:28,
-   step D needs ≈ 3 days), shuts down, installs the 4060 Ti in the same slot, boots, closes the
-   apps (Chrome, Task Manager, …), opens Claude Code in `C:\dev\Lightbound` and says "Continue
-   docs/PC_CLAUDE_TASK.md". Then: probe (`sysinfo.rebar: on` expected, `nvidia-smi` shows the
-   4060 Ti, link gen3 x8 expected on this board), start `results\m1_4060` with
-   `--tag rebar-on --resume` detached, nothing to rebuild, **nothing on the PC for the first
-   4 minutes of each run**. Then leave it for ≈ 3 days.
-2. Step E: combined report (`micro_report.py results\m1_3060 results\m1_4060 --out
-   results\m1_pc_report`, plus `results\m1_3060_rebar-off` as its own report), `docs/PC_REPORT.md`
-   per task §4 (the human wants everything **perfect before the hand-over to the Mac**: re-read
-   task §4 and check every item), gzip, commit, push, final message.
+The PC task is complete (2026-10-13). Everything is on branch `pc/m0-m1`; the Mac continues
+from `docs/PC_REPORT.md`. If a second card ever becomes available: boot with it, probe, run
+`results\m1_<card>` with `--tag rebar-on --resume`, then rebuild `results\m1_pc_report` from
+both directories (`micro_report.py results\m1_3060 results\m1_<card> --out results\m1_pc_report`)
+and extend `PC_REPORT.md`. Nothing on the PC during the first 4 minutes of each run.

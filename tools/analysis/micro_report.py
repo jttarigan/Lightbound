@@ -57,6 +57,9 @@ def load(paths: list[Path]) -> tuple[pd.DataFrame, dict[str, dict[str, str]]]:
     files: list[Path] = []
     for p in paths:
         files.extend(sorted(list(p.rglob("micro*.csv")) + list(p.rglob("micro*.csv.gz"))) if p.is_dir() else [p])
+    # A run that exists both as .csv and as .csv.gz (gzipped for git) is one run, not two.
+    gz_of_csv = {f.with_suffix(".csv.gz") for f in files if f.suffix == ".csv"}
+    files = [f for f in files if f not in gz_of_csv]
     if not files:
         sys.exit("no micro*.csv files found")
     frames, headers = [], {}
