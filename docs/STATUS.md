@@ -1,7 +1,8 @@
 # Work status (resume here)
 
-_Last updated 2026-10-13 16:05 WIB (end of session 8: merged `pc/m0-m1` (45b6182), rebuilt both Mac backends, ctest 37/37 on each,
-built the combined Mac + 3060 Ti reports, analysed the payload crossover (finding 9). No code work, nothing running)._
+_Last updated 2026-10-13 evening, Mac clock ≈ 18:30 WIB (session 9, Mac-only, no measurements: hot-GPU cells built behind
+`--micro-gpuload` (DECISIONS #32), ctest 40/40 on Metal and MoltenVK; re-scope draft `docs/M1_RESCOPE_PROPOSAL.md`; PC message
+`docs/PC_MESSAGE_2026-10-13.md`; bundle of `main` on the Desktop. Nothing running)._
 
 ## RESUME HERE (2026-10-13)
 - **M1 data is merged. The combined reports say NO-GO by protocol §6, and the decision is the user's** (to-do 1). The facts are in
@@ -14,6 +15,13 @@ built the combined Mac + 3060 Ti reports, analysed the payload crossover (findin
   hypothesis for the user's approval before writing code. If the user doesn't take this up, the hot-GPU test stays optional.
 - **4060 Ti series ≈ 2026-10-27 to 11-03** (card in service; to-do 4). **The PC's Windows Update pause ends 2026-10-16 14:28 WIB**
   (to-do 3).
+- **Session 9 (2026-10-13 evening, user AFK, decisions pending):** the hot-GPU cell is **built and tested on both backends, off by
+  default** (`--micro-gpuload=idle|hot|both`, DECISIONS #32; details there). The decisions 0 and a–d are written out with
+  recommendations in `docs/M1_RESCOPE_PROPOSAL.md` (§1), which also holds the H1′ hypothesis and the §6 text to add if approved.
+  `docs/PC_MESSAGE_2026-10-13.md` tells the PC Claude that step D is back on and how to run the extension; both go to the PC
+  with `~/Desktop/lightbound-main-2026-10-13.bundle` (branch `main`). Main (the lab's cross-project session) has the decision
+  list for the user's checklist. Smoke numbers only (30 iterations, validation on, not measurements): M5 empty round trip
+  ≈ 77 µs hot vs ≈ 204 µs idle; load duty 1.00.
 
 ## To-do (2026-10-13, in order)
 Tags: **[solo]** = this session, unattended; **[device: X, ~time]** = needs a machine; **[user]** = the human's hands or a decision.
@@ -28,10 +36,13 @@ Device slots come from Main's day plan (LAB.md). No phones or tablets are needed
    (c) **ReBAR on: rt alone or rt + GPU read**: rt as the protocol defines it, with the sum as a secondary figure.
    (d) **Repo public** (finding 6): keep it public for now, because anonymous HTTPS is the Mac's only way to fetch the PC's results.
    M2 starts only after a GO. On NO-GO the protocol says re-scope: the paper pivots to staleness + energy + design patterns.
-2. **[solo, ~½ day] then [device: Mac on AC, quiet, ~30 min] and [device: Windows PC, ~1 h], only if 1a = yes.** Implement
-   the hot-GPU cell on Metal and Vulkan with the same algorithm (R1), with tests and ctest on both Mac backends. Then do 3 Mac
-   runs: Mac on the charger, lid open, under `caffeinate -is` (LAB.md). No other session may run GPU work, builds or other
-   heavy jobs on the Mac during them. The PC part goes over as a bundle (SSH push is blocked), between series.
+2. **Code DONE 2026-10-13 (DECISIONS #32).** Remaining, **only if 1a = yes:** **[device: Mac on AC, quiet, ≈ 70 min]** the
+   extension series `results/m1_mac_ext` (idle + hot, 12 payloads; command in `docs/M1_RESCOPE_PROPOSAL.md` §4): Mac on the
+   charger, lid open, Low Power Mode off, under `caffeinate -is` (LAB.md); no other session may run GPU work, builds or other
+   heavy jobs on the Mac meanwhile. **[device: Windows PC, ≈ 3 h, rough]** the same on the 3060 Ti (`results\m1_3060_ext`) after
+   the user carries `~/Desktop/lightbound-main-2026-10-13.bundle` to the PC and the PC Claude merges and rebuilds
+   (`docs/PC_MESSAGE_2026-10-13.md` §2–3). Then **[solo, ~1 h]** report both with `micro_report.py` (the `gpuload` column
+   separates idle from hot) and compute the crossover with its run-to-run spread.
 3. **[user, before 2026-10-16 14:28] Windows Update on the PC.** Extend the pause, or at least keep the NVIDIA driver at
    566.36. Protocol §2 wants the same driver for both cards, and C ran on 566.36. Other projects may use the PC meanwhile
    (NeonSwarm asked for 10-13 night). They must keep its setup: driver, ReBAR on, Ultimate Performance, "Prefer maximum
@@ -57,7 +68,7 @@ Device slots come from Main's day plan (LAB.md). No phones or tablets are needed
 - **M1 — Round-trip microbenchmark (GO/NO-GO gate):** the Mac (AC) and the RTX 3060 Ti (ReBAR on and off) are measured.
   The combined reports are `results/m1_report` (3060 Ti ReBAR on, the primary condition) and `results/m1_report_rebar-off`.
   Both say **NO-GO** by protocol §6. Waiting for: the human's go/no-go (to-do 1), and for acceptance also the 4060 Ti
-  (to-do 4). Do not start M2 before a GO.
+  (to-do 4). Do not start M2 before a GO. The hot-GPU cells (DECISIONS #32) are built, off by default, unmeasured.
 - **PC:** idle since 2026-10-13 10:30. All its work is merged: `docs/PC_REPORT.md` is the hand-over, and `docs/PC_PROGRESS.md`
   is the session log with the resume procedure. Step D (4060 Ti) waits for the card. The PC Claude must be told it is coming
   (to-do 4).
@@ -148,6 +159,10 @@ full session log, both now on `main`. DECISIONS #27–#31 came with the merge. K
   criterion), `tools/run_microbench.py` (N process restarts with cooldown + report).
 - Tests: 6 new unit tests (patterns/checksums, payload parsing, memory policy) + `microbench_smoke`
   GPU test (all paths, validation on). ctest 36/36 on Metal and on MoltenVK; 0 warnings.
+- **Hot-GPU cells (2026-10-13, DECISIONS #32):** `--micro-gpuload=idle|hot|both`; `Gfx::loadDispatch/loadWait` on a second
+  queue in both backends, shared pacing thread + calibration in `src/bench/MicroLoad.*`, `micro_burn` in
+  `shaders/microbench.slang`, cells written as `<path>_hot` with `# cell_load:` duty notes, report support, 3 new tests
+  (ctest 40/40 on Metal and MoltenVK).
 
 ### Verified on the Mac
 - Every iteration of every run: CPU read-back sum = GPU-written pattern, GPU checksum = CPU-written
@@ -373,6 +388,10 @@ After step D add `results/m1_4060` to the first command. Keep ReBAR-off runs in 
   ssh.github.com), on 2026-10-12 and on 2026-10-13 (port 22).** Code for the PC goes over as a git bundle instead (finding 8). Local branch
   `mac/narrow-link` is unpushed too. When SSH works, push both: `git push origin main mac/narrow-link`. The PC branch doesn't depend on them. The preliminary
   `results/m1_prelim` runs predate the repo (their CSVs say `nogit`).
+- **Bundle for the PC (2026-10-13):** `~/Desktop/lightbound-main-2026-10-13.bundle` holds branch `main` (the merge of
+  `pc/m0-m1` plus the hot-GPU cells and the PC message). On the PC: `git fetch <bundle> main:mac-main`, then
+  `git merge --ff-only mac-main` on `pc/m0-m1` (it is an ancestor of `main`), only between series. It supersedes the
+  narrow-link bundle, which is needed only if the 4060 Ti never returns.
 - Build dirs: `build/` (Metal), `build-vk/` (Vulkan via MoltenVK). Toolchain PATH:
   `export PATH="$HOME/Library/Python/3.9/bin:$PATH"`. Python analysis deps are installed (user site).
 - Preliminary data: `results/m1_prelim/` (6 Metal + 3 MoltenVK runs, battery) — not valid for the study.
