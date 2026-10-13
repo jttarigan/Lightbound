@@ -1,19 +1,24 @@
 # Work status (resume here)
 
-_Last updated 2026-10-12 (session 7: state refresh and to-do list for Main's device plan; no code work, nothing started)._
+_Last updated 2026-10-13 (session 8: state refresh for Main. The PC pushed step C on 10-12; no code work, nothing started)._
 
-## To-do (2026-10-12, in order)
+## To-do (2026-10-13, in order)
 Tags: **[solo]** = this session, unattended; **[device: X, ~time]** = needs a machine; **[user]** = the human's hands or a decision.
-Nothing below is started: Main is collecting all projects' plans to share out the devices. No phones or tablets needed.
+Nothing below is started. Device slots come from Main's day plan. No phones or tablets are needed.
 
-1. **[user, ~10 min] Check the PC.** Nothing was pushed to `pc/m0-m1` after 2026-10-07 14:29 (head 8ce9af6, fetched
-   2026-10-12). C run 3 should have ended ≈ 10-08 13:50, followed by the report and a push. On the PC: did run 3 finish
-   (no `_running_run*.csv` in `results\m1_3060`)? Is the PC Claude session still open, or did its push fail? Ask it to
-   finish step C (report, gzip, commit, push). Also: did the narrow-link bundle go to the PC? It is no longer on the Mac's Desktop.
-2. **[solo, ~30 min] Rebuild the narrow-link bundle** (after 1, and only if the PC hasn't merged the old one). Replay
-   `mac/narrow-link`'s one commit (ec93327) onto the PC's latest head so the PC fast-forwards again. Refresh
-   `docs/PC_TASK_NARROW_LINK.md`: C is done, so the bundle now goes in after C. Test it on a fresh HTTPS clone and write it to `~/Desktop/`. If 3a
-   is yes, it also carries the hot-GPU cell.
+1. **[user, ~10 min at the PC] Let the PC finish the run-1 replacement.** Step C is done (3 clean runs, pushed 10-12
+   10:37). The human chose to redo run 1 because the PC's own git push disturbed two secondary cells (see "PC session
+   progress"). The new run 1 started 10-12 10:45 and was due ≈ **10-13 10:30**. Nothing has been pushed since 10-12 10:49
+   (head 505dde8, fetched 10-13 13:10), and the PC Claude only checks when asked. Tell it: *check run 1, rebuild the report,
+   gzip, commit, push* (its "Next steps" 1). Also tell it: **there is no 4060 Ti.** Its step D is replaced by the
+   narrowed-link series D′ (finding 8), whose tooling comes from the Mac as a bundle. It should not ask for a GPU swap, and
+   it should not start anything new.
+2. **[solo, ~30 min] Rebuild the narrow-link bundle**, after the PC's push in 1. The old file is gone from the Mac's
+   Desktop, and the PC has not merged it (checked 10-13). Replay `mac/narrow-link`'s one commit (ec93327) onto the PC's new
+   head so the PC fast-forwards. (The PC has changed only `docs/PC_PROGRESS.md` and `results/` since 6962eff, so there is
+   still no overlap.) Refresh `docs/PC_TASK_NARROW_LINK.md`: C is done, so the bundle now goes in after C, and the PC's
+   lesson on quiet run starts applies. Test it on a fresh HTTPS clone and write it to `~/Desktop/`. If 3a is yes, it
+   also carries the hot-GPU cell. **[user]** then moves the file to the PC.
 3. **[user] Decisions that change what D′ runs.** Make these before D′, because a BIOS change plus a 3-day series is expensive to repeat.
    (a) **Hot-GPU microbench cell** (finding 7)? Recommended: yes. Hot is the regime the game runs in, and hot M5 ≈ 55 µs vs
    3060 Ti 60 µs is what go/no-go turns on. It also needs a short hot-only run at the full link and on the Mac.
@@ -21,19 +26,28 @@ Nothing below is started: Main is collecting all projects' plans to share out th
    Ryzen 7 7700 PC (AM5 boards usually have a gen4 slot), but moving the card there also changes the CPU and memory, so
    the results would no longer be comparable with A2 and C. Invadex (~2 h/day) and NeonTide (M3) also use that PC (LAB.md, 2026-10-12).
 4. **[solo, ~½ day] then [device: Mac on AC, quiet, ~30 min], only if 3a = yes.** Implement the hot-GPU cell on Metal
-   and Vulkan with the same algorithm (R1), with tests and ctest on both Mac backends. Then do 3 Mac runs. No other GPU work may run on the Mac during them.
+   and Vulkan with the same algorithm (R1), with tests and ctest on both Mac backends. Then do 3 Mac runs: Mac on the
+   charger, lid open, under `caffeinate -is` (LAB.md). No other session may run GPU work, builds or other heavy jobs on
+   the Mac during them.
 5. **[user, ~30 min at the PC] Set up D′.** Extend the Windows Update pause (it ends **2026-10-16 14:28**, and D′ needs
-   ≈ 3–4 days). Hand the PC the bundle and `docs/PC_TASK_NARROW_LINK.md`. With the PC Claude, narrow the link in the BIOS
-   (CPU x8 slot first, otherwise force Gen2), then confirm the start of the series.
-6. **[device: Windows PC (3060 Ti), exclusive, ~3–4 days] D′.** 3 resumable runs at `P-3060-narrow`, full protocol
-   including `s2_rebar` (≈ 24 h or more each). Then **[user]** restores the BIOS to gen3 x16, and the PC writes
-   `PC_REPORT.md` and pushes. Nothing else may run on the PC meanwhile.
+   ≈ 3–4 days). If Windows won't extend it, let the updates install and reboot *before* D′, then check that the NVIDIA
+   driver is still 566.36 (the version C ran on). Hand the PC the bundle and `docs/PC_TASK_NARROW_LINK.md`. With the PC
+   Claude, narrow the link in the BIOS (CPU x8 slot first, otherwise force Gen2), then confirm the start of the series.
+6. **[device: Windows PC (3060 Ti), exclusive, ~3–4 days, unattended] D′.** 3 resumable runs at `P-3060-narrow`, full
+   protocol including `s2_rebar` (≈ 24 h each). Nobody may use the PC meanwhile: the first ≈ 4 min of each run and the last
+   ≈ 50 min (`s2_coherent`) are sensitive even to a git push (the lesson from C). Then **[user]** restores the BIOS to
+   gen3 x16, and the PC writes `PC_REPORT.md` and pushes.
 7. **[solo, ~2 h, when the human says merge]** Merge `pc/m0-m1` into `main`, rebuild Metal and MoltenVK, run ctest and
    `micro_report.py` (Mac AC vs 3060 Ti full vs narrow, ReBAR-off in its own report), and finish the M1 report (section C).
-8. **[user] M1 go/no-go.** By the letter of protocol §6 it is NO-GO: cold M5 214 µs vs 3060 Ti 60 µs (hot M5 ≈ 55).
-   Decide at the same time: rt alone or rt + GPU read for ReBAR on, and whether the repo stays public. M2 starts only after a GO.
-9. **[user, any time, low priority] Pushing.** SSH to GitHub still times out (checked 2026-10-12). `main` is 7 commits
-   ahead of `origin/main`, and `mac/narrow-link` is unpushed. Fix: a network where port 22 works, or an HTTPS token.
+8. **[user] M1 go/no-go.** By the letter of protocol §6 it is NO-GO: the M5 must be clearly lower than the best Vulkan path.
+   Cold M5 is 214 µs empty and 305 µs at 1 MiB. The 3060 Ti is 60 µs and 142 µs (s2_direct with ReBAR off; with ReBAR on,
+   s2_hostcached 160 and s2_direct 207). Hot M5 is ≈ 55 µs empty; hot 1 MiB is unmeasured. Decide at the same time:
+   rt alone or rt + GPU read for ReBAR on (recommended: rt as the protocol defines it, with rt + GPU read as a secondary
+   figure), and whether the repo stays public (recommended: keep it public for now, because anonymous HTTPS is the Mac's
+   only working way to fetch the PC's results). M2 starts only after a GO. On NO-GO the protocol says re-scope: the paper
+   pivots to staleness + energy + design patterns.
+9. **[user, any time, low priority] Pushing.** SSH to GitHub still times out (port 22, checked 2026-10-13). Every `main`
+   commit after `origin/main` (baf605a) is unpushed, and so is `mac/narrow-link`. Fix: a network where port 22 works, or an HTTPS token.
 
 **Deadline:** the PC's Windows Update pause ends 2026-10-16 14:28 WIB. Extend it before D′ starts.
 
@@ -43,17 +57,18 @@ Nothing below is started: Main is collecting all projects' plans to share out th
   `pc/m0-m1` (2026-10-02; one MSVC fix, DECISIONS #27 on that branch). M0 is fully closed once the branch is merged.
 - **M1 — Round-trip microbenchmark (GO/NO-GO gate):** implemented on both backends and verified
   on the Mac. **Not closed:** Mac AC re-run done (still fails run-to-run, see below); needs (2) PC runs on the 3060 Ti at the full link
-  (running) and at a **narrowed link** (`P-3060-narrow`, which replaces the 4060 Ti, finding 8), (3) the human's go/no-go decision. Do not start M2 before that. New evidence for that
+  (C done, run 1 being replaced) and at a **narrowed link** (`P-3060-narrow`, which replaces the 4060 Ti, finding 8), (3) the human's go/no-go decision. Do not start M2 before that. New evidence for that
   decision: the M5 sync probe, finding 7. A hot GPU gives a round trip ≈ 55 µs, stable, and polling isn't viable.
 - **Open human decisions:** go/no-go (the data so far says NO-GO by the letter, findings 4 and 7); whether to add
   a hot-GPU microbench cell (finding 7); the PCIe gen3 link (finding 5); whether the repo should be public (finding 6).
 - **PC session:** on branch `pc/m0-m1` (see "PC session progress" below). M0 checks pass. A2 (ReBAR off,
-  fixed clock mapping) is done and ReBAR is on. The ReBAR-on full-link series (C) started 2026-10-05 14:34; runs 1 and 2
-  are done and clean, and run 3 was due to end ≈ **2026-10-08 13:50**, followed by the report and a push. **As of
-  2026-10-12 nothing has been pushed since 10-07 14:29**, so C's outcome is unknown (to-do 1). The last pushed
-  `PC_PROGRESS.md` still plans "step D = swap to the 4060 Ti". The narrow-link bundle (finding 8) is not merged on the
-  pushed branch, and `~/Desktop/lightbound-narrow-link-2026-10-05.bundle` is gone from the Mac (it was not found by name on the Mac on 2026-10-12;
-  the human may have moved it to the PC). It is rebuilt from local branch `mac/narrow-link` (to-do 2). Never apply it in the
+  fixed clock mapping) is done and ReBAR is on. The ReBAR-on full-link series **C is done** (10-05 14:34 → 10-08 13:50,
+  3 clean runs, pushed 10-12). Its run-to-run check failed on two secondary cells of run 1, which the PC's own git push
+  disturbed, so the human had run 1 redone. That replacement started 10-12 10:45 and was due ≈ **10-13 10:30**. It had not been
+  pushed by 10-13 13:10 (to-do 1). The pushed `PC_PROGRESS.md` still plans "step D = swap to the 4060 Ti", which is wrong
+  (finding 8). The narrow-link bundle (finding 8) is not merged on the pushed branch, and
+  `~/Desktop/lightbound-narrow-link-2026-10-05.bundle` is gone from the Mac (not found by name on 10-12 or 10-13).
+  It is rebuilt from local branch `mac/narrow-link` (to-do 2). Never apply it in the
   middle of a series, because a rebuild breaks `--resume`. On resume: fetch the branch (command below), read its `docs/PC_PROGRESS.md`,
   report progress, and wait. Merge only when the human says so (section C).
 
@@ -64,6 +79,9 @@ cd ~/Project/Lightbound
 # SSH to github.com may time out on this network; the repo is public, so fetch over HTTPS:
 GIT_TERMINAL_PROMPT=0 git -c credential.helper= fetch https://github.com/jttarigan/Lightbound.git \
     pc/m0-m1:refs/remotes/origin/pc/m0-m1
+# The fetch can hang or fail quietly: check that the ref really moved (today's date in the reflog), else retry with
+# -c http.lowSpeedLimit=1000 -c http.lowSpeedTime=60 (on 2026-10-12 a stale ref was reported as "nothing pushed")
+git reflog show refs/remotes/origin/pc/m0-m1 --date=iso | head -1
 git log --oneline main..origin/pc/m0-m1
 git show origin/pc/m0-m1:docs/PC_PROGRESS.md
 # Has the PC applied the narrow-link bundle (finding 8)?
@@ -72,7 +90,36 @@ git merge-base --is-ancestor mac/narrow-link origin/pc/m0-m1 && echo "bundle mer
 (macOS has no GNU `timeout` command, so don't wrap git calls in it.) Always fetch before saying what the PC
 is doing. `PC_PROGRESS.md` on the branch is the only source; on 2026-10-05 a guess from the old plan turned out wrong.
 
-## PC session progress (as of 2026-10-07 21:00, branch head 8ce9af6, pushed 2026-10-07 14:29 +0700; unchanged at the 2026-10-12 fetch)
+## PC session progress (as of 2026-10-13 13:10, branch head 505dde8, pushed 2026-10-12 10:49 +0700)
+Read from `origin/pc/m0-m1:docs/PC_PROGRESS.md`. Since 8ce9af6 the PC pushed three docs/results commits and no code.
+- **C done:** 3 runs (23.7–23.8 h each), binary 6962eff, exit 0, 0 failures, no restarts, no reboot. ReBAR on (bar heap
+  8024 MB), gen3 x16, driver 566.36. Runs 2 and 3 are gzipped in `results/m1_3060` on the branch. Round trip p50 / p99
+  (µs), chain/spin, 3 runs pooled (including the disturbed run 1):
+
+  | path | 0 | 4K | 64K | 256K | 1M | 4M | 16M |
+  |---|---:|---:|---:|---:|---:|---:|---:|
+  | empty | 60 / 86 | | | | | | |
+  | s2_direct | | 60 / 85 | 69 / 106 | 97 / 138 | 207 / 283 | 651 / 965 | 2408 / 2768 |
+  | s1_copy | | 73 / 94 | 89 / 118 | 131 / 162 | 311 / 426 | 1060 / 1252 | 3973 / 4582 |
+  | s2_hostcached | | 62 / 99 | 69 / 101 | 87 / 132 | 160 / 238 | 466 / 646 | 1759 / 2208 |
+  | s2_rebar | | 1748 / 1926 | 27129 / 27895 | 108471 / 110358 | 434967 / 442314 | 1755536 / 1769449 | 7029474 / 7063888 |
+  | s2_coherent | | 119 / 146 | 991 / 1210 | 3823 / 4334 | 14976 / 16092 | 59888 / 63639 | 239384 / 252008 |
+
+  g2c / c2g p50 for empty 31.0 / 28.8 µs. Raw copy 16 MiB d2h 12.40 / h2d 13.26 GB/s. The ReBAR on/off split below
+  holds for the pooled data (1 MiB `s2_direct` rt 207 vs 142 µs, `cpu_write` 96 vs 33 µs).
+- **Run-to-run: FAIL by the tool's rule. Two of 124 cells were ≥ 10 %, both disturbed by the PC Claude's own push** at
+  ≈ 14:37:40 on 10-05: `s2_hostcached` perpass/spin 1M (+17.6 %) and 4M (+11.8 %) in run 1. Runs 2 and 3 agree on them within
+  0.1 %. The worst primary-condition (chain/spin) cell is 8.5 %, so the primary condition passes. **Human decision 2026-10-12:
+  replace run 1** (option b). The old run 1 is kept in `results/m1_3060_run1_disturbed/` with a README; don't pool it.
+- **Run 1 replacement:** launched detached 10-12 10:45:14 with the same `--resume` command and binary. The runner redoes run 1
+  only and rebuilds `report/`. It was expected to end ≈ **10-13 10:30**. The PC Claude must be asked to check, gzip, commit and push (to-do 1).
+- **PC's lesson (for every future series, D′ included):** no git commit or push, no log reads, nothing at all on the PC
+  during the first ≈ 4 minutes of each run (the fast paths) or during `s2_coherent` (the last ≈ 50 min). Notes are written only
+  while `s2_rebar` runs, which is shown to be insensitive (runs agree within 0.3 %).
+- Its "Next steps" still say step D = GPU swap to the 4060 Ti and "extend the pause if D starts after 10-13". D becomes D′
+  (finding 8). The PC needs to be told, and needs the bundle (to-dos 1, 2, 5).
+
+### PC notes from 2026-10-07 (branch head 8ce9af6, pushed 2026-10-07 14:29 +0700)
 Read from `origin/pc/m0-m1:docs/PC_PROGRESS.md`. Since 6962eff the PC pushed seven docs/results commits and no code;
 DECISIONS on the branch is still at #30.
 - **A2 done (2026-10-05 10:26–13:03):** 3060 Ti, ReBAR off, fixed clock mapping, gen3 x16, Ultimate Performance;
@@ -116,7 +163,7 @@ DECISIONS on the branch is still at #30.
   merge, not a fast-forward — a trial merge on the Mac (2026-10-07) was clean and no file is touched by both sides;
   (3) C runs on 6962eff and D′ will run on the merge commit, which differ only by the `--platform` plumbing (no measurement
   path changes); the write-up should say so.
-- **PC plan now:** C run 3 (→ 10-08 ≈ 13:50) → PC report, gzip, push → human: bundle + narrow-link task → D′ (3 runs,
+- **PC plan on 10-07 (superseded by the to-do list):** C run 3 (→ 10-08 ≈ 13:50) → PC report, gzip, push → human: bundle + narrow-link task → D′ (3 runs,
   ≈ 3 days, `--platform=P-3060-narrow`, `results\m1_3060_narrow`) → E: `PC_REPORT.md` + push → Mac: merge (section C).
 
 ### PC notes from 2026-10-05 (branch head 6962eff, pushed 2026-10-05 10:24 +0700)
@@ -249,8 +296,8 @@ Metal, chain/spin, round trip p50 / p99 (µs):
 4. The go criterion cannot be evaluated without PC data. If the RTX round trips land around
    50–150 µs (my expectation for timeline semaphores over PCIe — not measured), the M5 as measured here would **not** be
    "clearly lower" → NO-GO by the letter of protocol §6. **PC timing data (3060 Ti, gen3 x16): empty round
-   trip p50 60 µs vs M5 214 µs (AC); 1 MiB s2_direct 142 µs with ReBAR off (A2, pooled) and ≈ 207 µs with ReBAR on
-   (C, runs 1–2) vs M5 305 µs.**
+   trip p50 60 µs vs M5 214 µs (AC); 1 MiB s2_direct 142 µs with ReBAR off (A2, pooled) and 207 µs with ReBAR on
+   (C, 3 runs pooled; best Vulkan path with ReBAR on: s2_hostcached 160 µs) vs M5 305 µs.**
    As specified (cold GPU), the M5 is clearly *slower* on both criterion cells, so M1 is **NO-GO by the letter of
    protocol §6** unless the human takes one of the options below. With a hot GPU (finding 7), the M5's empty round trip is
    ≈ 53–57 µs vs 60 µs, about 10 % lower and probably not beyond run-to-run noise. The hot 1 MiB case is
@@ -330,7 +377,7 @@ Metal, chain/spin, round trip p50 / p99 (µs):
      `mac/narrow-link`, full history, ≈ 10 MB). Tested on a fresh clone of `pc/m0-m1`: fetch + merge is a fast-forward.
      **2026-10-12: the file is gone from the Desktop.** It gets rebuilt on the PC's current head (to-do 2).
      The PC should merge it only when no series is unfinished (a rebuild changes `git_commit`, and `--resume` then refuses);
-     the natural moment is after A2 and before C.
+     the natural moment was after A2 and before C; C started first, so it now goes in after C's run-1 replacement.
    - **DECISIONS.md entries** for the P-4060 → P-3060-narrow replacement and for the `--platform` flag are written by the PC
      on its branch (task file step 8), after its #30. `main` still doesn't touch DECISIONS.md.
    - Optional, still undecided: a hot-GPU microbench cell (finding 7). With only one card it would also need
@@ -390,8 +437,8 @@ Paste back `results/m1_report/report.md` and any errors. Keep ReBAR-off runs in 
   `git@github.com:jttarigan/Lightbound.git` (Mac pushes with a deploy key over SSH). On 2026-10-01 SSH
   to github.com timed out from the Mac's network (ports 22 and 443). HTTPS fetch works (see the
   resume checklist), but pushing needs SSH. **Local `main` is ahead of `origin/main` (baf605a)** with
-  the session-3 to 6 commits, which are unpushed. **SSH still timed out on 2026-10-06 (ports 22 and 443,
-  ssh.github.com) and on 2026-10-12 (port 22).** The PC gets the narrow-link tooling through the bundle instead (finding 8). Local branch
+  every commit since session 3, all unpushed. **SSH still timed out on 2026-10-06 (ports 22 and 443,
+  ssh.github.com), on 2026-10-12 and on 2026-10-13 (port 22).** The PC gets the narrow-link tooling through the bundle instead (finding 8). Local branch
   `mac/narrow-link` is unpushed too. When SSH works, push both: `git push origin main mac/narrow-link`. The PC branch doesn't depend on them. The preliminary
   `results/m1_prelim` runs predate the repo (their CSVs say `nogit`).
 - Build dirs: `build/` (Metal), `build-vk/` (Vulkan via MoltenVK). Toolchain PATH:
