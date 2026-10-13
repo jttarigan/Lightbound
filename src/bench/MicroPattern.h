@@ -8,6 +8,15 @@ namespace lb::bench {
 
 constexpr u32 kMicroGroupSize = 64;       // LB_AGENT_GROUP_SIZE
 constexpr u32 kMicroMaxReadGroups = 256;  // partial sums written by micro_read
+constexpr u32 kMicroBurnThreads = 32;     // micro_burn's [numthreads]: one group of one SIMD width
+constexpr u64 kMicroBurnBytes = 4096;     // its output buffer (≥ kMicroBurnThreads × 16 B)
+
+/// Push constants of every microbench kernel (shaders/microbench.slang `MicroParams`).
+/// micro_write/micro_read: x = element count, y = iteration, z = read groups; micro_burn: x = steps.
+struct MicroParams {
+    u32 v[4];
+};
+static_assert(sizeof(MicroParams) == 16 && alignof(MicroParams) == 4);
 
 /// Element i (16 B) of the pattern micro_write produces in iteration `it`.
 inline void gpuWriteElement(u32 i, u32 it, u32 out[4]) {

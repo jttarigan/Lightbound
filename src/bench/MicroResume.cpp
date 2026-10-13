@@ -1,5 +1,6 @@
 #include "bench/MicroResume.h"
 
+#include <cstdio>
 #include <cstdlib>
 
 namespace lb::bench {
@@ -8,6 +9,7 @@ namespace {
 
 constexpr const char* kColumnsPrefix = "platform,path,submit,cpuwait,payload_bytes,iter,";
 constexpr const char* kFailureNotePrefix = "# cell_failures: ";
+constexpr const char* kLoadNotePrefix = "# cell_load: ";
 constexpr usize kDataColumns = 15;
 
 bool startsWith(const std::string& s, const char* prefix) {
@@ -34,7 +36,7 @@ bool parseU64(const std::string& s, u64& out) {
 }
 
 struct Line {
-    enum Kind { Data, FailureNote, Other } kind = Other;
+    enum Kind { Data, FailureNote, LoadNote, Other } kind = Other;
     std::string text;
     usize cell = 0;      // Data, FailureNote: index into the cell table
     u64 failures = 0;    // FailureNote
@@ -70,6 +72,13 @@ std::string cellFailureNote(const std::string& path, const std::string& submit, 
                             u64 payload, u64 failures) {
     return kFailureNotePrefix + path + "," + submit + "," + cpuwait + "," + std::to_string(payload) + "," +
            std::to_string(failures);
+}
+
+std::string cellLoadNote(const std::string& path, const std::string& submit, const std::string& cpuwait, u64 payload,
+                         u64 dispatches, f64 duty) {
+    char tail[64];
+    std::snprintf(tail, sizeof(tail), ",dispatches=%llu,duty=%.3f", static_cast<unsigned long long>(dispatches), duty);
+    return kLoadNotePrefix + path + "," + submit + "," + cpuwait + "," + std::to_string(payload) + tail;
 }
 
 bool scanResumeCsv(const std::string& text, u32 iterations, u32 bandwidthRows, ResumeScan& out) {
@@ -116,6 +125,12 @@ bool scanResumeCsv(const std::string& text, u32 iterations, u32 bandwidthRows, R
             u64 payload = 0;
             if (f.size() != 5 || !parseU64(f[3], payload) || !parseU64(f[4], l.failures)) continue;
             l.kind = Line::FailureNote;
+            l.cell = cellIndex(seen, f[0], f[1], f[2], payload);
+        } else if (startsWith(l.text, kLoadNotePrefix)) {
+            const std::vector<std::string> f = split(l.text.substr(std::string(kLoadNotePrefix).size()), ',');
+            u64 payload = 0;
+            if (f.size() < 4 || !parseU64(f[3], payload)) continue;
+            l.kind = Line::LoadNote;
             l.cell = cellIndex(seen, f[0], f[1], f[2], payload);
         } else if (startsWith(l.text, "#")) {
             // The footer belongs to the process that wrote it; the resuming process writes its own.

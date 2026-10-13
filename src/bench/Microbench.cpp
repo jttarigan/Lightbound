@@ -2,6 +2,7 @@
 
 #include "GitInfo.h"
 #include "app/Version.h"
+#include "bench/MicroLoad.h"
 #include "bench/MicroPattern.h"
 #include "bench/MicroResume.h"
 #include "bench/SysInfo.h"
@@ -41,11 +42,6 @@ enum : u32 {
     kTsCopyUpBegin, kTsCopyUpEnd, kTsReadBegin, kTsReadEnd, kTsCount
 };
 
-struct MicroParams {
-    u32 v[4];
-};
-static_assert(sizeof(MicroParams) == 16);
-
 struct Row {
     u32 iter = 0;
     f64 rtUs = kNaN, g2cUs = kNaN, c2gUs = kNaN, cpuReadUs = kNaN, cpuWriteUs = kNaN;
@@ -53,9 +49,10 @@ struct Row {
 };
 
 struct PathDef {
-    std::string name;
+    std::string name;   // CSV path name; hot cells carry the "_hot" suffix
     bool empty = false;
     frame::TransferPath path = frame::TransferPath::S2Direct;
+    bool hot = false;   // measured with the background load running (DECISIONS #32)
 };
 
 struct PathBuffers {
@@ -212,7 +209,44 @@ private:
         m_checksumPtr = static_cast<u32*>(m_g.mappedPtr(m_checksum));
         m_timeline = m_g.createTimeline(0);
         m_ts = m_g.createTimestampPool(kTsCount);
-        return m_checksumPtr != nullptr && m_timeline.valid();
+        if (m_checksumPtr == nullptr || !m_timeline.valid()) return false;
+        return m_cfg.gpuLoad == GpuLoad::Idle || setupLoad();
+    }
+
+    // Hot-GPU cells (DECISIONS #32): the burn kernel on the second queue, calibrated once.
+    bool setupLoad() {
+        const GfxCaps& caps = m_g.caps();
+        if (!caps.secondQueue) {
+            if (m_cfg.gpuLoad == GpuLoad::Hot) {
+                LB_LOG_ERROR("hot-GPU cells need a second GPU queue; this device has none (%s)", caps.secondQueueInfo);
+                return false;
+            }
+            LB_LOG_WARN("hot-GPU cells skipped: this device has no second GPU queue (%s)", caps.secondQueueInfo);
+            m_loadAvailable = false;
+            return true;
+        }
+        ComputePipelineDesc pd;
+        pd.shader = "microbench";
+        pd.entry = "micro_burn";
+        pd.bufferCount = 2;
+        pd.pushConstantBytes = sizeof(MicroParams);
+        pd.threadsPerGroup = kMicroBurnThreads;
+        m_load.pipeline = m_g.createComputePipeline(pd);
+        m_burn = m_g.createBuffer({kMicroBurnBytes, MemoryClass::DeviceLocal, false, "micro.burn"});
+        const BufferHandle burnBufs[2] = {m_burn, m_burn};   // binding 1 (gChecksum) is unused by micro_burn
+        if (m_load.pipeline.valid() && m_burn.valid()) m_load.set = m_g.createBindingSet(m_load.pipeline, burnBufs, 2);
+        if (!m_load.set.valid()) {
+            LB_LOG_ERROR("hot-GPU load: micro_burn pipeline or buffer failed");
+            return false;
+        }
+        if (!calibrateLoad(m_g, m_load, m_loadDispatchUs)) {
+            LB_LOG_ERROR("hot-GPU load: calibration on the second queue failed (%s)", caps.secondQueueInfo);
+            return false;
+        }
+        m_loadAvailable = true;
+        LB_LOG_INFO("hot-GPU load: micro_burn %u steps = %.1f us per dispatch, %u in flight on %s", m_load.steps,
+                    m_loadDispatchUs, kLoadInFlight, caps.secondQueueInfo);
+        return true;
     }
 
     std::vector<PathDef> pathList() const {
@@ -224,16 +258,26 @@ private:
         for (frame::TransferPath p : paths) all.push_back({frame::transferPathName(p), false, p});
 
         std::vector<PathDef> out;
-        for (const PathDef& d : all) {
-            if (!m_cfg.paths.empty() && std::find(m_cfg.paths.begin(), m_cfg.paths.end(), d.name) == m_cfg.paths.end()) {
-                continue;
+        // Every idle cell first (the protocol run, unchanged), then the hot cells: the load leaves
+        // the GPU clocked up for a while, so idle must never follow hot.
+        const bool idle = m_cfg.gpuLoad != GpuLoad::Hot;
+        const bool hot = m_cfg.gpuLoad != GpuLoad::Idle && m_loadAvailable;
+        for (int pass = 0; pass < 2; ++pass) {
+            if ((pass == 0 && !idle) || (pass == 1 && !hot)) continue;
+            for (const PathDef& d : all) {
+                if (!m_cfg.paths.empty() && std::find(m_cfg.paths.begin(), m_cfg.paths.end(), d.name) == m_cfg.paths.end()) {
+                    continue;
+                }
+                frame::PathMemory mem;
+                if (!frame::pathMemory(d.path, m_g.caps(), mem)) {
+                    if (pass == 0) LB_LOG_INFO("path %s not available on this backend/device; skipped", d.name.c_str());
+                    continue;
+                }
+                PathDef def = d;
+                def.hot = pass == 1;
+                if (def.hot) def.name = hotPathName(d.name);
+                out.push_back(def);
             }
-            frame::PathMemory mem;
-            if (!frame::pathMemory(d.path, m_g.caps(), mem)) {
-                LB_LOG_INFO("path %s not available on this backend/device; skipped", d.name.c_str());
-                continue;
-            }
-            out.push_back(d);
         }
         return out;
     }
@@ -264,7 +308,7 @@ private:
             destroyPathBuffers(pb);
             return false;
         }
-        LB_LOG_INFO("path %-13s down=%s up=%s%s%s%s%s", def.name.c_str(), memoryClassName(pb.mem.down),
+        LB_LOG_INFO("path %-17s down=%s up=%s%s%s%s%s", def.name.c_str(), memoryClassName(pb.mem.down),
                     memoryClassName(pb.mem.up), pb.mem.copy ? " downStaging=" : "",
                     pb.mem.copy ? memoryClassName(pb.mem.downStaging) : "", pb.mem.copy ? " upStaging=" : "",
                     pb.mem.copy ? memoryClassName(pb.mem.upStaging) : "");
@@ -337,6 +381,10 @@ private:
             if (c.valid) worstCalibNs = std::max(worstCalibNs, c.maxDeviationNs);
             calibratedNs = nowNs();
         };
+
+        // Hot cells: the second queue runs the burn kernel for the whole cell, warm-up included.
+        BackgroundLoad load(m_g, m_load);
+        if (def.hot) load.start();
 
         for (u32 it = 0; it < total; ++it) {
             if (it % kRecalibrateEvery == 0 || nowNs() - calibratedNs > kMaxCalibrationAgeNs) calibrate();
@@ -442,6 +490,20 @@ private:
                 r.copyC2gUs = usBetween(ts[kTsCopyUpBegin], ts[kTsCopyUpEnd]);
             }
         }
+        f64 loadDuty = kNaN;
+        if (def.hot) {
+            load.stop();
+            loadDuty = static_cast<f64>(load.dispatches()) * m_loadDispatchUs / std::max(load.activeUs(), 1.0);
+            if (load.failed()) {
+                LB_LOG_ERROR("%s P=%llu: the background load failed; the cell was not hot", def.name.c_str(),
+                             static_cast<unsigned long long>(bytes));
+                ++cellFailures;
+            } else if (loadDuty < 0.5) {
+                LB_LOG_WARN("%s P=%llu: background load duty %.2f (dispatches %llu); the second queue idled",
+                            def.name.c_str(), static_cast<unsigned long long>(bytes), loadDuty,
+                            static_cast<unsigned long long>(load.dispatches()));
+            }
+        }
         m_failures += cellFailures;
 
         const char* submit = submitName(chain);
@@ -449,6 +511,9 @@ private:
         if (cellFailures != 0 && m_csv != nullptr) {
             // In front of the rows, so a resumed run (--resume) still counts this cell's failures.
             std::fprintf(m_csv, "%s\n", cellFailureNote(def.name, submit, cpuwait, bytes, cellFailures).c_str());
+        }
+        if (def.hot && m_csv != nullptr) {
+            std::fprintf(m_csv, "%s\n", cellLoadNote(def.name, submit, cpuwait, bytes, load.dispatches(), loadDuty).c_str());
         }
         writeRows(def.name, submit, cpuwait, bytes, rows);
 
@@ -461,9 +526,14 @@ private:
         Summary s{def.name, submit, cpuwait, bytes, percentile(rt, 0.5), percentile(rt, 0.99),
                   percentile(g2c, 0.5), percentile(c2g, 0.5)};
         m_summaries.push_back(s);
-        LB_LOG_INFO("%-13s %-7s %-5s %5s  rt p50 %9.1f us  p99 %9.1f  | g2c p50 %8.1f  c2g p50 %8.1f  | calib ±%.1f us%s",
+        char loadInfo[64] = "";
+        if (def.hot) {
+            std::snprintf(loadInfo, sizeof(loadInfo), "  | load %llu disp, duty %.2f",
+                          static_cast<unsigned long long>(load.dispatches()), loadDuty);
+        }
+        LB_LOG_INFO("%-17s %-7s %-5s %5s  rt p50 %9.1f us  p99 %9.1f  | g2c p50 %8.1f  c2g p50 %8.1f  | calib ±%.1f us%s%s",
                     def.name.c_str(), submit, cpuwait, payloadLabel(bytes).c_str(), s.rt50, s.rt99, s.g2c50,
-                    s.c2g50, worstCalibNs * 1e-3, cellFailures != 0 ? "  FAILURES" : "");
+                    s.c2g50, worstCalibNs * 1e-3, loadInfo, cellFailures != 0 ? "  FAILURES" : "");
     }
 
     // GPU copy bandwidth device→host staging and host staging→device (docs/06 §6 "raw copy
@@ -555,6 +625,21 @@ private:
         h.add("sysinfo.pcie_link", pcie);
         h.add("columns.extra", "copy_g2c_us,copy_c2g_us,gpu_write_us,gpu_read_us appended after the §12 columns "
                                "(DECISIONS #20); bw_* rows: rt_us = GPU copy time");
+        h.add("sysinfo.second_queue", m_g.caps().secondQueue ? m_g.caps().secondQueueInfo : "none");
+        h.add("gpuload", gpuLoadName(m_cfg.gpuLoad));
+        if (m_cfg.gpuLoad != GpuLoad::Idle) {
+            // Hot-GPU cells (DECISIONS #32). load.steps / load.dispatch_us are calibrated per process.
+            h.add("load.available", m_loadAvailable ? "yes" : "no");
+            h.add("load.kernel", "micro_burn: 1 group x 32 threads, dependent multiply-add chain on the second queue, " +
+                                     std::to_string(kLoadInFlight) + " dispatches in flight; hot cells = paths "
+                                     "suffixed _hot; '# cell_load:' notes give dispatches and duty per cell");
+            if (m_loadAvailable) {
+                char buf[32];
+                h.add("load.steps", std::to_string(m_load.steps));
+                std::snprintf(buf, sizeof(buf), "%.1f", m_loadDispatchUs);
+                h.add("load.dispatch_us", buf);
+            }
+        }
 
         std::string interrupted;
         if (m_cfg.resume && readFile(m_cfg.outPath, interrupted)) {
@@ -581,8 +666,8 @@ private:
             if (kv.first == "cli" || kv.first == "start" || kv.first == "sysinfo.thermal_state_start") continue;
             const std::string before = m_resume.headerValue(kv.first);
             if (before == kv.second) continue;
-            if (kv.first == "sysinfo.pcie_link") {
-                LB_LOG_WARN("--resume: PCIe link was '%s', now '%s'", before.c_str(), kv.second.c_str());
+            if (kv.first == "sysinfo.pcie_link" || kv.first == "load.steps" || kv.first == "load.dispatch_us") {
+                LB_LOG_WARN("--resume: %s was '%s', now '%s'", kv.first.c_str(), before.c_str(), kv.second.c_str());
                 continue;
             }
             LB_LOG_ERROR("--resume: %s was started with %s = '%s', now '%s'; not resumed", m_cfg.outPath.c_str(),
@@ -643,7 +728,7 @@ private:
 
     void printSummary() const {
         std::printf("\nround-trip p50 / p99 (us), %s\n", m_platform.c_str());
-        std::printf("%-13s %-7s %-5s", "path", "submit", "wait");
+        std::printf("%-17s %-7s %-5s", "path", "submit", "wait");
         std::vector<u64> payloads{0};
         for (u64 p : m_cfg.payloads) payloads.push_back(p);
         for (u64 p : payloads) std::printf(" %17s", payloadLabel(p).c_str());
@@ -653,7 +738,7 @@ private:
             const std::string key = s.path + s.submit + s.wait;
             if (std::find(seen.begin(), seen.end(), key) != seen.end()) continue;
             seen.push_back(key);
-            std::printf("%-13s %-7s %-5s", s.path.c_str(), s.submit.c_str(), s.wait.c_str());
+            std::printf("%-17s %-7s %-5s", s.path.c_str(), s.submit.c_str(), s.wait.c_str());
             for (u64 p : payloads) {
                 const Summary* found = nullptr;
                 for (const Summary& t : m_summaries) {
@@ -674,6 +759,10 @@ private:
     PipelineHandle m_write, m_read;
     BufferHandle m_checksum;
     u32* m_checksumPtr = nullptr;
+    LoadKernel m_load;               // hot-GPU cells (DECISIONS #32)
+    BufferHandle m_burn;
+    bool m_loadAvailable = false;
+    f64 m_loadDispatchUs = 0.0;
     TimelineHandle m_timeline;
     TimestampPoolHandle m_ts;
     u64 m_value = 0;
@@ -687,6 +776,24 @@ private:
 
 std::vector<u64> defaultMicroPayloads() {
     return {4ull << 10, 64ull << 10, 256ull << 10, 1ull << 20, 4ull << 20, 16ull << 20};
+}
+
+const char* gpuLoadName(GpuLoad l) {
+    switch (l) {
+    case GpuLoad::Idle: return "idle";
+    case GpuLoad::Hot: return "hot";
+    case GpuLoad::Both: return "both";
+    }
+    return "?";
+}
+
+std::string hotPathName(const std::string& path) {
+    return path + "_hot";
+}
+
+bool isHotPath(const std::string& path) {
+    const std::string suffix = "_hot";
+    return path.size() > suffix.size() && path.compare(path.size() - suffix.size(), suffix.size(), suffix) == 0;
 }
 
 bool parsePayloadList(const std::string& text, std::vector<u64>& out, std::string& error) {

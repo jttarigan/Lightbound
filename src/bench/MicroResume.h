@@ -32,6 +32,12 @@ struct ResumeScan {
 std::string cellFailureNote(const std::string& path, const std::string& submit, const std::string& cpuwait,
                             u64 payload, u64 failures);
 
+/// Note written in front of a hot-GPU cell's rows (DECISIONS #32): how many background-load
+/// dispatches ran during the cell and their duty (load time / cell wall time, ≈ 1 when the
+/// second queue never idled). Dropped with the cell's rows when the cell is incomplete.
+std::string cellLoadNote(const std::string& path, const std::string& submit, const std::string& cpuwait, u64 payload,
+                         u64 dispatches, f64 duty);
+
 /// Scans the text of a micro.csv left by an interrupted run. A cell is complete when it has
 /// exactly `iterations` rows (`bandwidthRows` for the bw_* rows). Rows of incomplete cells,
 /// malformed lines and the end-of-run footer are dropped. Returns false if the text has no

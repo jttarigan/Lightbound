@@ -77,6 +77,7 @@ constexpr EnumName<AudioMode> kAudioModes[] = {
     {"on", AudioMode::On}, {"null", AudioMode::Null}, {"off", AudioMode::Off}};
 constexpr EnumName<Preset> kPresets[] = {
     {"none", Preset::None}, {"quick", Preset::Quick}, {"core", Preset::Core}, {"audit", Preset::Audit}};
+constexpr EnumName<GpuLoad> kGpuLoads[] = {{"idle", GpuLoad::Idle}, {"hot", GpuLoad::Hot}, {"both", GpuLoad::Both}};
 
 struct FlagSpec { const char* name; bool takesValue; };
 constexpr FlagSpec kFlags[] = {
@@ -85,7 +86,7 @@ constexpr FlagSpec kFlags[] = {
     {"memvariant", true}, {"audit", true}, {"audio", true}, {"preset", true}, {"out", true},
     {"tag", true}, {"power", true},
     {"vsync", true}, {"validation", true}, {"width", true}, {"height", true}, {"exit-after", true},
-    {"log", true}, {"micro-paths", true}, {"micro-payloads", true}, {"resume", false},
+    {"log", true}, {"micro-paths", true}, {"micro-payloads", true}, {"micro-gpuload", true}, {"resume", false},
     {"help", false}, {"version", false},
 };
 
@@ -158,6 +159,7 @@ ParseStatus parseCommandLine(int argc, const char* const* argv, Options& out, st
         else if (name == "exit-after") ok = parseU32(value, out.exitAfter);
         else if (name == "micro-paths") out.microPaths = value;
         else if (name == "micro-payloads") out.microPayloads = value;
+        else if (name == "micro-gpuload") ok = parseEnum(value, kGpuLoads, out.microGpuLoad);
         else if (name == "resume") out.resume = true;
         else if (name == "log") {
             u32 lvl = 0;
@@ -231,6 +233,9 @@ void printUsage(FILE* to) {
         "  --micro-paths=a,b             microbench: only these paths (empty,s1_copy,s2_direct,\n"
         "                                s2_hostcached,s2_rebar,s2_coherent)\n"
         "  --micro-payloads=4K,1M        microbench: only these payload sizes\n"
+        "  --micro-gpuload=idle|hot|both microbench: GPU state during the CPU step (default idle =\n"
+        "                                protocol §6; hot = a second queue keeps the GPU busy, cells\n"
+        "                                are written as <path>_hot; both = idle cells, then hot)\n"
         "  --resume                      microbench: continue the interrupted run in --out (keeps the\n"
         "                                cells it completed, measures the missing ones)\n"
         "  --log=trace|info|warn|error   log level (default info)\n"
@@ -262,7 +267,17 @@ std::string describeOptions(const Options& o) {
     s += std::string(" validation=") + (o.validation ? "on" : "off");
     if (!o.microPaths.empty()) s += " micro-paths=" + o.microPaths;
     if (!o.microPayloads.empty()) s += " micro-payloads=" + o.microPayloads;
+    if (o.microGpuLoad != GpuLoad::Idle) s += " micro-gpuload=" + std::string(cliName(o.microGpuLoad));
     return s;
+}
+
+const char* cliName(GpuLoad v) {
+    switch (v) {
+    case GpuLoad::Idle: return "idle";
+    case GpuLoad::Hot: return "hot";
+    case GpuLoad::Both: return "both";
+    }
+    return "?";
 }
 
 const char* cliName(Mode v) {

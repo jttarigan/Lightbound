@@ -131,6 +131,30 @@ TEST_CASE("resume scan keeps complete cells and drops an interrupted one") {
     CHECK_FALSE(scanResumeCsv("# file: micro.csv\r\n# git_commit: abc", 3, 2, scan));  // killed inside the header
 }
 
+TEST_CASE("hot-GPU path names and load notes (DECISIONS #32)") {
+    CHECK(hotPathName("s2_direct") == "s2_direct_hot");
+    CHECK(isHotPath("s2_direct_hot"));
+    CHECK(isHotPath("empty_hot"));
+    CHECK_FALSE(isHotPath("s2_direct"));
+    CHECK_FALSE(isHotPath("_hot"));
+    CHECK(std::string(gpuLoadName(GpuLoad::Hot)) == "hot");
+    CHECK(cellLoadNote("empty_hot", "chain", "spin", 0, 1234, 0.98765) ==
+          "# cell_load: empty_hot,chain,spin,0,dispatches=1234,duty=0.988");
+
+    // A load note stays with a complete cell and goes with an interrupted one.
+    const std::string text = std::string(kMicroHeader) + cellLoadNote("empty_hot", "chain", "spin", 0, 10, 1.0) + "\r\n" +
+                             microRows("empty_hot", "chain", "spin", 0, 3) +
+                             cellLoadNote("empty_hot", "chain", "block", 0, 4, 0.9) + "\r\n" +
+                             microRows("empty_hot", "chain", "block", 0, 1);
+    ResumeScan scan;
+    REQUIRE(scanResumeCsv(text, 3, 2, scan));
+    CHECK(scan.cells.size() == 1);
+    CHECK(scan.has("empty_hot", "chain", "spin", 0));
+    CHECK(scan.droppedRows == 1);
+    CHECK(scan.kept.size() == 4 + 1 + 3);   // header, the kept cell's note and rows; nothing of the other cell
+    CHECK(scan.kept[4] == cellLoadNote("empty_hot", "chain", "spin", 0, 10, 1.0));
+}
+
 TEST_CASE("memory policy follows docs/05 §4.2") {
     gfx::GfxCaps metal;
     metal.backend = gfx::Backend::Metal;

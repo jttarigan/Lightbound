@@ -74,6 +74,9 @@ public:
             LB_LOG_ERROR("newCommandQueue failed");
             return false;
         }
+        // Independent queue for background work (loadDispatch): Metal queues execute concurrently.
+        m_loadQueue = m_device->newCommandQueue();
+        if (m_loadQueue == nullptr) LB_LOG_WARN("second MTLCommandQueue unavailable: no background load");
 
         if (m_window != nullptr) {
             m_view = SDL_Metal_CreateView(desc.window);
@@ -118,6 +121,9 @@ public:
         m_caps.gpuTimestampPeriodNs = 1.0;
         setClassInfo(MemoryClass::DeviceLocal, "MTLStorageModePrivate");
         setClassInfo(MemoryClass::Shared, "MTLStorageModeShared");
+        m_caps.secondQueue = m_loadQueue != nullptr;
+        std::strncpy(m_caps.secondQueueInfo, m_caps.secondQueue ? "second MTLCommandQueue" : "none",
+                     sizeof(m_caps.secondQueueInfo) - 1);
 
         calibrateClocks();
 
@@ -129,6 +135,8 @@ public:
 
     void shutdown() override {
         if (m_queue != nullptr) waitIdle();
+        for (LoadSlot& l : m_loadSlots) retireLoad(l);
+        if (m_loadQueue != nullptr) { m_loadQueue->release(); m_loadQueue = nullptr; }
         for (Segment& s : m_segments) {
             if (s.cb != nullptr) { s.cb->release(); s.cb = nullptr; }
             if (s.fence != nullptr) { s.fence->release(); s.fence = nullptr; }
@@ -571,6 +579,43 @@ public:
         return c;
     }
 
+    // ------------------------------------------------------------------ background load
+
+    u64 loadDispatch(PipelineHandle ph, BindingSetHandle bh, u32 groupsX, const void* push, u32 pushBytes) override {
+        const Pipeline* p = pipeline(ph);
+        const BindingSet* b = bindingSet(bh);
+        if (m_loadQueue == nullptr || p == nullptr || b == nullptr || pushBytes != p->pushBytes) {
+            LB_LOG_ERROR("loadDispatch: no second queue, invalid handle or push-constant size");
+            m_errorCount.fetch_add(1, std::memory_order_relaxed);
+            return 0;
+        }
+        const u64 ticket = m_loadCounter + 1;
+        LoadSlot& slot = m_loadSlots[ticket % kLoadSlots];
+        if (!retireLoad(slot)) return 0;
+        NS::AutoreleasePool* pool = NS::AutoreleasePool::alloc()->init();
+        MTL::CommandBuffer* cb = m_loadQueue->commandBufferWithUnretainedReferences();
+        cb->retain();
+        MTL::ComputeCommandEncoder* enc = cb->computeCommandEncoder();
+        enc->setComputePipelineState(p->state);
+        for (u32 i = 0; i < b->count; ++i) enc->setBuffer(b->buffers[i], 0, i);
+        if (p->pushBytes > 0) enc->setBytes(push, pushBytes, p->bufferCount);
+        enc->dispatchThreadgroups(MTL::Size(groupsX, 1, 1), MTL::Size(p->threadsPerGroup, 1, 1));
+        enc->endEncoding();
+        cb->commit();
+        pool->release();
+        slot.cb = cb;
+        slot.ticket = ticket;
+        m_loadCounter = ticket;
+        return ticket;
+    }
+
+    bool loadWait(u64 ticket) override {
+        if (ticket == 0 || ticket > m_loadCounter) return false;
+        LoadSlot& slot = m_loadSlots[ticket % kLoadSlots];
+        if (slot.ticket != ticket) return true;  // retired already (the slot was reused or waited on)
+        return retireLoad(slot);
+    }
+
     // ------------------------------------------------------------------ audit
 
     u64 researchCopyCount() const override { return m_researchCopies; }
@@ -611,6 +656,10 @@ private:
         bool pendingBarrier = false;
         bool recording = false;
         bool submitted = false;
+    };
+    struct LoadSlot {
+        MTL::CommandBuffer* cb = nullptr;   // committed on m_loadQueue
+        u64 ticket = 0;
     };
 
     template <class T> static u32 addSlot(std::vector<T>& v, const T& item) {
@@ -661,6 +710,24 @@ private:
         s.cb = nullptr;
         s.submitted = false;
         s.recording = false;
+        return ok;
+    }
+
+    // Waits for a background-load dispatch and releases its command buffer.
+    bool retireLoad(LoadSlot& s) {
+        if (s.cb == nullptr) return true;
+        s.cb->waitUntilCompleted();
+        bool ok = true;
+        if (s.cb->status() == MTL::CommandBufferStatusError) {
+            NS::Error* err = s.cb->error();
+            LB_LOG_ERROR("Metal background-load command buffer failed: %s",
+                         err != nullptr ? err->localizedDescription()->utf8String() : "unknown");
+            m_errorCount.fetch_add(1, std::memory_order_relaxed);
+            ok = false;
+        }
+        s.cb->release();
+        s.cb = nullptr;
+        s.ticket = 0;
         return ok;
     }
 
@@ -733,6 +800,9 @@ private:
     Segment m_segments[kSegmentSlots];
     u32 m_nextSegment = 0;
     u64 m_researchCopies = 0;
+    MTL::CommandQueue* m_loadQueue = nullptr;   // background load (loadDispatch); its slots are
+    LoadSlot m_loadSlots[kLoadSlots];           // touched only by the load caller and shutdown()
+    u64 m_loadCounter = 0;
 
     MachTimebase m_timebase;
     bool m_haveBaseline = false;

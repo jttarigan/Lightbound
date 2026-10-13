@@ -22,6 +22,20 @@ void micro_write(uint3 tid : SV_DispatchThreadID)
     gPayload[i] = uint4(i ^ it, i * 2654435761u + it, i + it * 40503u, ~i);
 }
 
+// Hot-GPU load (DECISIONS #32, not one of the §6 steps): one group of 32 threads runs a
+// dependent multiply-add chain of gParams.v.x steps on the second queue, back to back, so the
+// GPU never idles while a hot cell measures its round trips. The result is stored so the chain
+// is not dead code; the step count is calibrated at run time to about 200 µs per dispatch.
+[shader("compute")]
+[numthreads(32, 1, 1)]
+void micro_burn(uint3 tid : SV_DispatchThreadID)
+{
+    uint n = gParams.v.x;
+    float a = float(tid.x);
+    for (uint i = 0; i < n; ++i) a = a * 1.0001f + 0.5f;
+    gPayload[tid.x] = uint4(asuint(a), n, tid.x, 0);
+}
+
 // Step 3: GPU reads the P bytes the CPU wrote back. Grid-stride loop over gParams.v.z
 // groups; each group writes its partial sum of (x ^ y ^ z ^ w) (integer, order-independent,
 // no atomics), and the CPU adds the partials.

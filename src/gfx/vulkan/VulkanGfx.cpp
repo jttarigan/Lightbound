@@ -144,6 +144,7 @@ public:
         if (!createAllocator()) return false;
         describeMemoryClasses();
         if (!createSegmentSlots()) return false;
+        if (m_loadQueue != VK_NULL_HANDLE && !createLoadSlots()) return false;
         if (!m_headless) {
             if (!createSwapchain()) return false;
             if (!createFrames()) return false;
@@ -169,6 +170,12 @@ public:
             }
             if (m_segTimeline != VK_NULL_HANDLE) vkDestroySemaphore(m_device, m_segTimeline, nullptr);
             m_segTimeline = VK_NULL_HANDLE;
+            for (LoadSlot& l : m_loadSlots) {
+                if (l.fence != VK_NULL_HANDLE) vkDestroyFence(m_device, l.fence, nullptr);
+                l = LoadSlot{};
+            }
+            if (m_loadPool != VK_NULL_HANDLE) vkDestroyCommandPool(m_device, m_loadPool, nullptr);
+            m_loadPool = VK_NULL_HANDLE;
             for (VkSemaphore t : m_timelines) vkDestroySemaphore(m_device, t, nullptr);
             m_timelines.clear();
             for (TsPool& p : m_tsPools) vkDestroyQueryPool(m_device, p.pool, nullptr);
@@ -754,6 +761,70 @@ public:
         return c;
     }
 
+    // ------------------------------------------------------------------ background load
+
+    u64 loadDispatch(PipelineHandle ph, BindingSetHandle bh, u32 groupsX, const void* push, u32 pushBytes) override {
+        const Pipeline* p = pipeline(ph);
+        VkDescriptorSet* set = slot(m_bindingSets, bh.id);
+        if (m_loadQueue == VK_NULL_HANDLE || p == nullptr || set == nullptr || *set == VK_NULL_HANDLE ||
+            pushBytes != p->pushBytes) {
+            LB_LOG_ERROR("loadDispatch: no second queue, invalid handle or push-constant size");
+            m_errorCount.fetch_add(1, std::memory_order_relaxed);
+            return 0;
+        }
+        const u64 ticket = m_loadCounter + 1;
+        LoadSlot& s = m_loadSlots[ticket % kLoadSlots];
+        if (!retireLoad(s)) return 0;
+
+        vkResetCommandBuffer(s.cmd, 0);
+        VkCommandBufferBeginInfo bi{};
+        bi.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+        bi.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+        vkBeginCommandBuffer(s.cmd, &bi);
+        // Earlier load dispatches on this queue wrote the same buffer: order the writes.
+        VkMemoryBarrier2 mb{};
+        mb.sType = VK_STRUCTURE_TYPE_MEMORY_BARRIER_2;
+        mb.srcStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT;
+        mb.srcAccessMask = VK_ACCESS_2_SHADER_STORAGE_WRITE_BIT;
+        mb.dstStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT;
+        mb.dstAccessMask = VK_ACCESS_2_SHADER_STORAGE_WRITE_BIT | VK_ACCESS_2_SHADER_STORAGE_READ_BIT;
+        VkDependencyInfo di{};
+        di.sType = VK_STRUCTURE_TYPE_DEPENDENCY_INFO;
+        di.memoryBarrierCount = 1;
+        di.pMemoryBarriers = &mb;
+        m_fn.cmdPipelineBarrier2(s.cmd, &di);
+        vkCmdBindPipeline(s.cmd, VK_PIPELINE_BIND_POINT_COMPUTE, p->pipeline);
+        vkCmdBindDescriptorSets(s.cmd, VK_PIPELINE_BIND_POINT_COMPUTE, p->layout, 0, 1, set, 0, nullptr);
+        if (pushBytes > 0) vkCmdPushConstants(s.cmd, p->layout, VK_SHADER_STAGE_COMPUTE_BIT, 0, pushBytes, push);
+        vkCmdDispatch(s.cmd, groupsX, 1, 1);
+        vkEndCommandBuffer(s.cmd);
+
+        VkCommandBufferSubmitInfo cbi{};
+        cbi.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_SUBMIT_INFO;
+        cbi.commandBuffer = s.cmd;
+        VkSubmitInfo2 si{};
+        si.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO_2;
+        si.commandBufferInfoCount = 1;
+        si.pCommandBufferInfos = &cbi;
+        vkResetFences(m_device, 1, &s.fence);
+        const VkResult r = m_fn.queueSubmit2(m_loadQueue, 1, &si, s.fence);
+        if (r != VK_SUCCESS) {
+            LB_LOG_ERROR("vkQueueSubmit2 (background load) failed: %d", static_cast<int>(r));
+            m_errorCount.fetch_add(1, std::memory_order_relaxed);
+            return 0;
+        }
+        s.ticket = ticket;
+        m_loadCounter = ticket;
+        return ticket;
+    }
+
+    bool loadWait(u64 ticket) override {
+        if (ticket == 0 || ticket > m_loadCounter) return false;
+        LoadSlot& s = m_loadSlots[ticket % kLoadSlots];
+        if (s.ticket != ticket) return true;  // retired already (the slot was reused or waited on)
+        return retireLoad(s);
+    }
+
     // ------------------------------------------------------------------ audit
 
     u64 researchCopyCount() const override { return m_researchCopies; }
@@ -795,6 +866,11 @@ private:
         SegmentSync sync{};
         u64 completionValue = 0;   // value of m_segTimeline signalled when this slot completes
         bool recording = false;
+    };
+    struct LoadSlot {
+        VkCommandBuffer cmd = VK_NULL_HANDLE;   // from m_loadPool, submitted on m_loadQueue
+        VkFence fence = VK_NULL_HANDLE;
+        u64 ticket = 0;                         // 0 = nothing pending
     };
     // Functions not guaranteed to be exported by every loader/ICD (1.2/1.3 core, extensions).
     struct Fns {
@@ -867,6 +943,39 @@ private:
             LB_LOG_ERROR("waiting for GPU segment completion failed: %d", static_cast<int>(r));
             m_errorCount.fetch_add(1, std::memory_order_relaxed);
             return false;
+        }
+        return true;
+    }
+
+    // Waits for a pending background-load dispatch.
+    bool retireLoad(LoadSlot& s) {
+        if (s.ticket == 0) return true;
+        const VkResult r = vkWaitForFences(m_device, 1, &s.fence, VK_TRUE, 10'000'000'000ull);
+        s.ticket = 0;
+        if (r != VK_SUCCESS) {
+            LB_LOG_ERROR("waiting for a background-load dispatch failed: %d", static_cast<int>(r));
+            m_errorCount.fetch_add(1, std::memory_order_relaxed);
+            return false;
+        }
+        return true;
+    }
+
+    bool createLoadSlots() {
+        VkCommandPoolCreateInfo pci{};
+        pci.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+        pci.flags = VK_COMMAND_POOL_CREATE_TRANSIENT_BIT | VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+        pci.queueFamilyIndex = m_loadFamily;
+        LB_VK_CHECK(vkCreateCommandPool(m_device, &pci, nullptr, &m_loadPool));
+        for (LoadSlot& l : m_loadSlots) {
+            VkCommandBufferAllocateInfo cai{};
+            cai.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+            cai.commandPool = m_loadPool;
+            cai.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+            cai.commandBufferCount = 1;
+            LB_VK_CHECK(vkAllocateCommandBuffers(m_device, &cai, &l.cmd));
+            VkFenceCreateInfo fci{};
+            fci.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+            LB_VK_CHECK(vkCreateFence(m_device, &fci, nullptr, &l.fence));
         }
         return true;
     }
@@ -1151,22 +1260,64 @@ private:
         want2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
         want2.pNext = &want12;
 
-        const float priority = 1.0f;
-        VkDeviceQueueCreateInfo qci{};
-        qci.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-        qci.queueFamilyIndex = m_queueFamily;
-        qci.queueCount = 1;
-        qci.pQueuePriorities = &priority;
+        // Second, independent queue for background work (loadDispatch): another queue of the main
+        // family when it has one, else the first other compute-capable family. Same priority as
+        // the main queue, as the Metal backend's queues have no priorities either.
+        u32 qCount = 0;
+        vkGetPhysicalDeviceQueueFamilyProperties(m_physical, &qCount, nullptr);
+        std::vector<VkQueueFamilyProperties> qProps(qCount);
+        vkGetPhysicalDeviceQueueFamilyProperties(m_physical, &qCount, qProps.data());
+        u32 loadFamily = UINT32_MAX, loadIndex = 0;
+        if (qProps[m_queueFamily].queueCount >= 2) {
+            loadFamily = m_queueFamily;
+            loadIndex = 1;
+        } else {
+            for (u32 i = 0; i < qCount; ++i) {
+                if (i != m_queueFamily && (qProps[i].queueFlags & VK_QUEUE_COMPUTE_BIT) != 0 && qProps[i].queueCount >= 1) {
+                    loadFamily = i;
+                    break;
+                }
+            }
+        }
+
+        const float priorities[2] = {1.0f, 1.0f};
+        VkDeviceQueueCreateInfo qcis[2]{};
+        qcis[0].sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+        qcis[0].queueFamilyIndex = m_queueFamily;
+        qcis[0].queueCount = loadFamily == m_queueFamily ? 2u : 1u;
+        qcis[0].pQueuePriorities = priorities;
+        u32 qciCount = 1;
+        if (loadFamily != UINT32_MAX && loadFamily != m_queueFamily) {
+            qcis[1].sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+            qcis[1].queueFamilyIndex = loadFamily;
+            qcis[1].queueCount = 1;
+            qcis[1].pQueuePriorities = priorities;
+            qciCount = 2;
+        }
 
         VkDeviceCreateInfo dci{};
         dci.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
         dci.pNext = &want2;
-        dci.queueCreateInfoCount = 1;
-        dci.pQueueCreateInfos = &qci;
+        dci.queueCreateInfoCount = qciCount;
+        dci.pQueueCreateInfos = qcis;
         dci.enabledExtensionCount = static_cast<u32>(exts.size());
         dci.ppEnabledExtensionNames = exts.data();
         LB_VK_CHECK(vkCreateDevice(m_physical, &dci, nullptr, &m_device));
         vkGetDeviceQueue(m_device, m_queueFamily, 0, &m_queue);
+        if (loadFamily != UINT32_MAX) {
+            m_loadFamily = loadFamily;
+            vkGetDeviceQueue(m_device, loadFamily, loadIndex, &m_loadQueue);
+        }
+        m_caps.secondQueue = m_loadQueue != VK_NULL_HANDLE;
+        if (m_caps.secondQueue) {
+            std::snprintf(m_caps.secondQueueInfo, sizeof(m_caps.secondQueueInfo), "family %u queue %u (%s, %u queues)",
+                          loadFamily, loadIndex, loadFamily == m_queueFamily ? "main family" : "other family",
+                          qProps[loadFamily].queueCount);
+        } else {
+            std::snprintf(m_caps.secondQueueInfo, sizeof(m_caps.secondQueueInfo), "none (family %u has %u queue)",
+                          m_queueFamily, qProps[m_queueFamily].queueCount);
+            LB_LOG_WARN("no second compute queue on this device: no background load");
+        }
         return true;
     }
 
@@ -1500,6 +1651,11 @@ private:
     VkSemaphore m_segTimeline = VK_NULL_HANDLE;
     u64 m_segCounter = 0;
     u64 m_researchCopies = 0;
+    u32 m_loadFamily = 0;                       // background load (loadDispatch); the slots are
+    VkQueue m_loadQueue = VK_NULL_HANDLE;       // touched only by the load caller and shutdown()
+    VkCommandPool m_loadPool = VK_NULL_HANDLE;
+    LoadSlot m_loadSlots[kLoadSlots];
+    u64 m_loadCounter = 0;
 
     VkTimeDomainKHR m_hostDomain = VK_TIME_DOMAIN_DEVICE_KHR;
     u64 m_refGpu = 0;

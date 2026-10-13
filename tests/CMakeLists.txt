@@ -23,3 +23,12 @@ add_test(NAME microbench_smoke
   COMMAND lightbound --mode=microbench --frames=30 --warmup=5 --micro-payloads=4K,256K
           --validation=on --log=warn --out=${CMAKE_BINARY_DIR}/test_micro_smoke.csv)
 set_tests_properties(microbench_smoke PROPERTIES LABELS gpu TIMEOUT 300)
+
+# Hot-GPU cells (DECISIONS #32): idle and hot cells of two paths with the background load on
+# the second queue, validation on. On a device without a second queue the hot cells are skipped
+# with a warning (the run still has to verify and exit 0).
+add_test(NAME microbench_smoke_hot
+  COMMAND lightbound --mode=microbench --frames=30 --warmup=5 --micro-paths=empty,s2_direct
+          --micro-payloads=4K --micro-gpuload=both --validation=on --log=warn
+          --out=${CMAKE_BINARY_DIR}/test_micro_smoke_hot.csv)
+set_tests_properties(microbench_smoke_hot PROPERTIES LABELS gpu TIMEOUT 300)

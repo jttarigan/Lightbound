@@ -7,6 +7,12 @@
 
 namespace lb::bench {
 
+/// GPU state during the CPU step (DECISIONS #32). Idle = protocol §6 as written (the GPU has
+/// nothing else to do). Hot = a second queue keeps the GPU busy, as render work does in a real
+/// frame; such cells are written with the path name suffixed "_hot". Both = idle cells, then hot.
+enum class GpuLoad : u8 { Idle, Hot, Both };
+const char* gpuLoadName(GpuLoad l);
+
 struct MicrobenchConfig {
     u32 iterations = 2000;                 // measured iterations per cell
     u32 warmup = 200;                      // discarded iterations per cell
@@ -14,6 +20,7 @@ struct MicrobenchConfig {
     std::vector<gfx::CpuWaitMode> waitModes;
     std::vector<std::string> paths;        // empty = every path this backend supports
     std::vector<u64> payloads;             // bytes (multiples of 16); P = 0 is the "empty" path
+    GpuLoad gpuLoad = GpuLoad::Idle;
     std::string outPath;
     std::string commandLine;               // full CLI, for the CSV header
     std::string options;                   // normalized options, for the CSV header
@@ -23,6 +30,10 @@ struct MicrobenchConfig {
 
 /// Protocol payload set: 4 KiB .. 16 MiB.
 std::vector<u64> defaultMicroPayloads();
+
+/// Name of a path's hot-GPU cells in micro.csv ("s2_direct" -> "s2_direct_hot") and its inverse.
+std::string hotPathName(const std::string& path);
+bool isHotPath(const std::string& path);
 
 /// Parses "4K,64K,1M,16M" (K/M/G binary suffixes; plain bytes allowed). Sizes must be
 /// non-zero multiples of 16.

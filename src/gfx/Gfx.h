@@ -59,6 +59,7 @@ struct ComputePipelineDesc {
 };
 constexpr u32 kMaxPushConstantBytes = 128;
 constexpr u32 kMaxBindings = 8;
+constexpr u32 kLoadSlots = 4;   // background-load dispatches that can be pending (loadDispatch)
 
 /// Memory access kinds for explicit barriers (research buffers are untracked).
 enum AccessBits : u32 {
@@ -112,6 +113,8 @@ struct GfxCaps {
     f64 gpuTimestampPeriodNs = 0.0;  // ns per GPU timestamp tick
     bool memoryClassSupported[kMemoryClassCount] = {};
     char memoryClassInfo[kMemoryClassCount][96] = {}; // what each class maps to (for CSV headers)
+    bool secondQueue = false;        // loadDispatch()/loadWait() available (independent GPU queue)
+    char secondQueueInfo[64] = {};   // which queue it is (for CSV headers)
     u32 backbufferWidth = 0;
     u32 backbufferHeight = 0;
 };
@@ -192,6 +195,20 @@ public:
     virtual bool readTimestamps(TimestampPoolHandle pool, u32 first, u32 count, u64* outSteadyNs) = 0;
     /// Re-correlates the GPU and CPU clocks (at startup and periodically).
     virtual ClockCalibration calibrateClocks() = 0;
+
+    // ------------------------------------------------------------------ background load (second queue)
+    /// Independent GPU work on a second queue, running concurrently with the segments on the
+    /// main queue (docs/05 §3 "GPU may run independent work"); the microbench's hot-GPU cells use
+    /// it (DECISIONS #32). Available when caps().secondQueue. Submits one dispatch, without
+    /// timestamps or timeline operations, and returns its ticket (> 0), or 0 when there is no
+    /// second queue or the submission failed. Up to kLoadSlots dispatches can be pending; when
+    /// they all are, the call first waits for the oldest. Both calls may come from a thread other
+    /// than the one recording and submitting segments, as long as no resource is created or
+    /// destroyed meanwhile and the load has been drained before shutdown().
+    virtual u64 loadDispatch(PipelineHandle p, BindingSetHandle set, u32 groupsX, const void* pushConstants,
+                             u32 pushBytes) = 0;
+    /// Blocks until the dispatch with `ticket` has completed. Returns false on timeout or error.
+    virtual bool loadWait(u64 ticket) = 0;
 
     // ------------------------------------------------------------------ audit
     /// GPU copies that touched a research buffer since init (R7).

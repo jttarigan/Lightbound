@@ -121,6 +121,21 @@ TEST_CASE("normalizeOptions applies protocol rules") {
     CHECK(o.audit);
 }
 
+TEST_CASE("--micro-gpuload selects the hot-GPU cells (DECISIONS #32)") {
+    Options o;
+    std::string err;
+    REQUIRE(parse({"--mode=microbench"}, o, err) == ParseStatus::Ok);
+    CHECK(o.microGpuLoad == GpuLoad::Idle);
+    CHECK(describeOptions(o).find("micro-gpuload") == std::string::npos);  // default: header unchanged
+    REQUIRE(parse({"--mode=microbench", "--micro-gpuload=hot"}, o, err) == ParseStatus::Ok);
+    CHECK(o.microGpuLoad == GpuLoad::Hot);
+    CHECK(describeOptions(o).find("micro-gpuload=hot") != std::string::npos);
+    REQUIRE(parse({"--micro-gpuload", "both"}, o, err) == ParseStatus::Ok);
+    CHECK(o.microGpuLoad == GpuLoad::Both);
+    CHECK(parse({"--micro-gpuload=warm"}, o, err) == ParseStatus::Error);
+    CHECK(std::string(cliName(GpuLoad::Both)) == "both");
+}
+
 TEST_CASE("describeOptions round-trips key fields") {
     Options o;
     std::string err;

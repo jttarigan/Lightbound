@@ -219,3 +219,49 @@ Ambiguities resolved while building, per CLAUDE.md rule 4. Newest at the bottom.
     `results/m1_3060/report` and `results/m1_pc_report` were rebuilt with the fix and are
     identical to a build from the `.csv.gz` files alone (what a fresh checkout has). The other
     PC reports were built before gzipping and were never affected.
+
+## 2026-10-13 — M1 hot-GPU cells (built behind a flag; protocol text unchanged until the human decides)
+
+32. **`--mode=microbench` can measure every cell with the GPU kept busy** (`--micro-gpuload=idle|hot|both`,
+    default `idle` = protocol §6 as written). Why: finding 7 (STATUS) showed that the microbench as
+    specified measures a *cold* GPU, whose CPU→GPU hand-off on the M5 sits at power-state levels of
+    ≈ 45 / 155 / 235 µs, while a real frame keeps the GPU busy with independent work (docs/05 §3), where
+    the same hand-off is ≈ 31 µs and stable. Whether the hot cells count for the §6 go criterion is the
+    human's decision (STATUS to-do 1a); until then the default run is unchanged and the report treats hot
+    cells as information. What the option does:
+    - **Load definition** (same on both backends, R1): a second, independent GPU queue runs `micro_burn`
+      (one group of 32 threads, i.e. one SIMD group, a dependent multiply-add chain) back to back with 2
+      dispatches queued ahead, from before a hot cell's warm-up until after its last iteration. The step
+      count is calibrated per process so that one dispatch takes ≈ 200 µs (wall clock with 2 in flight;
+      written to the header as `load.steps`, `load.dispatch_us`). The probe (finding 7) showed that a
+      load filling the whole GPU changes the result by only ≈ 3 µs, so the lightest continuous load was
+      chosen: it keeps the GPU's power state up and competes least with the measured kernels.
+    - **Backends** provide only `Gfx::loadDispatch` / `loadWait` on a second queue (`src/gfx`); the
+      pacing thread and the calibration are shared code (`src/bench/MicroLoad.*`). Metal: a second
+      `MTLCommandQueue`. Vulkan: a second queue of the main family when it has one (NVIDIA: 16), else
+      the first other compute-capable family (MoltenVK exposes one queue per family, so its compute
+      family is used); same priority as the main queue, because Metal queues have no priorities either.
+      The queue is recorded as `sysinfo.second_queue`. Without a second queue, `hot` exits 2 and `both`
+      skips the hot cells with a warning (`load.available: no`).
+    - **Cells and order:** hot cells are the same paths × payloads × submit × cpuwait, written with the
+      path name suffixed `_hot` (`empty_hot`, `s2_direct_hot`, …), so the §12 columns, `--resume` and the
+      pooling rules need no change. In `both` mode every idle cell runs first, then the hot cells: the
+      probe showed that idle blocks measured next to loaded blocks come out faster (hysteresis), so idle
+      must never follow hot.
+    - **Validity record:** each hot cell gets a `# cell_load: path,submit,cpuwait,payload,dispatches=N,
+      duty=D` note in front of its rows (dropped with the rows on `--resume` when the cell is incomplete).
+      Duty = dispatches × calibrated dispatch time / cell wall time; ≈ 1 means the second queue never
+      idled. A load failure counts as a cell failure (the cell was not hot); duty < 0.5 is a warning.
+      The load thread wakes once per dispatch (≈ every 200 µs, one wait + one submit) on another core
+      while the main thread spins; nothing inside a timed interval changed.
+    - **Report:** `micro_report.py` splits the `_hot` suffix into a `gpuload` column (summary.csv,
+      variation.csv), prints hot tables, `fig1_hot.png` and the load duty per platform, checks
+      run-to-run per (platform, gpuload), evaluates the §6 criterion on the idle cells only and prints
+      the same comparison for the hot cells as information. Idle-only reports are unchanged (checked on
+      `results/m1_report`: identical `report.md`, `summary.csv` and `variation.csv` apart from the new column).
+    - **Verified:** ctest 40/40 on Metal and MoltenVK (new `microbench_smoke_hot`: idle and hot cells of
+      `empty` and `s2_direct`, validation on, checksums and R7 counts every iteration). In those
+      30-iteration smoke runs (not measurements) the M5's empty round trip was ≈ 77 µs hot vs ≈ 204 µs
+      idle on Metal, duty 1.00; MoltenVK 99 vs 218 µs, duty 1.01.
+    - **Protocol:** docs/06 §6 is not edited. The text to add if the human approves, and the proposed
+      payload grid for the crossover study, are in `docs/M1_RESCOPE_PROPOSAL.md`.

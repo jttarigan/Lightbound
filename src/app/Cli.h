@@ -14,6 +14,7 @@ enum class CpuWait : u8 { Spin, Block };
 enum class MemVariant : u8 { Default, Rebar, HostCached, Coherent };
 enum class AudioMode : u8 { On, Null, Off };
 enum class Preset : u8 { None, Quick, Core, Audit };
+enum class GpuLoad : u8 { Idle, Hot, Both };   // microbench: GPU state during the CPU step (DECISIONS #32)
 
 struct Options {
     // Protocol §11 flags
@@ -50,6 +51,7 @@ struct Options {
     u32 exitAfter = 0;          // play mode: quit after N rendered frames (0 = never)
     std::string microPaths;     // microbench: comma list of paths to run (default all)
     std::string microPayloads;  // microbench: comma list of payload sizes, e.g. 4K,1M (default protocol set)
+    GpuLoad microGpuLoad = GpuLoad::Idle;  // microbench: idle = protocol §6 as written; hot = GPU kept busy
     bool resume = false;        // microbench: continue the interrupted run in `out` (keeps its complete cells)
     u8 logLevel = 1;            // 0 trace, 1 info, 2 warn, 3 error
     bool help = false;
@@ -77,5 +79,6 @@ const char* cliName(CpuWait v);
 const char* cliName(MemVariant v);
 const char* cliName(AudioMode v);
 const char* cliName(Preset v);
+const char* cliName(GpuLoad v);
 
 } // namespace lb::app

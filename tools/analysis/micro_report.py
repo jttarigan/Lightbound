@@ -14,6 +14,10 @@ run; several runs per platform give the run-to-run variation). Outputs in the ou
     variation.csv              per-cell p50 spread across process restarts
     bandwidth.csv              raw GPU copy bandwidth (bw_d2h / bw_h2d rows)
     report.md                  tables + run-to-run check (< 10 %) + go criterion (§6)
+    fig1_hot.png               the same for the hot-GPU cells (paths suffixed _hot, DECISIONS #32), if any
+
+Hot-GPU cells are reported as gpuload = "hot" next to the protocol's idle cells; they never enter
+the §6 go criterion, which is evaluated on the idle cells alone.
 """
 from __future__ import annotations
 
@@ -36,6 +40,8 @@ PRIMARY_SUBMIT = "chain"
 PRIMARY_WAIT = "spin"
 VARIATION_LIMIT = 0.10  # M1 acceptance: p50 spread across 3 restarts < 10 %
 RTX_PLATFORMS = ("P-3060", "P-4060")
+KEYS = ["platform", "gpuload", "path", "submit", "cpuwait", "payload_bytes"]
+LOAD_NOTE = "# cell_load: "
 
 # Fixed path -> color assignment (color follows the entity; reference categorical order).
 PATH_ORDER = ["s2_direct", "s1_copy", "s2_hostcached", "s2_rebar", "s2_coherent"]
@@ -53,7 +59,8 @@ GRID = "#e4e3df"
 SURFACE = "#fcfcfb"
 
 
-def load(paths: list[Path]) -> tuple[pd.DataFrame, dict[str, dict[str, str]]]:
+def load(paths: list[Path]) -> tuple[pd.DataFrame, dict[str, dict[str, str]], pd.DataFrame]:
+    """Rows, per-run headers, and the per-cell background-load notes of the hot-GPU cells."""
     files: list[Path] = []
     for p in paths:
         files.extend(sorted(list(p.rglob("micro*.csv")) + list(p.rglob("micro*.csv.gz"))) if p.is_dir() else [p])
@@ -62,24 +69,42 @@ def load(paths: list[Path]) -> tuple[pd.DataFrame, dict[str, dict[str, str]]]:
     files = [f for f in files if f not in gz_of_csv]
     if not files:
         sys.exit("no micro*.csv files found")
-    frames, headers = [], {}
+    frames, headers, loads = [], {}, []
     for f in files:
         header = {}
+        run = f.name.removesuffix(".gz").removesuffix(".csv")
+        if run in headers:   # same file name in two directories: keep the runs apart
+            run = f"{f.parent.name}/{run}"
         opener = gzip.open if f.suffix == ".gz" else open
         with opener(f, "rt", encoding="utf-8", errors="replace") as fh:
             for line in fh:
-                if line.startswith("# ") and ": " in line:
+                if line.startswith(LOAD_NOTE):
+                    body = line[len(LOAD_NOTE):].rstrip("\n").split(",")
+                    kv = dict(x.split("=", 1) for x in body[4:] if "=" in x)
+                    if len(body) >= 4:
+                        loads.append({"run": run, "path": body[0], "submit": body[1], "cpuwait": body[2],
+                                      "payload_bytes": int(body[3]), "dispatches": int(kv.get("dispatches", 0)),
+                                      "duty": float(kv.get("duty", "nan"))})
+                elif line.startswith("# cell_failures: ") or line.startswith("# resumed: "):
+                    continue
+                elif line.startswith("# ") and ": " in line:
                     k, v = line[2:].rstrip("\n").split(": ", 1)
                     header[k] = v
         df = pd.read_csv(f, comment="#")
         if df.empty:
             continue
-        run = f.name.removesuffix(".gz").removesuffix(".csv")
         df["run"] = run
         headers[run] = header
         frames.append(df)
     data = pd.concat(frames, ignore_index=True)
-    return data, headers
+    # Hot-GPU cells (DECISIONS #32) are the paths suffixed "_hot": one more condition column.
+    data["gpuload"] = np.where(data.path.str.endswith("_hot"), "hot", "idle")
+    data["path"] = data.path.str.replace(r"_hot$", "", regex=True)
+    load_df = pd.DataFrame(loads, columns=["run", "path", "submit", "cpuwait", "payload_bytes", "dispatches", "duty"])
+    if not load_df.empty:
+        load_df["path"] = load_df.path.str.replace(r"_hot$", "", regex=True)
+        load_df = load_df.merge(data[["run", "platform"]].drop_duplicates(), on="run", how="left")
+    return data, headers, load_df
 
 
 def fmt_payload(b: int) -> str:
@@ -93,8 +118,7 @@ def fmt_payload(b: int) -> str:
 
 
 def summarize(rt: pd.DataFrame) -> pd.DataFrame:
-    keys = ["platform", "path", "submit", "cpuwait", "payload_bytes"]
-    g = rt.groupby(keys)
+    g = rt.groupby(KEYS)
     s = g.agg(
         n=("rt_us", "count"),
         runs=("run", "nunique"),
@@ -115,9 +139,8 @@ def summarize(rt: pd.DataFrame) -> pd.DataFrame:
 
 
 def variation(rt: pd.DataFrame) -> pd.DataFrame:
-    keys = ["platform", "path", "submit", "cpuwait", "payload_bytes"]
-    per_run = rt.groupby(keys + ["run"])["rt_us"].median().reset_index()
-    v = per_run.groupby(keys)["rt_us"].agg(runs="count", p50_min="min", p50_max="max", p50_median="median").reset_index()
+    per_run = rt.groupby(KEYS + ["run"])["rt_us"].median().reset_index()
+    v = per_run.groupby(KEYS)["rt_us"].agg(runs="count", p50_min="min", p50_max="max", p50_median="median").reset_index()
     v["spread"] = (v["p50_max"] - v["p50_min"]) / v["p50_median"]
     return v
 
@@ -133,8 +156,9 @@ def style_axes(ax):
     ax.tick_params(colors=INK_2, labelsize=8)
 
 
-def plot_panel(ax, s: pd.DataFrame, platform: str, submit: str, wait: str, title: str, legend: bool):
-    sub = s[(s.platform == platform) & (s.submit == submit) & (s.cpuwait == wait)]
+def plot_panel(ax, s: pd.DataFrame, platform: str, submit: str, wait: str, title: str, legend: bool,
+               gpuload: str = "idle"):
+    sub = s[(s.platform == platform) & (s.gpuload == gpuload) & (s.submit == submit) & (s.cpuwait == wait)]
     style_axes(ax)
     payloads = sorted(p for p in sub.payload_bytes.unique() if p > 0)
     for path in PATH_ORDER:
@@ -180,17 +204,23 @@ def add_legend(fig, s: pd.DataFrame):
 
 def figure1(s: pd.DataFrame, out: Path):
     platforms = sorted(s.platform.unique())
-    fig, axes = plt.subplots(1, len(platforms), figsize=(4.2 * len(platforms), 3.6), squeeze=False, sharey=True)
-    fig.patch.set_facecolor(SURFACE)
-    for i, p in enumerate(platforms):
-        plot_panel(axes[0][i], s, p, PRIMARY_SUBMIT, PRIMARY_WAIT, f"{p}  ({PRIMARY_SUBMIT}, {PRIMARY_WAIT})", i == 0)
-    fig.suptitle("Figure 1 — CPU↔GPU round-trip latency vs payload (solid p50, dashed p99)",
-                 fontsize=10, color=INK, x=0.01, ha="left")
-    fig.tight_layout(rect=(0, 0, 1, 0.88))
-    add_legend(fig, s)
-    fig.savefig(out / "fig1_microbench.png", dpi=160, facecolor=SURFACE)
-    fig.savefig(out / "fig1_microbench.pdf", facecolor=SURFACE)
-    plt.close(fig)
+    for gpuload in ("idle", "hot"):
+        if not (s.gpuload == gpuload).any():
+            continue
+        fig, axes = plt.subplots(1, len(platforms), figsize=(4.2 * len(platforms), 3.6), squeeze=False, sharey=True)
+        fig.patch.set_facecolor(SURFACE)
+        for i, p in enumerate(platforms):
+            plot_panel(axes[0][i], s, p, PRIMARY_SUBMIT, PRIMARY_WAIT, f"{p}  ({PRIMARY_SUBMIT}, {PRIMARY_WAIT})",
+                       i == 0, gpuload)
+        hot = " — hot GPU (second queue busy, DECISIONS #32)" if gpuload == "hot" else ""
+        fig.suptitle(f"Figure 1{hot} — CPU↔GPU round-trip latency vs payload (solid p50, dashed p99)",
+                     fontsize=10, color=INK, x=0.01, ha="left")
+        fig.tight_layout(rect=(0, 0, 1, 0.88))
+        add_legend(fig, s)
+        stem = "fig1_microbench" if gpuload == "idle" else "fig1_hot"
+        fig.savefig(out / f"{stem}.png", dpi=160, facecolor=SURFACE)
+        fig.savefig(out / f"{stem}.pdf", facecolor=SURFACE)
+        plt.close(fig)
 
     modes = [("chain", "spin"), ("chain", "block"), ("perpass", "spin"), ("perpass", "block")]
     fig, axes = plt.subplots(len(platforms), 4, figsize=(15, 3.3 * len(platforms)), squeeze=False, sharey=True)
@@ -204,8 +234,8 @@ def figure1(s: pd.DataFrame, out: Path):
     plt.close(fig)
 
 
-def markdown_table(s: pd.DataFrame, platform: str) -> str:
-    sub = s[(s.platform == platform) & (s.submit == PRIMARY_SUBMIT) & (s.cpuwait == PRIMARY_WAIT)]
+def markdown_table(s: pd.DataFrame, platform: str, gpuload: str = "idle") -> str:
+    sub = s[(s.platform == platform) & (s.gpuload == gpuload) & (s.submit == PRIMARY_SUBMIT) & (s.cpuwait == PRIMARY_WAIT)]
     payloads = sorted(sub.payload_bytes.unique())
     lines = [f"| path | " + " | ".join(fmt_payload(int(p)) for p in payloads) + " |",
              "|---|" + "---:|" * len(payloads)]
@@ -221,12 +251,17 @@ def markdown_table(s: pd.DataFrame, platform: str) -> str:
     return "\n".join(lines)
 
 
-def go_criterion(s: pd.DataFrame, v: pd.DataFrame) -> str:
+def go_criterion(s: pd.DataFrame, v: pd.DataFrame, gpuload: str = "idle") -> str:
+    """The §6 criterion on the idle cells; with gpuload="hot" the same comparison on the hot cells,
+    reported as information only (the protocol defines the criterion on an otherwise idle GPU)."""
+    s = s[s.gpuload == gpuload]
+    v = v[v.gpuload == gpuload]
     platforms = set(s.platform)
     rtx = [p for p in RTX_PLATFORMS if p in platforms]
     if "P-M5" not in platforms or not rtx:
         missing = [p for p in ("P-M5",) + RTX_PLATFORMS if p not in platforms]
-        return f"**PENDING** — needs data from {', '.join(missing)}."
+        what = "Hot-GPU comparison" if gpuload == "hot" else "PENDING"
+        return f"**{what}** — needs data from {', '.join(missing)}."
 
     def cell(platform, path, payload):
         r = s[(s.platform == platform) & (s.path == path) & (s.submit == PRIMARY_SUBMIT) &
@@ -256,6 +291,11 @@ def go_criterion(s: pd.DataFrame, v: pd.DataFrame) -> str:
             verdict &= bool(ok)
             lines.append(f"- {label}: P-M5 {m5:.1f} µs vs {p} best ({best[1]}) {best[0]:.1f} µs, "
                          f"noise margin ±{margin * 100:.1f} % → {'M5 clearly lower' if ok else 'NOT clearly lower'}")
+    if gpuload == "hot":
+        head = "**Hot GPU: M5 clearly lower**" if verdict else "**Hot GPU: M5 not clearly lower on every cell**"
+        return head + " — the §6 comparison repeated on the hot-GPU cells (second queue busy during the CPU step, " \
+                      "DECISIONS #32). Information only; the go criterion above is the protocol's verdict.\n\n" + \
+               "\n".join(lines)
     head = "**GO**" if verdict else "**NO-GO** (protocol §6: stop and re-scope)"
     return head + " — criterion: empty and 1 MB round-trip p50 on M5 lower than both RTX cards under their best " \
                   "Vulkan path by more than run-to-run noise.\n\n" + "\n".join(lines)
@@ -274,9 +314,10 @@ def main():
         inputs = inputs[:-1]
     out.mkdir(parents=True, exist_ok=True)
 
-    data, headers = load(inputs)
+    data, headers, loads = load(inputs)
     bw = data[data.path.str.startswith("bw_")].copy()
     rt = data[~data.path.str.startswith("bw_")].copy()
+    has_hot = bool((rt.gpuload == "hot").any())
 
     s = summarize(rt)
     v = variation(rt)
@@ -304,18 +345,33 @@ def main():
                 md.append(f"- raw copy {path} {fmt_payload(int(payload))}: {us:.1f} µs = "
                           f"{payload / (us * 1e-6) / 1e9:.2f} GB/s")
             md.append("")
+        if ((s.platform == platform) & (s.gpuload == "hot")).any():
+            md.append(f"### {platform} — hot GPU (second queue busy during the CPU step, DECISIONS #32)")
+            md.append("")
+            md.append(markdown_table(s, platform, "hot"))
+            md.append("")
+            runs_here = sorted(r for r, h in headers.items() if h.get("sysinfo.platform") == platform
+                               and "load.dispatch_us" in h)
+            disp = [float(headers[r]["load.dispatch_us"]) for r in runs_here]
+            ld = loads[loads.platform == platform] if not loads.empty else loads
+            duty = f"duty min {ld.duty.min():.2f}, median {ld.duty.median():.2f} over {len(ld)} cells" \
+                if not ld.empty else "no load notes"
+            md.append(f"- background load: micro_burn dispatches of "
+                      f"{min(disp):.0f}–{max(disp):.0f} µs per run; {duty} (≈ 1 = the second queue never idled)"
+                      if disp else f"- background load: {duty}")
+            md.append("")
     md.append("## Run-to-run variation (p50 across process restarts)")
     md.append("")
     multi = v[v.runs >= 2]
     if multi.empty:
         md.append("Only one run per platform: variation not measured.")
     else:
-        for platform in sorted(multi.platform.unique()):
-            m = multi[multi.platform == platform]
+        for (platform, gpuload), m in multi.groupby(["platform", "gpuload"], sort=True):
             worst = m.sort_values("spread", ascending=False).iloc[0]
             bad = m[m.spread >= VARIATION_LIMIT]
             prim = m[(m.submit == PRIMARY_SUBMIT) & (m.cpuwait == PRIMARY_WAIT)]
-            md.append(f"- {platform}: {int(m.runs.max())} runs, {len(m)} cells; cells ≥ 10 %: {len(bad)}; "
+            label = platform if gpuload == "idle" else f"{platform} hot GPU"
+            md.append(f"- {label}: {int(m.runs.max())} runs, {len(m)} cells; cells ≥ 10 %: {len(bad)}; "
                       f"worst {worst.spread * 100:.1f} % ({worst.path} {worst.submit}/{worst.cpuwait} "
                       f"{fmt_payload(int(worst.payload_bytes))}); worst in primary condition "
                       f"{prim.spread.max() * 100:.1f} % → {'PASS' if len(bad) == 0 else 'FAIL'}")
@@ -324,8 +380,7 @@ def main():
     md.append("")
     md.append("A single p50 hides multimodal sync latency; histogram peaks (5 µs bins, ≥ 1 % of samples):")
     md.append("")
-    for platform in sorted(rt.platform.unique()):
-        e = rt[(rt.platform == platform) & (rt.path == "empty")]
+    for (platform, gpuload), e in rt[rt.path == "empty"].groupby(["platform", "gpuload"], sort=True):
         parts = []
         for col in ("g2c_us", "c2g_us", "rt_us"):
             x = e[col].dropna().to_numpy()
@@ -335,16 +390,23 @@ def main():
             peaks = [f"{edges[i]:.0f}–{edges[i + 1]:.0f} ({h[i] / x.size * 100:.0f} %)" for i in range(1, len(h) - 1)
                      if h[i] >= h[i - 1] and h[i] >= h[i + 1] and h[i] > 0.01 * x.size]
             parts.append(f"{col.replace('_us', '')}: " + ", ".join(peaks))
-        md.append(f"- {platform}: " + "; ".join(parts))
+        label = platform if gpuload == "idle" else f"{platform} hot GPU"
+        md.append(f"- {label}: " + "; ".join(parts))
     md.append("")
     md.append("## Go criterion (protocol §6)")
     md.append("")
     md.append(go_criterion(s, v))
     md.append("")
-    md.append("Figures: `fig1_microbench.png` (primary condition), `fig1_modes.png` (all submit × wait modes).")
+    if has_hot:
+        md.append(go_criterion(s, v, "hot"))
+        md.append("")
+    md.append("Figures: `fig1_microbench.png` (primary condition), `fig1_modes.png` (all submit × wait modes)"
+              + (", `fig1_hot.png` (hot-GPU cells)." if has_hot else "."))
     # UTF-8 explicitly: the Windows default code page cannot encode "→" (the report was left empty).
     (out / "report.md").write_text("\n".join(md) + "\n", encoding="utf-8")
-    s_md = [f"## {p}\n\n" + markdown_table(s, p) for p in sorted(s.platform.unique())]
+    s_md = [f"## {p}{' — hot GPU' if g == 'hot' else ''}\n\n" + markdown_table(s, p, g)
+            for p in sorted(s.platform.unique()) for g in ("idle", "hot")
+            if ((s.platform == p) & (s.gpuload == g)).any()]
     (out / "summary.md").write_text("\n\n".join(s_md) + "\n", encoding="utf-8")
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")

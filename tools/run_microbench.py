@@ -7,8 +7,9 @@ across process restarts), with an idle cooldown between runs, then builds the re
     python tools/run_microbench.py --exe build\\lightbound.exe --out results\\m1 --tag rebar-on --resume
 
 Each run writes <out>/micro_<platform>_<tag>_run<i>.csv (+ .log). Extra arguments after `--`
-are passed to lightbound (e.g. `-- --validation=on`). Do not run anything else on the machine
-while this runs: other GPU/CPU work perturbs the measurements.
+are passed to lightbound (e.g. `-- --validation=on`, or `-- --micro-gpuload=both` for the hot-GPU
+cells of DECISIONS #32). Do not run anything else on the machine while this runs: other GPU/CPU
+work perturbs the measurements.
 
 A series that was interrupted (shutdown, crash, killed process) leaves <out>/_running_run<i>.csv
 behind. Start the same command again with --resume to continue it: finished runs are kept, and

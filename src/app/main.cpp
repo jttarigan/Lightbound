@@ -123,6 +123,11 @@ int runMicrobench(const lb::app::Options& opt, int argc, char** argv) {
             return 2;
         }
     }
+    switch (opt.microGpuLoad) {
+    case app::GpuLoad::Idle: cfg.gpuLoad = bench::GpuLoad::Idle; break;
+    case app::GpuLoad::Hot: cfg.gpuLoad = bench::GpuLoad::Hot; break;
+    case app::GpuLoad::Both: cfg.gpuLoad = bench::GpuLoad::Both; break;
+    }
     cfg.outPath = opt.out.empty() ? std::string("results/micro.csv") : opt.out;
     for (int i = 0; i < argc; ++i) cfg.commandLine += (i > 0 ? " " : "") + std::string(argv[i]);
     cfg.options = app::describeOptions(opt);
