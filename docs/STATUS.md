@@ -1,18 +1,17 @@
 # Work status (resume here)
 
-_Last updated 2026-10-13 (session 8: state refresh for Main. The PC pushed step C on 10-12. The RTX 4060 Ti exists after all
+_Last updated 2026-10-13 (session 8: state refresh for Main. Step C is final: run-to-run PASS, pushed 10-13 14:25. The RTX 4060 Ti exists after all
 (the user's device list, LAB.md 2026-10-13), so finding 8 is reopened. No code work, nothing started)._
 
 ## To-do (2026-10-13, in order)
 Tags: **[solo]** = this session, unattended; **[device: X, ~time]** = needs a machine; **[user]** = the human's hands or a decision.
 Nothing below is started. Device slots come from Main's day plan. No phones or tablets are needed.
 
-1. **[user, ~10 min at the PC] Let the PC finish the run-1 replacement.** Step C is done (3 clean runs, pushed 10-12
-   10:37). The human chose to redo run 1 because the PC's own git push disturbed two secondary cells (see "PC session
-   progress"). The new run 1 started 10-12 10:45 and was due ≈ **10-13 10:30**. Nothing has been pushed since 10-12 10:49
-   (head 505dde8, fetched 10-13 13:10), and the PC Claude only checks when asked. Tell it to check run 1, rebuild the
-   report, gzip, commit and push (its "Next steps" 1), and then to start nothing new: **step D is on hold** until the
-   human picks the second PCIe condition (to-do 2a), so it shouldn't ask for a GPU swap yet. Keep the BIOS as it is (ReBAR on).
+1. ~~Let the PC finish the run-1 replacement~~ **Done 2026-10-13.** The redo ran 10-12 10:45 → 10-13 10:30. Run-to-run
+   PASS, report built, pushed 14:25 (head 4e051ca). Step C is final. The PC's own notes still say "next: GPU swap (step D)".
+   Main has the corrected text for it: **step D is on hold** until the human picks the second PCIe condition (2a).
+   Between series the PC is free for other projects. Keep its measurement setup unchanged, though: NVIDIA driver 566.36,
+   ReBAR on, Ultimate Performance, "Prefer maximum performance", and leave `C:\dev\Lightbound` alone.
 2. **[user] Decisions.**
    (a) **Second PCIe condition** (finding 8, reopened). The 4060 Ti exists, but its PC is broken until ≈ 10-27.
    Recommended: **wait for the 4060 Ti** and run it as the protocol specifies, in the same i7-12700F PC and the same slot
@@ -35,7 +34,7 @@ Nothing below is started. Device slots come from Main's day plan. No phones or t
    566.36. Protocol §2 wants the same driver for both PCIe conditions, and C ran on 566.36.
 5. **[user] M1 go/no-go**, possible as soon as the hot-cell data is in (or now, without it). By the letter of protocol §6
    it is NO-GO: the M5 must be clearly lower than the best Vulkan path on both cards. Cold M5 is 214 µs empty and 305 µs at
-   1 MiB. The 3060 Ti is 60 µs and 142 µs (s2_direct with ReBAR off; with ReBAR on, s2_hostcached 160 and s2_direct 207).
+   1 MiB. The 3060 Ti is 60 µs and 142 µs (s2_direct with ReBAR off; with ReBAR on, s2_hostcached 159 and s2_direct 207).
    Hot M5 is ≈ 55 µs empty; hot 1 MiB is unmeasured. Decide at the same time: rt alone or rt + GPU read for ReBAR on
    (recommended: rt as the protocol defines it, with rt + GPU read as a secondary figure), and whether the repo stays
    public (recommended: keep it public for now, because anonymous HTTPS is the Mac's only working way to fetch the PC's
@@ -63,16 +62,14 @@ Nothing below is started. Device slots come from Main's day plan. No phones or t
   `pc/m0-m1` (2026-10-02; one MSVC fix, DECISIONS #27 on that branch). M0 is fully closed once the branch is merged.
 - **M1 — Round-trip microbenchmark (GO/NO-GO gate):** implemented on both backends and verified
   on the Mac. **Not closed:** Mac AC re-run done (still fails run-to-run, see below); needs (2) PC runs on the 3060 Ti at the full link
-  (C done, run 1 being replaced) and a second PCIe condition (the 4060 Ti, back ≈ 10-27, or the narrowed-link 3060 Ti, finding 8), (3) the human's go/no-go decision. Do not start M2 before that. New evidence for that
+  (C final, run-to-run PASS) and a second PCIe condition (the 4060 Ti, back ≈ 10-27, or the narrowed-link 3060 Ti, finding 8), (3) the human's go/no-go decision. Do not start M2 before that. New evidence for that
   decision: the M5 sync probe, finding 7. A hot GPU gives a round trip ≈ 55 µs, stable, and polling isn't viable.
 - **Open human decisions:** go/no-go (the data so far says NO-GO by the letter, findings 4 and 7); the second PCIe
   condition (wait for the 4060 Ti or run the narrowed-link 3060 Ti, finding 8); whether to add
   a hot-GPU microbench cell (finding 7); the PCIe gen3 link (finding 5); whether the repo should be public (finding 6).
 - **PC session:** on branch `pc/m0-m1` (see "PC session progress" below). M0 checks pass. A2 (ReBAR off,
-  fixed clock mapping) is done and ReBAR is on. The ReBAR-on full-link series **C is done** (10-05 14:34 → 10-08 13:50,
-  3 clean runs, pushed 10-12). Its run-to-run check failed on two secondary cells of run 1, which the PC's own git push
-  disturbed, so the human had run 1 redone. That replacement started 10-12 10:45 and was due ≈ **10-13 10:30**. It had not been
-  pushed by 10-13 13:10 (to-do 1). The pushed `PC_PROGRESS.md` plans "step D = swap to the 4060 Ti". The card exists but is in a
+  fixed clock mapping) is done and ReBAR is on. The ReBAR-on full-link series **C is final**: 3 clean runs, run-to-run PASS, pushed
+  2026-10-13 14:25. Run 1 was redone on 10-12/13 because the PC's own git push had disturbed two cells of the first one. The pushed `PC_PROGRESS.md` plans "step D = swap to the 4060 Ti". The card exists but is in a
   broken PC until ≈ 10-27, so D is on hold until the human decides (to-do 2a). The narrow-link bundle (finding 8) is not merged on the pushed branch, and
   `~/Desktop/lightbound-narrow-link-2026-10-05.bundle` is gone from the Mac (not found by name on 10-12 or 10-13).
   It is rebuilt from local branch `mac/narrow-link` (to-do 2). Never apply it in the
@@ -97,34 +94,32 @@ git merge-base --is-ancestor mac/narrow-link origin/pc/m0-m1 && echo "bundle mer
 (macOS has no GNU `timeout` command, so don't wrap git calls in it.) Always fetch before saying what the PC
 is doing. `PC_PROGRESS.md` on the branch is the only source; on 2026-10-05 a guess from the old plan turned out wrong.
 
-## PC session progress (as of 2026-10-13 13:10, branch head 505dde8, pushed 2026-10-12 10:49 +0700)
-Read from `origin/pc/m0-m1:docs/PC_PROGRESS.md`. Since 8ce9af6 the PC pushed three docs/results commits and no code.
-- **C done:** 3 runs (23.7–23.8 h each), binary 6962eff, exit 0, 0 failures, no restarts, no reboot. ReBAR on (bar heap
-  8024 MB), gen3 x16, driver 566.36. Runs 2 and 3 are gzipped in `results/m1_3060` on the branch. Round trip p50 / p99
-  (µs), chain/spin, 3 runs pooled (including the disturbed run 1):
+## PC session progress (as of 2026-10-13 14:52, branch head 4e051ca, pushed 2026-10-13 14:25 +0700)
+Read from `origin/pc/m0-m1:docs/PC_PROGRESS.md`. Since 8ce9af6 the PC pushed four docs/results commits and no code.
+- **C final:** 3 runs of 23.8 h each, binary 6962eff: run 1 is the replacement (10-12 10:45 → 10-13 10:30), and runs 2 and 3
+  ran 10-06/07 and 10-07/08. Exit 0, 0 failures, no restarts, no reboot since 10-05. ReBAR on (bar heap 8024 MB), gen3 x16,
+  driver 566.36, Ultimate Performance. CSVs gzipped and the report pushed (`results/m1_3060`). Round trip p50 / p99 (µs),
+  chain/spin, 3 runs pooled:
 
   | path | 0 | 4K | 64K | 256K | 1M | 4M | 16M |
   |---|---:|---:|---:|---:|---:|---:|---:|
-  | empty | 60 / 86 | | | | | | |
-  | s2_direct | | 60 / 85 | 69 / 106 | 97 / 138 | 207 / 283 | 651 / 965 | 2408 / 2768 |
-  | s1_copy | | 73 / 94 | 89 / 118 | 131 / 162 | 311 / 426 | 1060 / 1252 | 3973 / 4582 |
-  | s2_hostcached | | 62 / 99 | 69 / 101 | 87 / 132 | 160 / 238 | 466 / 646 | 1759 / 2208 |
-  | s2_rebar | | 1748 / 1926 | 27129 / 27895 | 108471 / 110358 | 434967 / 442314 | 1755536 / 1769449 | 7029474 / 7063888 |
-  | s2_coherent | | 119 / 146 | 991 / 1210 | 3823 / 4334 | 14976 / 16092 | 59888 / 63639 | 239384 / 252008 |
+  | empty | 60 / 83 | | | | | | |
+  | s2_direct | | 60 / 79 | 69 / 104 | 96 / 135 | 207 / 279 | 646 / 804 | 2387 / 2652 |
+  | s1_copy | | 73 / 98 | 89 / 113 | 131 / 166 | 311 / 383 | 1054 / 1259 | 3935 / 4395 |
+  | s2_hostcached | | 62 / 91 | 69 / 102 | 87 / 124 | 159 / 231 | 463 / 614 | 1742 / 2274 |
+  | s2_rebar | | 1748 / 1856 | 27163 / 27960 | 108712 / 110651 | 436651 / 442876 | 1758034 / 1769897 | 7032390 / 7064631 |
+  | s2_coherent | | 119 / 148 | 991 / 1217 | 3817 / 4324 | 14960 / 16269 | 59800 / 64968 | 239183 / 256932 |
 
-  g2c / c2g p50 for empty 31.0 / 28.8 µs. Raw copy 16 MiB d2h 12.40 / h2d 13.26 GB/s. The ReBAR on/off split below
-  holds for the pooled data (1 MiB `s2_direct` rt 207 vs 142 µs, `cpu_write` 96 vs 33 µs).
-- **Run-to-run: FAIL by the tool's rule. Two of 124 cells were ≥ 10 %, both disturbed by the PC Claude's own push** at
-  ≈ 14:37:40 on 10-05: `s2_hostcached` perpass/spin 1M (+17.6 %) and 4M (+11.8 %) in run 1. Runs 2 and 3 agree on them within
-  0.1 %. The worst primary-condition (chain/spin) cell is 8.5 %, so the primary condition passes. **Human decision 2026-10-12:
-  replace run 1** (option b). The old run 1 is kept in `results/m1_3060_run1_disturbed/` with a README; don't pool it.
-- **Run 1 replacement:** launched detached 10-12 10:45:14 with the same `--resume` command and binary. The runner redoes run 1
-  only and rebuilds `report/`. It was expected to end ≈ **10-13 10:30**. The PC Claude must be asked to check, gzip, commit and push (to-do 1).
-- **PC's lesson (for every future series, D′ included):** no git commit or push, no log reads, nothing at all on the PC
-  during the first ≈ 4 minutes of each run (the fast paths) or during `s2_coherent` (the last ≈ 50 min). Notes are written only
-  while `s2_rebar` runs, which is shown to be insensitive (runs agree within 0.3 %).
-- Its "Next steps" say step D = GPU swap to the 4060 Ti and "extend the pause if D starts after 10-13". The 4060 Ti exists
-  (corrected 2026-10-13) but isn't usable before ≈ 10-27, so D waits for the human's choice (to-do 2a).
+  g2c / c2g p50 for empty 30.9 / 29.0 µs. Raw copy 16 MiB d2h 12.36 / h2d 13.27 GB/s. **Run-to-run PASS:** 124 cells, none
+  ≥ 10 %, worst 8.4 % (s2_hostcached perpass/block 16M), worst primary-condition cell 7.4 %. ReBAR changes only
+  `s2_direct`: every other path agrees with A2 within a few percent. For `s2_direct` at 1 MiB, rt is 207 vs 142 µs and
+  `cpu_write` 96 vs 33 µs, while the GPU read pass (outside rt) becomes almost free.
+- **The disturbed first run 1** is kept in `results/m1_3060_run1_disturbed/` (README; don't pool it). The PC's own push at
+  ≈ 14:37:40 on 10-05 spoiled two of its secondary cells (`s2_hostcached` perpass/spin 1M +17.6 %, 4M +11.8 %).
+- **PC's lesson (for every future series):** no git commit or push, no log reads, nothing at all on the PC during the first
+  ≈ 4 minutes of each run (the fast paths) or during `s2_coherent` (the last ≈ 50 min).
+- Its "Next steps" are step D = 4060 Ti swap (≈ 3 days, gen3 x8 expected, extend the Windows Update pause first), then
+  E = `PC_REPORT.md` + push. The 4060 Ti exists but isn't usable before ≈ 10-27, so D waits for the human (to-do 2a).
 
 ### PC notes from 2026-10-07 (branch head 8ce9af6, pushed 2026-10-07 14:29 +0700)
 Read from `origin/pc/m0-m1:docs/PC_PROGRESS.md`. Since 6962eff the PC pushed seven docs/results commits and no code;
@@ -304,7 +299,7 @@ Metal, chain/spin, round trip p50 / p99 (µs):
    50–150 µs (my expectation for timeline semaphores over PCIe — not measured), the M5 as measured here would **not** be
    "clearly lower" → NO-GO by the letter of protocol §6. **PC timing data (3060 Ti, gen3 x16): empty round
    trip p50 60 µs vs M5 214 µs (AC); 1 MiB s2_direct 142 µs with ReBAR off (A2, pooled) and 207 µs with ReBAR on
-   (C, 3 runs pooled; best Vulkan path with ReBAR on: s2_hostcached 160 µs) vs M5 305 µs.**
+   (C final, 3 runs pooled; best Vulkan path with ReBAR on: s2_hostcached 159 µs) vs M5 305 µs.**
    As specified (cold GPU), the M5 is clearly *slower* on both criterion cells, so M1 is **NO-GO by the letter of
    protocol §6** unless the human takes one of the options below. With a hot GPU (finding 7), the M5's empty round trip is
    ≈ 53–57 µs vs 60 µs, about 10 % lower and probably not beyond run-to-run noise. The hot 1 MiB case is
@@ -388,7 +383,7 @@ Metal, chain/spin, round trip p50 / p99 (µs):
      `mac/narrow-link`, full history, ≈ 10 MB). Tested on a fresh clone of `pc/m0-m1`: fetch + merge is a fast-forward.
      **2026-10-12: the file is gone from the Desktop.** It gets rebuilt on the PC's current head (to-do 2).
      The PC should merge it only when no series is unfinished (a rebuild changes `git_commit`, and `--resume` then refuses);
-     the natural moment was after A2 and before C; C started first, so it now goes in after C's run-1 replacement.
+     the natural moment was after A2 and before C; C started first, and C is now final, so it can go in any time.
    - **DECISIONS.md entries** for the P-4060 → P-3060-narrow replacement and for the `--platform` flag are written by the PC
      on its branch (task file step 8), after its #30. `main` still doesn't touch DECISIONS.md.
    - Optional, still undecided: a hot-GPU microbench cell (finding 7). It would also need to run in the second PCIe
