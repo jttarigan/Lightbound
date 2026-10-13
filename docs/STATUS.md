@@ -1,13 +1,25 @@
 # Work status (resume here)
 
-_Last updated 2026-10-13 (session 8: merged `pc/m0-m1` (45b6182), rebuilt both Mac backends, ctest 37/37 on each, built the
-combined Mac + 3060 Ti reports. The M1 go/no-go is with the human. The RTX 4060 Ti is in service and back in 2–3 weeks)._
+_Last updated 2026-10-13 16:05 WIB (end of session 8: merged `pc/m0-m1` (45b6182), rebuilt both Mac backends, ctest 37/37 on each,
+built the combined Mac + 3060 Ti reports, analysed the payload crossover (finding 9). No code work, nothing running)._
+
+## RESUME HERE (2026-10-13)
+- **M1 data is merged. The combined reports say NO-GO by protocol §6, and the decision is the user's** (to-do 1). The facts are in
+  "M1 combined report" below. Do not start M2 before the user decides.
+- **Pending question to the user (asked 2026-10-13, no answer yet).** The user said: "moving data is the strength, let's
+  evaluate this and try to exploit this". The evaluation is finding 9. I proposed, and recommended all three:
+  (1) record M1 as NO-GO on H1 and re-scope to the payload/N crossover, writing the new hypothesis down *before* measuring;
+  (2) extend the microbench with the hot-GPU cell and more payload sizes (1–4 MiB grid, up to 64 MiB, without `s2_rebar`):
+  ≈ 1 day of code, Mac ≈ 45 min, PC ≈ 1–2 h; (3) then M2. Step 2 changes the protocol, so draft the re-scope and the
+  hypothesis for the user's approval before writing code. If the user doesn't take this up, the hot-GPU test stays optional.
+- **4060 Ti series ≈ 2026-10-27 to 11-03** (card in service; to-do 4). **The PC's Windows Update pause ends 2026-10-16 14:28 WIB**
+  (to-do 3).
 
 ## To-do (2026-10-13, in order)
 Tags: **[solo]** = this session, unattended; **[device: X, ~time]** = needs a machine; **[user]** = the human's hands or a decision.
 Device slots come from Main's day plan (LAB.md). No phones or tablets are needed.
 
-1. **[user] M1 go/no-go**, on the facts in "M1 combined report" below. The report tool says **NO-GO** by the letter of
+1. **[user] M1 go/no-go**, on the facts in "M1 combined report" below. The open re-scope proposal is in "RESUME HERE". The report tool says **NO-GO** by the letter of
    protocol §6, with or without ReBAR: the M5 is slower than the 3060 Ti on both criterion cells. The second card can't
    change that, because §6 needs the M5 clearly below *both* cards. Decide at the same time, each with my recommendation:
    (a) **hot-GPU microbench cell** (finding 7): yes, if the human wants to know whether the realistic busy-GPU regime
