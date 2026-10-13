@@ -1,6 +1,7 @@
 # Work status (resume here)
 
-_Last updated 2026-10-13 (session 8: state refresh for Main. The PC pushed step C on 10-12; no code work, nothing started)._
+_Last updated 2026-10-13 (session 8: state refresh for Main. The PC pushed step C on 10-12. The RTX 4060 Ti exists after all
+(the user's device list, LAB.md 2026-10-13), so finding 8 is reopened. No code work, nothing started)._
 
 ## To-do (2026-10-13, in order)
 Tags: **[solo]** = this session, unattended; **[device: X, ~time]** = needs a machine; **[user]** = the human's hands or a decision.
@@ -9,47 +10,52 @@ Nothing below is started. Device slots come from Main's day plan. No phones or t
 1. **[user, ~10 min at the PC] Let the PC finish the run-1 replacement.** Step C is done (3 clean runs, pushed 10-12
    10:37). The human chose to redo run 1 because the PC's own git push disturbed two secondary cells (see "PC session
    progress"). The new run 1 started 10-12 10:45 and was due ≈ **10-13 10:30**. Nothing has been pushed since 10-12 10:49
-   (head 505dde8, fetched 10-13 13:10), and the PC Claude only checks when asked. Tell it: *check run 1, rebuild the report,
-   gzip, commit, push* (its "Next steps" 1). Also tell it: **there is no 4060 Ti.** Its step D is replaced by the
-   narrowed-link series D′ (finding 8), whose tooling comes from the Mac as a bundle. It should not ask for a GPU swap, and
-   it should not start anything new.
-2. **[solo, ~30 min] Rebuild the narrow-link bundle**, after the PC's push in 1. The old file is gone from the Mac's
-   Desktop, and the PC has not merged it (checked 10-13). Replay `mac/narrow-link`'s one commit (ec93327) onto the PC's new
-   head so the PC fast-forwards. (The PC has changed only `docs/PC_PROGRESS.md` and `results/` since 6962eff, so there is
-   still no overlap.) Refresh `docs/PC_TASK_NARROW_LINK.md`: C is done, so the bundle now goes in after C, and the PC's
-   lesson on quiet run starts applies. Test it on a fresh HTTPS clone and write it to `~/Desktop/`. If 3a is yes, it
-   also carries the hot-GPU cell. **[user]** then moves the file to the PC.
-3. **[user] Decisions that change what D′ runs.** Make these before D′, because a BIOS change plus a 3-day series is expensive to repeat.
-   (a) **Hot-GPU microbench cell** (finding 7)? Recommended: yes. Hot is the regime the game runs in, and hot M5 ≈ 55 µs vs
-   3060 Ti 60 µs is what go/no-go turns on. It also needs a short hot-only run at the full link and on the Mac.
-   (b) **PCIe gen3** (finding 5)? Recommended: accept the measured gen3 links as the platform definition. LAB.md lists a
-   Ryzen 7 7700 PC (AM5 boards usually have a gen4 slot), but moving the card there also changes the CPU and memory, so
-   the results would no longer be comparable with A2 and C. Invadex (~2 h/day) and NeonTide (M3) also use that PC (LAB.md, 2026-10-12).
-4. **[solo, ~½ day] then [device: Mac on AC, quiet, ~30 min], only if 3a = yes.** Implement the hot-GPU cell on Metal
-   and Vulkan with the same algorithm (R1), with tests and ctest on both Mac backends. Then do 3 Mac runs: Mac on the
-   charger, lid open, under `caffeinate -is` (LAB.md). No other session may run GPU work, builds or other heavy jobs on
-   the Mac during them.
-5. **[user, ~30 min at the PC] Set up D′.** Extend the Windows Update pause (it ends **2026-10-16 14:28**, and D′ needs
-   ≈ 3–4 days). If Windows won't extend it, let the updates install and reboot *before* D′, then check that the NVIDIA
-   driver is still 566.36 (the version C ran on). Hand the PC the bundle and `docs/PC_TASK_NARROW_LINK.md`. With the PC
-   Claude, narrow the link in the BIOS (CPU x8 slot first, otherwise force Gen2), then confirm the start of the series.
-6. **[device: Windows PC (3060 Ti), exclusive, ~3–4 days, unattended] D′.** 3 resumable runs at `P-3060-narrow`, full
-   protocol including `s2_rebar` (≈ 24 h each). Nobody may use the PC meanwhile: the first ≈ 4 min of each run and the last
-   ≈ 50 min (`s2_coherent`) are sensitive even to a git push (the lesson from C). Then **[user]** restores the BIOS to
-   gen3 x16, and the PC writes `PC_REPORT.md` and pushes.
+   (head 505dde8, fetched 10-13 13:10), and the PC Claude only checks when asked. Tell it to check run 1, rebuild the
+   report, gzip, commit and push (its "Next steps" 1), and then to start nothing new: **step D is on hold** until the
+   human picks the second PCIe condition (to-do 2a), so it shouldn't ask for a GPU swap yet. Keep the BIOS as it is (ReBAR on).
+2. **[user] Decisions.**
+   (a) **Second PCIe condition** (finding 8, reopened). The 4060 Ti exists, but its PC is broken until ≈ 10-27.
+   Recommended: **wait for the 4060 Ti** and run it as the protocol specifies, in the same i7-12700F PC and the same slot
+   (protocol §2). It will run at gen3 x8 there. First ask the user: does the card itself work, and may it move into the
+   i7 PC? Its own PC is probably the Ryzen that Invadex and NeonTide plan to use. The fallback is the narrowed-link 3060 Ti
+   (D′) if the card isn't usable by ≈ 10-27. The gate doesn't have to wait for either: protocol §6 needs the M5 clearly
+   below *both* cards, so a NO-GO against the 3060 Ti stands whatever the second card shows. Running both (4060 Ti and
+   D′) would separate link width from GPU generation, but it costs a second multi-day series. Only worth it if H5 needs it.
+   (b) **`s2_rebar` in the second condition?** It is ≈ 23 of each run's 24 hours. Without it, a 3-run series takes ≈ 3 h
+   instead of ≈ 3 days. Recommended: full protocol, as in C, so the two conditions match, unless the PC is needed sooner.
+   (c) **Hot-GPU microbench cell** (finding 7)? Recommended: yes. Hot is the regime the game runs in, and hot M5 ≈ 55 µs vs
+   3060 Ti 60 µs is what go/no-go turns on. It needs a hot-only run on the 3060 Ti at the full link too, and on the Mac.
+   (d) **PCIe gen3** (finding 5)? Recommended: accept the measured gen3 links as the platform definition. The protocol's
+   "PCIe 4.0 x16 / x8" can't be met on this board.
+3. **[solo, ~½ day] then [device: Mac on AC, quiet, ~30 min] and [device: Windows PC, ~1 h], only if 2c = yes.** Implement the
+   hot-GPU cell on Metal and Vulkan with the same algorithm (R1), with tests and ctest on both Mac backends. Then do 3 Mac runs:
+   Mac on the charger, lid open, under `caffeinate -is` (LAB.md). No other session may run GPU work, builds or other heavy
+   jobs on the Mac during them. The PC part goes to the PC as a bundle (SSH push is blocked), between series.
+4. **[user, before 2026-10-16 14:28] Windows Update on the PC.** Extend the pause, or at least keep the NVIDIA driver at
+   566.36. Protocol §2 wants the same driver for both PCIe conditions, and C ran on 566.36.
+5. **[user] M1 go/no-go**, possible as soon as the hot-cell data is in (or now, without it). By the letter of protocol §6
+   it is NO-GO: the M5 must be clearly lower than the best Vulkan path on both cards. Cold M5 is 214 µs empty and 305 µs at
+   1 MiB. The 3060 Ti is 60 µs and 142 µs (s2_direct with ReBAR off; with ReBAR on, s2_hostcached 160 and s2_direct 207).
+   Hot M5 is ≈ 55 µs empty; hot 1 MiB is unmeasured. Decide at the same time: rt alone or rt + GPU read for ReBAR on
+   (recommended: rt as the protocol defines it, with rt + GPU read as a secondary figure), and whether the repo stays
+   public (recommended: keep it public for now, because anonymous HTTPS is the Mac's only working way to fetch the PC's
+   results). M2 starts only after a GO. On NO-GO the protocol says re-scope: the paper pivots to staleness + energy + design patterns.
+6. **Second PCIe condition, as decided in 2a.**
+   - 4060 Ti (recommended): **[user]** moves the card into the i7 PC, same slot, ReBAR on. **[device: Windows PC, exclusive,
+     ≈ 3–4 days unattended (≈ 3 h without `s2_rebar`)]** the PC runs step D from its task file as written (`results\m1_4060`).
+     No new code is needed.
+   - D′ (fallback): **[solo, ~30 min]** rebuild the narrow-link bundle on the PC's newest head (replay ec93327; the old file is
+     gone, and no file overlaps). Refresh `docs/PC_TASK_NARROW_LINK.md` (C is done, quiet-start lesson). **[user, ~30 min at
+     the PC]** moves the bundle over and narrows the link in the BIOS (CPU x8 slot, else force Gen2). **[device: Windows PC,
+     exclusive, same durations]** `--platform=P-3060-narrow`, then **[user]** restores the BIOS.
+   - Either way, nobody may use the PC during a series. The first ≈ 4 min of each run and the last ≈ 50 min
+     (`s2_coherent`) are sensitive even to a git push (the lesson from C). Afterwards the PC writes `PC_REPORT.md` and pushes.
 7. **[solo, ~2 h, when the human says merge]** Merge `pc/m0-m1` into `main`, rebuild Metal and MoltenVK, run ctest and
-   `micro_report.py` (Mac AC vs 3060 Ti full vs narrow, ReBAR-off in its own report), and finish the M1 report (section C).
-8. **[user] M1 go/no-go.** By the letter of protocol §6 it is NO-GO: the M5 must be clearly lower than the best Vulkan path.
-   Cold M5 is 214 µs empty and 305 µs at 1 MiB. The 3060 Ti is 60 µs and 142 µs (s2_direct with ReBAR off; with ReBAR on,
-   s2_hostcached 160 and s2_direct 207). Hot M5 is ≈ 55 µs empty; hot 1 MiB is unmeasured. Decide at the same time:
-   rt alone or rt + GPU read for ReBAR on (recommended: rt as the protocol defines it, with rt + GPU read as a secondary
-   figure), and whether the repo stays public (recommended: keep it public for now, because anonymous HTTPS is the Mac's
-   only working way to fetch the PC's results). M2 starts only after a GO. On NO-GO the protocol says re-scope: the paper
-   pivots to staleness + energy + design patterns.
-9. **[user, any time, low priority] Pushing.** SSH to GitHub still times out (port 22, checked 2026-10-13). Every `main`
+   `micro_report.py` (Mac AC vs the two PCIe conditions, ReBAR-off in its own report), and finish the M1 report (section C).
+8. **[user, any time, low priority] Pushing.** SSH to GitHub still times out (port 22, checked 2026-10-13). Every `main`
    commit after `origin/main` (baf605a) is unpushed, and so is `mac/narrow-link`. Fix: a network where port 22 works, or an HTTPS token.
 
-**Deadline:** the PC's Windows Update pause ends 2026-10-16 14:28 WIB. Extend it before D′ starts.
+**Deadline:** the PC's Windows Update pause ends 2026-10-16 14:28 WIB (to-do 4). No series is due before then unless 2a picks D′ now.
 
 ## State
 
@@ -57,16 +63,17 @@ Nothing below is started. Device slots come from Main's day plan. No phones or t
   `pc/m0-m1` (2026-10-02; one MSVC fix, DECISIONS #27 on that branch). M0 is fully closed once the branch is merged.
 - **M1 — Round-trip microbenchmark (GO/NO-GO gate):** implemented on both backends and verified
   on the Mac. **Not closed:** Mac AC re-run done (still fails run-to-run, see below); needs (2) PC runs on the 3060 Ti at the full link
-  (C done, run 1 being replaced) and at a **narrowed link** (`P-3060-narrow`, which replaces the 4060 Ti, finding 8), (3) the human's go/no-go decision. Do not start M2 before that. New evidence for that
+  (C done, run 1 being replaced) and a second PCIe condition (the 4060 Ti, back ≈ 10-27, or the narrowed-link 3060 Ti, finding 8), (3) the human's go/no-go decision. Do not start M2 before that. New evidence for that
   decision: the M5 sync probe, finding 7. A hot GPU gives a round trip ≈ 55 µs, stable, and polling isn't viable.
-- **Open human decisions:** go/no-go (the data so far says NO-GO by the letter, findings 4 and 7); whether to add
+- **Open human decisions:** go/no-go (the data so far says NO-GO by the letter, findings 4 and 7); the second PCIe
+  condition (wait for the 4060 Ti or run the narrowed-link 3060 Ti, finding 8); whether to add
   a hot-GPU microbench cell (finding 7); the PCIe gen3 link (finding 5); whether the repo should be public (finding 6).
 - **PC session:** on branch `pc/m0-m1` (see "PC session progress" below). M0 checks pass. A2 (ReBAR off,
   fixed clock mapping) is done and ReBAR is on. The ReBAR-on full-link series **C is done** (10-05 14:34 → 10-08 13:50,
   3 clean runs, pushed 10-12). Its run-to-run check failed on two secondary cells of run 1, which the PC's own git push
   disturbed, so the human had run 1 redone. That replacement started 10-12 10:45 and was due ≈ **10-13 10:30**. It had not been
-  pushed by 10-13 13:10 (to-do 1). The pushed `PC_PROGRESS.md` still plans "step D = swap to the 4060 Ti", which is wrong
-  (finding 8). The narrow-link bundle (finding 8) is not merged on the pushed branch, and
+  pushed by 10-13 13:10 (to-do 1). The pushed `PC_PROGRESS.md` plans "step D = swap to the 4060 Ti". The card exists but is in a
+  broken PC until ≈ 10-27, so D is on hold until the human decides (to-do 2a). The narrow-link bundle (finding 8) is not merged on the pushed branch, and
   `~/Desktop/lightbound-narrow-link-2026-10-05.bundle` is gone from the Mac (not found by name on 10-12 or 10-13).
   It is rebuilt from local branch `mac/narrow-link` (to-do 2). Never apply it in the
   middle of a series, because a rebuild breaks `--resume`. On resume: fetch the branch (command below), read its `docs/PC_PROGRESS.md`,
@@ -116,8 +123,8 @@ Read from `origin/pc/m0-m1:docs/PC_PROGRESS.md`. Since 8ce9af6 the PC pushed thr
 - **PC's lesson (for every future series, D′ included):** no git commit or push, no log reads, nothing at all on the PC
   during the first ≈ 4 minutes of each run (the fast paths) or during `s2_coherent` (the last ≈ 50 min). Notes are written only
   while `s2_rebar` runs, which is shown to be insensitive (runs agree within 0.3 %).
-- Its "Next steps" still say step D = GPU swap to the 4060 Ti and "extend the pause if D starts after 10-13". D becomes D′
-  (finding 8). The PC needs to be told, and needs the bundle (to-dos 1, 2, 5).
+- Its "Next steps" say step D = GPU swap to the 4060 Ti and "extend the pause if D starts after 10-13". The 4060 Ti exists
+  (corrected 2026-10-13) but isn't usable before ≈ 10-27, so D waits for the human's choice (to-do 2a).
 
 ### PC notes from 2026-10-07 (branch head 8ce9af6, pushed 2026-10-07 14:29 +0700)
 Read from `origin/pc/m0-m1:docs/PC_PROGRESS.md`. Since 6962eff the PC pushed seven docs/results commits and no code;
@@ -356,7 +363,11 @@ Metal, chain/spin, round trip p50 / p99 (µs):
      to run on the RTX cards (R1: same algorithm on both backends). The 3060 Ti may also speed up when hot, although
      "Prefer maximum performance" already holds its clocks. Adding a hot-GPU cell to `--mode=microbench` is a
      protocol change and needs the human's approval.
-8. **No RTX 4060 Ti (2026-10-05).** The human has only the 3060 Ti. P-4060 (protocol §2) exists to give
+8. **Reopened 2026-10-13: the RTX 4060 Ti exists.** The user's device list (LAB.md, 2026-10-13) says a PC with a 4060 Ti
+   exists, probably the Ryzen 7 7700 PC. It is broken now and may be back ≈ 2026-10-27. The "no 4060 Ti" note below was
+   wrong, so the replacement decision rests on wrong information and goes back to the human (to-do 2a). Nothing below was
+   merged, and no DECISIONS entry was written, so there is nothing to undo. `mac/narrow-link` stays as the fallback.
+   Original note: **No RTX 4060 Ti (2026-10-05).** The human has only the 3060 Ti. P-4060 (protocol §2) exists to give
    H5 an x8 link ("on PCIe the S1–S2 gap depends on link width (x16 vs x8)"). **Human decision
    2026-10-05: replace P-4060 with the 3060 Ti at a narrowed link**, platform id `P-3060-narrow`. Same GPU,
    so only the link changes. The order of preference for narrowing (feasibility check on the PC, with the human)
@@ -380,8 +391,8 @@ Metal, chain/spin, round trip p50 / p99 (µs):
      the natural moment was after A2 and before C; C started first, so it now goes in after C's run-1 replacement.
    - **DECISIONS.md entries** for the P-4060 → P-3060-narrow replacement and for the `--platform` flag are written by the PC
      on its branch (task file step 8), after its #30. `main` still doesn't touch DECISIONS.md.
-   - Optional, still undecided: a hot-GPU microbench cell (finding 7). With only one card it would also need
-     both link configurations. The narrow-link session is the cheapest moment to add it, but only with approval.
+   - Optional, still undecided: a hot-GPU microbench cell (finding 7). It would also need to run in the second PCIe
+     condition. The session that sets that condition up is the cheapest moment to add it, but only with approval.
 
 ### Deviations from spec
 Recorded in `docs/DECISIONS.md` #17–#26 (ReBAR read policy, binding convention, headless microbench,
@@ -416,7 +427,8 @@ build\lightbound.exe --mode=play --validation=on --exit-after=300
 echo exit code: %ERRORLEVEL%
 python tools\run_microbench.py --exe build\lightbound.exe --out results\m1_3060 --tag rebar-on
 ```
-~~Then swap to the 4060 Ti~~ (no 4060 Ti, finding 8). Then follow `docs/PC_TASK_NARROW_LINK.md` (delivered in the
+Then the second PCIe condition (finding 8, human's choice): either swap in the 4060 Ti (same PC, same slot, task file step D,
+`results\m1_4060`), or follow `docs/PC_TASK_NARROW_LINK.md` (delivered in the
 bundle, branch `mac/narrow-link`): narrowed link, `--resume -- --platform=P-3060-narrow`, into `results\m1_3060_narrow`. Optional (protocol §9): ReBAR off in BIOS, repeat with
 `--tag rebar-off` into separate directories. Note: `s2_rebar` at 16 MiB reads uncached PCIe memory
 from the CPU on purpose (the slow path); a full run may take tens of minutes.
