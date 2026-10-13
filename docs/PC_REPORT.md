@@ -6,6 +6,10 @@ work done 2026-10-01 … 2026-10-13. The session log with every intermediate ste
 so `results/m1_4060` does not exist** and the combined report `results/m1_pc_report` holds the 3060 Ti
 alone.
 
+> **Correction (Mac, 2026-10-13):** the RTX 4060 Ti does exist. The user says it is in service and will be
+> available in 2–3 weeks (≈ 2026-10-27 to 11-03). Step D (4060 Ti, same PC, same slot) is postponed, not dropped.
+> See `docs/STATUS.md`, to-do 4.
+
 Facts only; the go/no-go decision belongs to the human.
 
 ## 1. Environment
