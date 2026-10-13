@@ -129,3 +129,93 @@ Ambiguities resolved while building, per CLAUDE.md rule 4. Newest at the bottom.
 26. **`--frames`/`--warmup` in microbench mode** mean measured / warm-up iterations per cell and
     default to 2000 / 200 (protocol §6). Submit and CPU-wait modes are swept unless `--submit` /
     `--cpuwait` are given. Dev filters `--micro-paths`, `--micro-payloads` select subsets.
+
+## 2026-10-02 — M0 [PC] MSVC build (Windows 11, VS Build Tools 2022 17.14, MSVC 19.44)
+
+27. **`alignUp` is one constrained template** (`requires std::is_unsigned_v<T>`) instead of the
+    `u32` / `usize` / `u64` overloads. On MSVC x64 `size_t` and `uint64_t` are both
+    `unsigned long long`, so the `usize` and `u64` overloads were the same function (C2084,
+    only in the test TUs that include `Math.h` via `Arena.h`). Clang on macOS keeps them distinct
+    (`unsigned long` vs `unsigned long long`), which is why it never showed there. Both callers
+    (`Arena::alloc`, `test_math`) pass same-typed unsigned arguments; behaviour unchanged. This
+    was the only MSVC `/W4 /WX` failure: the rest of the tree (Vulkan backend included) compiled
+    warning-free on the first MSVC build.
+
+## 2026-10-05 — M1 [PC] interruptible runs (human request)
+
+28. **Microbench runs can be interrupted and resumed** (`lightbound --resume`,
+    `tools/run_microbench.py --resume`). With the full `s2_rebar` protocol one run on the PC takes
+    about a day (the 16 MiB `s2_rebar` cells alone are ≈ 4.3 h each), and the human needs to be able
+    to switch the PC off. What a resumed run keeps and what it changes:
+    - The unit of resumption is the **cell** (path × submit × cpuwait × payload). A cell was already
+      measured independently (own warm-up, own clock calibration) and written to the CSV as one
+      block followed by a flush; nothing inside a cell or inside a timed interval changed.
+    - `--resume` reads the CSV in `--out`, keeps the cells that have exactly `iterations` rows,
+      drops the rows of a cell that was being written when the process died, and measures only the
+      missing cells, in the usual order. It refuses to continue (exit 2) if the binary
+      (`version`, `git_commit`), the options, the tag or any `sysinfo.*` value (GPU, driver, ReBAR,
+      BAR heap, power plan, …) differs from the header of the interrupted run; only a different
+      PCIe link reading is a warning. A file without a complete header is started over.
+    - Every process still starts with the raw copy bandwidth pass (it ramps the PCIe link up for
+      the link query); a resuming process discards those rows because the file already has them.
+      Path buffers are created as usual (same sizes) for a path that still has cells to measure.
+    - The CSV gets one `# resumed: <UTC time>, <n> complete cells kept, …` line per restart, at the
+      position where the restart happened, so analysis can tell which cells ran after a restart
+      (cold machine, new process). The header (`start`, `cli`) stays that of the first process.
+    - Verification/R7 failures of a cell are written as `# cell_failures: path,submit,cpuwait,
+      payload,count` in front of that cell's rows (only when non-zero), and a resuming process
+      adds them to its own count, so `# failures:` and the exit code still cover the whole run.
+      API errors are per process: check every part of the log for `ERROR` lines.
+    - Runner: an unfinished run stays in `_running_run<i>.csv/.log`; the runner then stops with
+      exit 3 instead of renaming a partial CSV to its final name. Without `--resume` it refuses to
+      start in a directory that holds such a file. With `--resume`, finished runs are skipped.
+    - A resumed run is therefore one protocol "process run" split over several processes at cell
+      boundaries. Run-to-run variation is still computed per run file.
+29. **Runner log and report encoding.** `run_microbench.py` now sends lightbound's output straight
+    to the run's log file instead of collecting it in memory (the log of an interrupted run was
+    lost otherwise); `printSummary` flushes stdout so the table still precedes the closing
+    `microbench done` line. `micro_report.py` reads and writes UTF-8 explicitly: on Windows the
+    default code page (cp1252) cannot encode "→", which left `report.md` empty after the first PC
+    series.
+
+## 2026-10-05 — M1 clock mapping (human decision; amends #23)
+
+30. **The GPU→host clock mapping is refreshed by elapsed time, not only by iteration count.**
+    Finding (first PC series, RTX 3060 Ti, Vulkan calibrated timestamps, QPC): the GPU timestamp
+    clock and the host clock drift apart by ≈ 32 ppm, and the Vulkan mapping uses the nominal
+    `timestampPeriod`. With a recalibration only every 500 iterations (#23), `g2c` fell and `c2g`
+    rose linearly inside every calibration block by the same amount and jumped back at the next
+    recalibration. `rt` (GPU clock only) and `g2c + c2g` were not affected, but the split was:
+    ≈ 1 µs off for `empty`, ≈ 3 µs at 1 MiB, wrong at 16 MiB (`s2_direct` g2c p50 16 µs instead of
+    57 µs, 34 % of samples negative), milliseconds off for `s2_coherent`, and it would have been
+    ≈ 100 ms off for `s2_rebar` 16 MiB (7 s per iteration).
+    Change, in `Microbench::runCell` only (shared code, nothing inside a timed interval):
+    - before an iteration the clocks are recalibrated when `it % 500 == 0` (as before) **or** the
+      last calibration is older than 20 ms (`kMaxCalibrationAgeNs`; 20 ms × 32 ppm = 0.64 µs);
+    - `g2c` uses that mapping (the hand-off is at the start of the iteration); if the calibration
+      is older than 20 ms when the iteration ends (long CPU read/write), the clocks are calibrated
+      again and the consuming kernel's start timestamp is read again for `c2g` (the hand-off at
+      the end). `rt` is still computed from one mapping, i.e. purely on the GPU clock. For such
+      iterations `rt = g2c + cpu_read + cpu_write + c2g` no longer holds to the nanosecond.
+    Check on the PC (old schedule vs new, three interleaved process runs each, chain/spin):
+    `rt` p50 within ±1.3 % for every cell (run-to-run noise), block drift of g2c 2.1 → 0.2 µs
+    (`empty`) and 74 → 0 µs (16 MiB), no negative samples. Fast cells now recalibrate about every
+    130 iterations instead of 500; cells slower than 20 ms per iteration recalibrate every
+    iteration.
+    Metal: GPU timestamps and `sampleTimestamps` share mach_absolute_time and the backend already
+    fits a slope, so no drift is expected there and the Mac results should not move; to check any
+    CSV, compare the g2c median of the first and last 50 iterations of each block
+    (`(iter + warmup) % 500`). The first PC series (binary `6a2d02e`, kept as
+    `results/m1_3060_rebar-off_old-calibration`) has valid `rt` and biased g2c/c2g.
+
+## 2026-10-13 — M1 [PC] report pooling
+
+31. **`micro_report.py` counts a run once when it exists both as `.csv` and as `.csv.gz`.** The
+    report pools every `micro*.csv` and `micro*.csv.gz` below a directory. On the PC the raw CSVs
+    stay next to their gzipped copies (the `.gz` is what gets committed), so after the ReBAR-on
+    series had been gzipped, the runner's report pooled runs 2 and 3 twice (`n` = 10000 instead
+    of 6000 per cell); the per-run variation check was unaffected, the pooled p50/p99 were weighted
+    towards those runs. `load()` now drops `x.csv.gz` when `x.csv` is present. The committed
+    `results/m1_3060/report` and `results/m1_pc_report` were rebuilt with the fix and are
+    identical to a build from the `.csv.gz` files alone (what a fresh checkout has). The other
+    PC reports were built before gzipping and were never affected.

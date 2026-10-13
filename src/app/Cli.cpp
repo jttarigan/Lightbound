@@ -85,7 +85,8 @@ constexpr FlagSpec kFlags[] = {
     {"memvariant", true}, {"audit", true}, {"audio", true}, {"preset", true}, {"out", true},
     {"tag", true}, {"power", true},
     {"vsync", true}, {"validation", true}, {"width", true}, {"height", true}, {"exit-after", true},
-    {"log", true}, {"micro-paths", true}, {"micro-payloads", true}, {"help", false}, {"version", false},
+    {"log", true}, {"micro-paths", true}, {"micro-payloads", true}, {"resume", false},
+    {"help", false}, {"version", false},
 };
 
 const FlagSpec* findFlag(const std::string& name) {
@@ -157,6 +158,7 @@ ParseStatus parseCommandLine(int argc, const char* const* argv, Options& out, st
         else if (name == "exit-after") ok = parseU32(value, out.exitAfter);
         else if (name == "micro-paths") out.microPaths = value;
         else if (name == "micro-payloads") out.microPayloads = value;
+        else if (name == "resume") out.resume = true;
         else if (name == "log") {
             u32 lvl = 0;
             if (ieq(value.c_str(), "trace")) lvl = 0;
@@ -229,6 +231,8 @@ void printUsage(FILE* to) {
         "  --micro-paths=a,b             microbench: only these paths (empty,s1_copy,s2_direct,\n"
         "                                s2_hostcached,s2_rebar,s2_coherent)\n"
         "  --micro-payloads=4K,1M        microbench: only these payload sizes\n"
+        "  --resume                      microbench: continue the interrupted run in --out (keeps the\n"
+        "                                cells it completed, measures the missing ones)\n"
         "  --log=trace|info|warn|error   log level (default info)\n"
         "  --help  --version\n",
         to);

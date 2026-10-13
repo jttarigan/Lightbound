@@ -1,0 +1,10 @@
+[    0.000] INFO  main.cpp:173: lightbound 0.1.0-m1 | mode=play strategy=S2 k=1 delay=2 agents=20000 seed=1234 frames=3600 warmup=600 submit=chain cpuwait=spin threads=4 memvariant=default audit=off audio=on preset=none out= tag= power=off vsync=on validation=on
+[    0.211] INFO  VulkanGfx.cpp:923: Vulkan loader: C:\WINDOWS\SYSTEM32\vulkan-1.dll
+[    0.220] INFO  VulkanGfx.cpp:976: Vulkan validation layer enabled (VK_LAYER_KHRONOS_validation)
+[    0.295] INFO  VulkanGfx.cpp:1251: memory class DeviceLocal            -> type 1 DEVICE_LOCAL heap 8024 MB
+[    0.295] INFO  VulkanGfx.cpp:1251: memory class HostVisibleCached      -> type 4 HOST_VISIBLE|HOST_COHERENT|HOST_CACHED heap 16310 MB
+[    0.295] INFO  VulkanGfx.cpp:1251: memory class HostVisibleCoherent    -> type 3 HOST_VISIBLE|HOST_COHERENT heap 16310 MB
+[    0.295] INFO  VulkanGfx.cpp:1251: memory class DeviceLocalHostVisible -> type 5 DEVICE_LOCAL|HOST_VISIBLE|HOST_COHERENT heap 214 MB
+[    0.485] INFO  VulkanGfx.cpp:157: Vulkan device: NVIDIA GeForce RTX 3060 Ti (Vulkan 1.3.289, NVIDIA 566.36 (0x8d890000), unified: no, ReBAR: no, host-cached: yes, clock: QueryPerformanceCounter, vsync on)
+[    0.485] INFO  main.cpp:50: backend=vulkan device="NVIDIA GeForce RTX 3060 Ti" backbuffer=1920x1080
+[    5.466] INFO  main.cpp:84: rendered 300 frames in 4.98 s (16.60 ms/frame avg), backend errors: 0

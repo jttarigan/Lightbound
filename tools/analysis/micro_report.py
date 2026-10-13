@@ -57,13 +57,16 @@ def load(paths: list[Path]) -> tuple[pd.DataFrame, dict[str, dict[str, str]]]:
     files: list[Path] = []
     for p in paths:
         files.extend(sorted(list(p.rglob("micro*.csv")) + list(p.rglob("micro*.csv.gz"))) if p.is_dir() else [p])
+    # A run that exists both as .csv and as .csv.gz (gzipped for git) is one run, not two.
+    gz_of_csv = {f.with_suffix(".csv.gz") for f in files if f.suffix == ".csv"}
+    files = [f for f in files if f not in gz_of_csv]
     if not files:
         sys.exit("no micro*.csv files found")
     frames, headers = [], {}
     for f in files:
         header = {}
         opener = gzip.open if f.suffix == ".gz" else open
-        with opener(f, "rt") as fh:
+        with opener(f, "rt", encoding="utf-8", errors="replace") as fh:
             for line in fh:
                 if line.startswith("# ") and ": " in line:
                     k, v = line[2:].rstrip("\n").split(": ", 1)
@@ -339,10 +342,13 @@ def main():
     md.append(go_criterion(s, v))
     md.append("")
     md.append("Figures: `fig1_microbench.png` (primary condition), `fig1_modes.png` (all submit × wait modes).")
-    (out / "report.md").write_text("\n".join(md) + "\n")
+    # UTF-8 explicitly: the Windows default code page cannot encode "→" (the report was left empty).
+    (out / "report.md").write_text("\n".join(md) + "\n", encoding="utf-8")
     s_md = [f"## {p}\n\n" + markdown_table(s, p) for p in sorted(s.platform.unique())]
-    (out / "summary.md").write_text("\n\n".join(s_md) + "\n")
-    print((out / "report.md").read_text())
+    (out / "summary.md").write_text("\n\n".join(s_md) + "\n", encoding="utf-8")
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    print((out / "report.md").read_text(encoding="utf-8"))
 
 
 if __name__ == "__main__":

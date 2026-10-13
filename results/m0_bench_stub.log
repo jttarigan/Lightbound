@@ -1,0 +1,2 @@
+[    0.000] INFO  main.cpp:173: lightbound 0.1.0-m1 | mode=bench strategy=S2 k=1 delay=2 agents=20000 seed=1234 frames=3600 warmup=600 submit=chain cpuwait=spin threads=4 memvariant=default audit=off audio=on preset=none out= tag= power=off vsync=off validation=off
+mode 'bench' is not implemented yet (milestone M4)

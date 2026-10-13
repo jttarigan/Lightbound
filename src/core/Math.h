@@ -6,6 +6,7 @@
 #include "core/Types.h"
 
 #include <cmath>
+#include <type_traits>
 
 namespace lb {
 
@@ -96,9 +97,11 @@ constexpr f32 smoothstep(f32 e0, f32 e1, f32 x) {
     const f32 t = saturate((x - e0) / (e1 - e0));
     return t * t * (3.f - 2.f * t);
 }
-constexpr u32 alignUp(u32 v, u32 a) { return (v + a - 1) / a * a; }
-constexpr usize alignUp(usize v, usize a) { return (v + a - 1) / a * a; }
-constexpr u64 alignUp(u64 v, u64 a) { return (v + a - 1) / a * a; }
+// One template instead of u32/usize/u64 overloads: on MSVC x64 size_t and uint64_t are the
+// same type (both unsigned long long), so the usize and u64 overloads were a redefinition.
+template <class T>
+    requires std::is_unsigned_v<T>
+constexpr T alignUp(T v, T a) { return (v + a - 1) / a * a; }
 constexpr bool isPow2(u64 v) { return v != 0 && (v & (v - 1)) == 0; }
 constexpr u32 divCeil(u32 a, u32 b) { return (a + b - 1) / b; }
 

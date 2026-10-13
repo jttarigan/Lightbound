@@ -18,6 +18,7 @@ struct MicrobenchConfig {
     std::string commandLine;               // full CLI, for the CSV header
     std::string options;                   // normalized options, for the CSV header
     std::string tag;
+    bool resume = false;                   // outPath holds an interrupted run: keep its complete cells
 };
 
 /// Protocol payload set: 4 KiB .. 16 MiB.

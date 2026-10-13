@@ -40,7 +40,7 @@ target_link_libraries(lb_frame PUBLIC lb_gfx)
 lb_set_warnings(lb_frame)
 
 # ------------------------------------------------------------------ bench (microbench, sysinfo, CSV writers)
-add_library(lb_bench STATIC bench/Microbench.cpp bench/SysInfo.cpp)
+add_library(lb_bench STATIC bench/Microbench.cpp bench/MicroResume.cpp bench/SysInfo.cpp)
 target_include_directories(lb_bench PRIVATE "${LB_GEN_DIR}")
 target_link_libraries(lb_bench PUBLIC lb_frame)
 add_dependencies(lb_bench lb_gitinfo)

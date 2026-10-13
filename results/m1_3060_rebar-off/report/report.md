@@ -1,0 +1,32 @@
+# M1 microbenchmark report
+
+Runs: `micro_P-3060_rebar-off_run1` (P-3060, ?, thermal n/a→n/a, failures 0), `micro_P-3060_rebar-off_run2` (P-3060, ?, thermal n/a→n/a, failures 0), `micro_P-3060_rebar-off_run3` (P-3060, ?, thermal n/a→n/a, failures 0)
+
+## P-3060 — round trip p50 / p99 (µs), chain / spin
+
+| path | 0 | 4K | 64K | 256K | 1M | 4M | 16M |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| empty | 60 / 99 | — | — | — | — | — | — |
+| s2_direct | — | 59 / 88 | 65 / 89 | 80 / 114 | 142 / 212 | 388 / 530 | 1392 / 1684 |
+| s1_copy | — | 74 / 120 | 90 / 129 | 131 / 178 | 312 / 408 | 1074 / 1298 | 3983 / 4583 |
+| s2_hostcached | — | 59 / 93 | 67 / 106 | 85 / 146 | 157 / 239 | 470 / 606 | 1806 / 2134 |
+| s2_coherent | — | 117 / 152 | 991 / 1168 | 3810 / 4296 | 15063 / 16251 | 60172 / 64126 | 239800 / 254593 |
+
+- raw copy bw_d2h 16M: 1337.3 µs = 12.55 GB/s
+- raw copy bw_h2d 16M: 1273.9 µs = 13.17 GB/s
+
+## Run-to-run variation (p50 across process restarts)
+
+- P-3060: 3 runs, 100 cells; cells ≥ 10 %: 0; worst 9.6 % (s2_direct perpass/spin 16M); worst in primary condition 6.9 % → PASS
+
+## Latency modes (empty round trip, all runs pooled)
+
+A single p50 hides multimodal sync latency; histogram peaks (5 µs bins, ≥ 1 % of samples):
+
+- P-3060: g2c: 30–35 (81 %); c2g: 25–30 (48 %), 35–40 (29 %); rt: 60–65 (41 %)
+
+## Go criterion (protocol §6)
+
+**PENDING** — needs data from P-M5, P-4060.
+
+Figures: `fig1_microbench.png` (primary condition), `fig1_modes.png` (all submit × wait modes).

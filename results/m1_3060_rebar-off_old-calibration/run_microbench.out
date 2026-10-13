@@ -1,0 +1,6 @@
+[1/3] build\lightbound.exe --mode=microbench --out=results\m1_3060_rebar-off\_running_run1.csv --tag=rebar-offrun1 --micro-paths=empty,s1_copy,s2_direct,s2_hostcached,s2_coherent
+    exit 0 after 3186 s -> micro_P-3060_rebar-off_run1.csv
+[2/3] build\lightbound.exe --mode=microbench --out=results\m1_3060_rebar-off\_running_run2.csv --tag=rebar-offrun2 --micro-paths=empty,s1_copy,s2_direct,s2_hostcached,s2_coherent
+    exit 0 after 3083 s -> micro_P-3060_rebar-off_run2.csv
+[3/3] build\lightbound.exe --mode=microbench --out=results\m1_3060_rebar-off\_running_run3.csv --tag=rebar-offrun3 --micro-paths=empty,s1_copy,s2_direct,s2_hostcached,s2_coherent
+    exit 0 after 3081 s -> micro_P-3060_rebar-off_run3.csv
