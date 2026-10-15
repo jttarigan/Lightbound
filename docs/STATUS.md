@@ -1,6 +1,10 @@
 # Work status (resume here)
 
-_Last updated 2026-10-15 11:50 WIB (session 10, state refresh for Main; no code, no measurements. Nothing running.
+> **DEADLINE: the Windows PC's Update pause ends 2026-10-16 14:28 WIB.** The user extends it, or at least keeps the NVIDIA
+> driver at 566.36 (to-do 1).
+
+_Last updated 2026-10-15 ≈ 15:45 WIB (session 10, saved at the user's sign-off; no code, no measurements. Nothing running.
+The afternoon brought only other projects' device holds; Lightbound used no device.
 Session 9 (10-13 evening) built the hot-GPU cells behind `--micro-gpuload` (DECISIONS #32) and drafted
 `docs/M1_RESCOPE_PROPOSAL.md` and `docs/PC_MESSAGE_2026-10-13.md`)._
 
