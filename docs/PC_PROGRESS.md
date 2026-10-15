@@ -3,7 +3,7 @@
 Claude Code session log for `docs/PC_CLAUDE_TASK.md` on the Windows 11 PC. Newest entry at the
 bottom of each section. Clone: `C:\dev\Lightbound`, branch `pc/m0-m1`.
 
-_Last updated 2026-10-13 (hand-over; sessions on 2026-10-01/02, 10-05, 10-06 … 10-13)._
+_Last updated 2026-10-14 (idle; hand-over 10-13; sessions on 2026-10-01/02, 10-05, 10-06 … 10-14)._
 
 ## Where we are
 
@@ -344,7 +344,16 @@ Risk for the multi-day runs: Windows Update auto-restart — the human should pa
 
 ## Next steps
 The PC task is complete (2026-10-13). Everything is on branch `pc/m0-m1`; the Mac continues
-from `docs/PC_REPORT.md`. If a second card ever becomes available: boot with it, probe, run
-`results\m1_<card>` with `--tag rebar-on --resume`, then rebuild `results\m1_pc_report` from
+from `docs/PC_REPORT.md` (the human was given the Mac prompt on 2026-10-14: *Merge pc/m0-m1 and
+continue from docs/PC_REPORT.md*). If a second card ever becomes available: boot with it, probe,
+run `results\m1_<card>` with `--tag rebar-on --resume`, then rebuild `results\m1_pc_report` from
 both directories (`micro_report.py results\m1_3060 results\m1_<card> --out results\m1_pc_report`)
 and extend `PC_REPORT.md`. Nothing on the PC during the first 4 minutes of each run.
+
+**State on 2026-10-14 (session paused):** PC idle — no `lightbound.exe`/`python` running, working
+tree clean, `pc/m0-m1` even with origin at the hand-over commit. The PC session may be resumed
+later if the Mac side asks for additional measurements (e.g. a re-run after a Mac-side code
+change, an extra path/payload, or a ReBAR-off `s2_rebar` cross-check). In that case: start from
+"If the PC has to be switched off" above, **rebuild first if `src/` changed** (the `--resume`
+header check refuses a different `git_commit`), use a **new output directory** for a new series
+(never add runs to `results\m1_3060`, its three runs are final), and keep the 4-minute rule.
