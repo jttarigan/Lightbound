@@ -355,3 +355,5 @@ Ambiguities resolved while building, per CLAUDE.md rule 4. Newest at the bottom.
       `pmset -g ac` (wattage) at the start and the end. A run whose power source leaves `AC Power` is invalid.
     - **Open:** the adapter used for `m1_mac_ac` (10-13) was not recorded. If it was the same 20 W one (the only
       charger now), the two series match. Otherwise the report notes the difference.
+    - **Lab scheduling (Main, 10-17 morning):** the run waits for a 35 W+ charger anyway (RTBench waits too).
+      #35 stays the protocol reading, and the fallback if no bigger charger comes in.
