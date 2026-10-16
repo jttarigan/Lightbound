@@ -343,3 +343,15 @@ Ambiguities resolved while building, per CLAUDE.md rule 4. Newest at the bottom.
       result line (hash + §6 metrics) and writes the PNG. stb has no release tags and is pinned to
       commit 2c980bb. `kGeneratorVersion` stays 1, since this is the first generator. Tests: determinism
       and validity cycle depth = 1 + seed % 5; the golden file holds the bench seeds × depths 1..5.
+
+35. **2026-10-17 — A 20 W adapter counts as "plugged in" for Mac runs (protocol §2).**
+    - **Question (Main, 06:37 WIB):** the only charger here is 20 W; under load the battery may slowly drain. Does
+      `m1_mac_ext` still meet §2?
+    - **Decision: yes, with guards.** §2 asks for "plugged in". With the 20 W adapter macOS reports
+      `AC Power`, which is what the run records (`sysinfo.power_source`), so the OS power policy is the AC one; the
+      battery only covers peaks above 20 W. What §2 protects against is the battery power state, i.e. running
+      unplugged (declined 10-16), not the adapter's wattage.
+    - **Guards:** start at ≥ 50 % battery; Low Power Mode off; lid open; `caffeinate -is`; log `pmset -g batt` and
+      `pmset -g ac` (wattage) at the start and the end. A run whose power source leaves `AC Power` is invalid.
+    - **Open:** the adapter used for `m1_mac_ac` (10-13) was not recorded. If it was the same 20 W one (the only
+      charger now), the two series match. Otherwise the report notes the difference.
