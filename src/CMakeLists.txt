@@ -14,6 +14,23 @@ target_include_directories(lb_core PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(lb_core PUBLIC Threads::Threads)
 lb_set_warnings(lb_core)
 
+# ------------------------------------------------------------------ procgen (floors, docs/02; CPU only)
+add_library(lb_procgen STATIC
+  procgen/Generator.cpp
+  procgen/Sdf.cpp
+  procgen/Puzzle.cpp
+  procgen/Validate.cpp
+  procgen/Hash.cpp
+  procgen/FloorImage.cpp)
+target_link_libraries(lb_procgen PUBLIC lb_core)
+# Floors must be bit-identical with clang and MSVC (docs/02 §7, DECISIONS #34): no FMA contraction.
+if(MSVC)
+  target_compile_options(lb_procgen PRIVATE /fp:precise)
+else()
+  target_compile_options(lb_procgen PRIVATE -ffp-contract=off)
+endif()
+lb_set_warnings(lb_procgen)
+
 # ------------------------------------------------------------------ gfx
 set(LB_GFX_SOURCES gfx/Gfx.cpp)
 if(LB_BACKEND STREQUAL "metal")
@@ -58,7 +75,7 @@ target_link_libraries(lb_app PUBLIC lb_core)
 lb_set_warnings(lb_app)
 
 # ------------------------------------------------------------------ executable
-add_executable(lightbound app/main.cpp)
-target_link_libraries(lightbound PRIVATE lb_app lb_bench)  # lb_frame, lb_gfx, lb_core, SDL3 come transitively
+add_executable(lightbound app/main.cpp app/ProcgenDump.cpp)
+target_link_libraries(lightbound PRIVATE lb_app lb_bench lb_procgen lb_stb)  # lb_frame, lb_gfx, lb_core, SDL3 come transitively
 set_target_properties(lightbound PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
 lb_set_warnings(lightbound)

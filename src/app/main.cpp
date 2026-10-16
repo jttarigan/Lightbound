@@ -1,4 +1,5 @@
 #include "app/Cli.h"
+#include "app/ProcgenDump.h"
 #include "app/Version.h"
 #include "bench/Microbench.h"
 #include "core/Log.h"
@@ -181,9 +182,7 @@ int main(int argc, char** argv) {
     switch (opt.mode) {
     case Mode::Play: return runPlay(opt);
     case Mode::Microbench: return runMicrobench(opt, argc, argv);
-    case Mode::ProcgenDump:
-        std::fprintf(stderr, "mode '%s' is not implemented yet (milestone M2)\n", cliName(opt.mode));
-        return 2;
+    case Mode::ProcgenDump: return lb::app::runProcgenDump(opt);
     case Mode::Bench:
         std::fprintf(stderr, "mode '%s' is not implemented yet (milestone M4)\n", cliName(opt.mode));
         return 2;

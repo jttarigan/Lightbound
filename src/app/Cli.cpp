@@ -86,7 +86,7 @@ constexpr FlagSpec kFlags[] = {
     {"memvariant", true}, {"audit", true}, {"audio", true}, {"preset", true}, {"out", true},
     {"tag", true}, {"power", true},
     {"vsync", true}, {"validation", true}, {"width", true}, {"height", true}, {"exit-after", true},
-    {"log", true}, {"micro-paths", true}, {"micro-payloads", true}, {"micro-gpuload", true}, {"resume", false},
+    {"log", true}, {"micro-paths", true}, {"micro-payloads", true}, {"micro-gpuload", true}, {"resume", false}, {"depth", true},
     {"help", false}, {"version", false},
 };
 
@@ -161,6 +161,7 @@ ParseStatus parseCommandLine(int argc, const char* const* argv, Options& out, st
         else if (name == "micro-payloads") out.microPayloads = value;
         else if (name == "micro-gpuload") ok = parseEnum(value, kGpuLoads, out.microGpuLoad);
         else if (name == "resume") out.resume = true;
+        else if (name == "depth") { ok = parseU32(value, out.depth) && out.depth >= 1 && out.depth <= 5; out.depthExplicit = ok; }
         else if (name == "log") {
             u32 lvl = 0;
             if (ieq(value.c_str(), "trace")) lvl = 0;
@@ -238,6 +239,8 @@ void printUsage(FILE* to) {
         "                                are written as <path>_hot; both = idle cells, then hot)\n"
         "  --resume                      microbench: continue the interrupted run in --out (keeps the\n"
         "                                cells it completed, measures the missing ones)\n"
+        "  --depth=1..5                  play / procgen-dump: floor depth (default 1); procgen-dump\n"
+        "                                writes --out (PNG) and prints the floor hash and metrics\n"
         "  --log=trace|info|warn|error   log level (default info)\n"
         "  --help  --version\n",
         to);
@@ -268,6 +271,7 @@ std::string describeOptions(const Options& o) {
     if (!o.microPaths.empty()) s += " micro-paths=" + o.microPaths;
     if (!o.microPayloads.empty()) s += " micro-payloads=" + o.microPayloads;
     if (o.microGpuLoad != GpuLoad::Idle) s += " micro-gpuload=" + std::string(cliName(o.microGpuLoad));
+    if (o.depthExplicit) s += " depth=" + std::to_string(o.depth);
     return s;
 }
 

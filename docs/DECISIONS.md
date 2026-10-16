@@ -289,3 +289,57 @@ Ambiguities resolved while building, per CLAUDE.md rule 4. Newest at the bottom.
     - **Next milestone:** M2 (procedural floors, CPU only) may start before the extension is measured;
       the proposal's "M2 (the agent system)" meant the later agent milestones. The N levels that bracket
       the crossover matter from M4 on (§4 already spans 1k–100k, 1 MiB ≈ 37k agents).
+
+## 2026-10-16 — M2 procedural floors: spec interpretations
+
+34. **Where docs/02 leaves a choice, the generator does the following** (`src/procgen/`). All layout
+    decisions are integer-only, and `lb_procgen` builds with FP contraction off (`-ffp-contract=off`,
+    MSVC `/fp:precise`), so floors are bit-identical with clang and MSVC (§7 golden hashes).
+    - **Rooms:** dart throwing on the integer grid, 14-tile margin, ≈ (w·h)/900 rooms (fewer if the
+      darts run out; < 8 re-rolls). **Delaunay** by the empty-circumcircle test with exact integer
+      predicates (n ≤ ≈ 50; cocircular ties keep every triangle). **MST** by Kruskal on (d², a, b);
+      loops = round(15 % of the remaining Delaunay edges), chosen by a seeded shuffle.
+    - **Roles:** START = lowest degree among the quarter of rooms nearest the map edge (seeded ties).
+      EXIT = most hops from START (ties: farther in space). Antechamber = EXIT's neighbor nearest
+      START. **On seal floors the antechamber is also the PUZZLE room**: EXIT is almost always a
+      leaf, so it has no second neighbor. NEST: hops ≥ 2 (relaxed to 1 if short), degree first, then
+      hops. CACHE: 3–5 random caves.
+    - **Caves:** CA fill 45 % inside 0.8 R, rising linearly to 70 % at R ("radial falloff" is not
+      quantified; a falloff to 100 % from 0.6 R left rooms ≈ 4–5 tiles across). Room cores
+      (d² ≤ 5) and corridor centerlines are protected from the smoothing passes, so every room
+      center stays connected. Corridor walk: 70 % one step toward the target (axis chosen in
+      proportion to the remaining |dx|, |dy|), else one random 4-way step; after 4·manhattan + 64
+      steps it finishes straight.
+    - **Water:** 40 % of caves in Mossy Hollow ("many pools"), 20 % elsewhere. **Chasms** (Abyss):
+      35 % of caves, radius 2–3, placed after the connectivity cleanup and kept only if every
+      walkable tile stays reachable. The cleanup turns every open tile not connected to START into
+      wall, which also covers "fill tiny enclosed islands".
+    - **SDF:** signed (+ open, − inside walls), the distance from each sample center to the nearest
+      tile square of the other class. Tile EDT argmin → samples (boundary tiles also try their
+      neighbors) → jump flood over offsets 4, 2, 1. Wall samples more than 3 tiles from open space
+      keep the EDT candidate. Tested against brute force: exact on > 99.9 % of samples, worst
+      error < 1 px (jump flood far from walls).
+    - **Lights:** brazier range sdf ∈ [1.5, 3] tiles at the tile center (else any floor tile of the
+      room); corridor braziers at least 10 tiles from every brazier. Priorities: 0 START brazier
+      and puzzle crystal, 1 room braziers, 2 crystals, 3 corridor braziers; the cap drops 3, then 2,
+      then 1, last generated first. Pre-lit = round(fraction × braziers after the cap), START
+      included. Crystal clusters (2–4 wall tiles, one 40 px light each): 50 % of rooms in the
+      Crystal biomes, 0–3 elsewhere. Ember Deep's glowing cracks are deco, not static lights.
+    - **Seal puzzle:** a mirror is a line with 4 orientations and rotates one way in +45° steps,
+      so it needs 0–3 presses. A beam reflects to 2m − d, so mirrors make 90° turns. Diagonal steps
+      are blocked only between two walls. The path is built backwards from a sigil wall of EXIT
+      (farthest from the PUZZLE room first) with 2 (d3) or 3 (d5) mirrors, segments ≥ 2 tiles. The
+      crystal source is a floor tile of the PUZZLE room. A failed search or > 8 rotations re-rolls
+      the floor (≈ 5 % of seal floors, seeds 1..200).
+    - **Validation:** rule 1 uses 4-connected walkable tiles. Rule 5 uses consecutive 60-tile chunks
+      of that path, with a lit brazier ≤ 30 tiles (Euclidean) from any tile of the chunk. **Rule 6
+      target** = the median open fraction (floor + water + chasm) of seeds 1..200 per GDD map size:
+      21.4 / 22.2 / 22.8 / 23.4 / 23.5 % for 120…200, linear in between. ≈ 2 % of floors re-roll
+      on it.
+    - **Spawns:** dark pockets are walkable tiles of rooms ≥ 3 hops from START with no static
+      light (lit or not) within 120 px. Nest zones are walkable tiles within 3 tiles of the nest.
+      lit_area_fraction uses light radius only (no occlusion).
+    - **Tooling:** `--depth=1..5` (in the options header only when given); `procgen-dump` prints one
+      result line (hash + §6 metrics) and writes the PNG. stb has no release tags and is pinned to
+      commit 2c980bb. `kGeneratorVersion` stays 1, since this is the first generator. Tests: determinism
+      and validity cycle depth = 1 + seed % 5; the golden file holds the bench seeds × depths 1..5.

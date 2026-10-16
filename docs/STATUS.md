@@ -1,7 +1,7 @@
 # Work status (resume here)
 
-_Last updated 2026-10-16 ≈ 09:00 WIB (session 10, continued). The user decided M1 this morning; docs only, nothing measured,
-nothing running._
+_Last updated 2026-10-16 evening (session 10, continued). M1 decided this morning; paper drafts; M2 built on the Mac.
+Nothing measured, nothing running._
 
 ## RESUME HERE (2026-10-16)
 - **M1 decided: NO-GO on H1, re-scoped to the payload crossover (H1′)**, all as recommended (DECISIONS #33). H1′ with its
@@ -15,17 +15,33 @@ nothing running._
 - **Paper started (user's request via Main, 10-16):** `docs/paper/OUTLINE.md` (section readiness, venue open = user's call) and
   `docs/paper/methods_microbench.md` (§4 draft). Next in the draft order: §3 platforms + §5 M1 idle results, then related work after
   a real literature search; §6 only once both `_ext` series are in.
-- **Next milestone: M2, procedural floors** (`docs/02_PROCGEN.md`), CPU only. It may start before the extension is measured.
+- **M2 built on the Mac** (see the M2 section below); waiting for the [PC] golden check and the user's review.
 - **PC:** still at c593742 on GitHub (checked 10-16 08:31 WIB, `ls-remote` + GitHub API: last push 10-14 16:58 WIB). The user
   said "the PC says the new result is on GitHub", but nothing new had arrived. Ask the user for the PC's `git status -sb` /
   `git log --oneline -3 origin/pc/m0-m1` if it comes up again.
+
+## M2 — procedural floors (built on the Mac 2026-10-16; [PC] golden check pending)
+- **Built:** `src/procgen/` (stages 1–6, validation, metrics, `floorHash`, debug image), `--mode=procgen-dump --seed=N
+  --depth=D --out=x.png`, `--depth` flag, stb pinned. Interpretations: **DECISIONS #34**.
+- **Verified [Mac], Release, Metal build:** ctest 45/45 without the GPU label (the 2 GPU smoke tests not run: light-work
+  rule); warnings-as-errors clean.
+  - determinism seeds 1..200 ✓; validity seeds 1..1000 ✓ (at most 3 attempts);
+  - golden hashes for the bench seeds × depths 1..5 written to `tests/golden/floors.txt`;
+  - 200×200 generation: best of 3 per bench seed well under 150 ms (single attempt ≈ 26–35 ms; worst seen with
+    re-rolls 84 ms);
+  - seal puzzles on seeds 1..40 (d3/d5): scrambled, solvable in 1..8 rotations, the stored solution solves;
+  - SDF vs brute force: exact on > 99.9 % of samples, worst < 1 px.
+- **Review PNGs:** `docs/img/floors/` (bench seeds at d5 = 200×200, and seed 101 at d1–d4 for each biome).
+- **Open for acceptance:** [PC] golden hashes identical with MSVC (in the PC message; runs when the PC gets the bundle).
+  Calibration stats (seeds 1..200 per depth): open fraction p50 21.4 → 23.5 %, re-rolls ≈ 7 % of floors (rule 5 dark
+  stretches, puzzle search, rule 6).
 
 ## To-do (2026-10-16, in order)
 Tags: **[solo]** = this session, unattended; **[device: X, ~time]** = needs a machine; **[user]** = the human's hands or a decision.
 No phones or tablets are needed.
 
-1. **[solo] M2, procedural floors**, by `docs/07_MILESTONES.md`. Light code work, fine while the user is on the Mac (no GPU,
-   short builds).
+1. **[user] Review M2** (`docs/img/floors/*.png`, DECISIONS #34). M2's [PC] check rides along with to-do 3. M3 (headless
+   simulation core) is next after M2 is accepted.
 2. **[device: Mac on AC, ≈ 70 min, unattended, Mac otherwise quiet]** extension series `results/m1_mac_ext` (idle + hot,
    12 payloads; command in `docs/M1_RESCOPE_PROPOSAL.md` §4): charger, lid open, Low Power Mode off, `caffeinate -is`; no
    other session may run GPU work, builds or heavy jobs meanwhile. Needs a slot from Main when the Mac is quiet (evening/night,

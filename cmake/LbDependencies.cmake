@@ -31,6 +31,13 @@ FetchContent_Declare(miniaudio
   GIT_SHALLOW    TRUE
   SOURCE_SUBDIR  cmake_not_used)
 
+# ---------------------------------------------------------------- stb (header only: stb_image_write for procgen-dump PNGs)
+# stb has no release tags; pinned to a commit of master (DECISIONS #34).
+FetchContent_Declare(stb
+  GIT_REPOSITORY https://github.com/nothings/stb.git
+  GIT_TAG        2c980bb59875b0d32144a71867fbdebb2f77cd20
+  SOURCE_SUBDIR  cmake_not_used)
+
 # ---------------------------------------------------------------- Slang binary release
 set(LB_SLANG_VERSION "2026.18.2")
 if(APPLE)
@@ -48,7 +55,7 @@ FetchContent_Declare(slang_release
   URL "https://github.com/shader-slang/slang/releases/download/v${LB_SLANG_VERSION}/${_lb_slang_asset}"
   DOWNLOAD_EXTRACT_TIMESTAMP TRUE)
 
-set(_lb_fetch_list SDL3 doctest miniaudio slang_release)
+set(_lb_fetch_list SDL3 doctest miniaudio stb slang_release)
 
 # ---------------------------------------------------------------- Metal: metal-cpp
 if(LB_BACKEND STREQUAL "metal")
@@ -86,6 +93,8 @@ endif()
 FetchContent_MakeAvailable(${_lb_fetch_list})
 
 # ---------------------------------------------------------------- interface targets
+add_library(lb_stb INTERFACE)
+target_include_directories(lb_stb SYSTEM INTERFACE "${stb_SOURCE_DIR}")
 add_library(lb_miniaudio INTERFACE)
 target_include_directories(lb_miniaudio SYSTEM INTERFACE "${miniaudio_SOURCE_DIR}")
 

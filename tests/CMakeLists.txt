@@ -7,9 +7,11 @@ add_executable(lb_tests
   test_jobs.cpp
   test_layouts.cpp
   test_cli.cpp
-  test_micro.cpp)
-target_link_libraries(lb_tests PRIVATE lb_app lb_bench doctest::doctest)  # lb_core etc. come transitively
+  test_micro.cpp
+  test_procgen.cpp)
+target_link_libraries(lb_tests PRIVATE lb_app lb_bench lb_procgen doctest::doctest)  # lb_core etc. come transitively
 target_include_directories(lb_tests PRIVATE "${CMAKE_SOURCE_DIR}/src" "${LB_GEN_DIR}")
+target_compile_definitions(lb_tests PRIVATE LB_SOURCE_DIR="${CMAKE_SOURCE_DIR}")
 add_dependencies(lb_tests lb_layouts_gen)
 set_target_properties(lb_tests PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
 lb_set_warnings(lb_tests)

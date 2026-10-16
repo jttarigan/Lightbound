@@ -53,6 +53,8 @@ struct Options {
     std::string microPayloads;  // microbench: comma list of payload sizes, e.g. 4K,1M (default protocol set)
     GpuLoad microGpuLoad = GpuLoad::Idle;  // microbench: idle = protocol §6 as written; hot = GPU kept busy
     bool resume = false;        // microbench: continue the interrupted run in `out` (keeps its complete cells)
+    u32 depth = 1;              // play / procgen-dump: floor depth 1..5 (GDD §7)
+    bool depthExplicit = false;
     u8 logLevel = 1;            // 0 trace, 1 info, 2 warn, 3 error
     bool help = false;
     bool version = false;

@@ -8,6 +8,12 @@ Read this when you resume on the PC. It arrives with a git bundle of the Mac's `
 > before the run and record it). **The 4060 Ti can't be installed before November**, so §1 (step D) waits; when
 > the card arrives, do §1 as written. Gen3 is accepted as the platform definition (decision b), and for ReBAR on
 > `s2_direct` report `rt` as primary and `rt` + GPU read as secondary (decision c).
+>
+> **M2 is in the bundle too (2026-10-16):** procedural floors (`src/procgen/`, DECISIONS #34). After the rebuild,
+> ctest has 47 tests. **`procgen golden hashes ...` must pass with MSVC**: that is M2's [PC] acceptance (same floors on
+> macOS and Windows, `tests/golden/floors.txt`). If it fails, do not regenerate the file: report which lines differ
+> (`LB_UPDATE_GOLDEN=1` would hide the bug). Also note the `procgen performance` result. Run the M1 extension series
+> first if the user asks for it; these tests take ≈ 1 min and must not overlap a measurement.
 
 ## 1. Step D is back on: the RTX 4060 Ti exists
 Your `PC_REPORT.md` ("the human has no RTX 4060 Ti") and the "D (cancelled)" row in `PC_PROGRESS.md` are
