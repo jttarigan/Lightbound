@@ -51,7 +51,7 @@ No phones or tablets are needed.
    Provenance: built 10-16 08:37 WIB, before Xcode auto-updated to 27.1 at 10:14 (Main's notice); `xcrun metal` is
    32023.921 before and after, the OS is unchanged, and the cache pins no SDK path. Builds after 10:14 use Apple clang 21.0.0
    (Xcode 27.1); a plain incremental build still works. Record both facts in the run log.
-3. **[user]** carry `~/Desktop/lightbound-main-2026-10-13.bundle` (rebuilt 10-16 with the decisions) and
+3. **[user]** carry `~/Desktop/lightbound-main-2026-10-13.bundle` (rebuilt 10-16 at 364ffbf: decisions + M2) and
    `docs/PC_MESSAGE_2026-10-13.md` to the PC and start the PC Claude on the message.
 4. **[device: Windows PC, ≈ 3 h, unattended]** the same series on the 3060 Ti (`results\m1_3060_ext`), after the PC Claude
    fast-forwards and rebuilds. Nothing on the PC during the first ≈ 4 min.
