@@ -16,6 +16,9 @@ Nothing measured, nothing running._
   `docs/paper/methods_microbench.md` (§4 draft). Next in the draft order: §3 platforms + §5 M1 idle results, then related work after
   a real literature search; §6 only once both `_ext` series are in.
 - **M2 built on the Mac** (see the M2 section below); waiting for the [PC] golden check and the user's review.
+  M2 report given to the user 10-16 ≈ 19:00 WIB (PNGs in `docs/img/floors/`); M3 starts only after the user accepts.
+- **Pending trigger:** Main sends "go lightbound" with a start time for the Mac ext run (to-do 2). On it: run with the frozen
+  binary, then SendMessage Main "done". (Session moved into BattleStation 10-16 ≈ 19:10 WIB via `claude --continue`.)
 - **PC:** still at c593742 on GitHub (checked 10-16 08:31 WIB, `ls-remote` + GitHub API: last push 10-14 16:58 WIB). The user
   said "the PC says the new result is on GitHub", but nothing new had arrived. Ask the user for the PC's `git status -sb` /
   `git log --oneline -3 origin/pc/m0-m1` if it comes up again.
