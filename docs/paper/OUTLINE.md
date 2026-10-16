@@ -20,7 +20,7 @@ staleness of frame-delayed readback (H4).
 | § | Section | State | Waits on |
 |---|---|---|---|
 | 1 | Introduction | outline only | contribution list is final after the crossover runs |
-| 2 | Background & related work | **writable**, needs a literature search (no citations from memory) | — |
+| 2 | Background & related work | **draft:** `related_work.md` (9 sources, checked; gap statement) | 6 open search topics listed there |
 | 3 | Platforms | **draft:** `platforms_and_m1_results.md` | P-4060 (November) |
 | 4 | Microbenchmark method | **draft:** `methods_microbench.md` | — |
 | 5 | M1 results, idle GPU: the refuted H1 | **draft:** `platforms_and_m1_results.md` (data final) | figure 1 to embed |
