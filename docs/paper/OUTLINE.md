@@ -21,9 +21,9 @@ staleness of frame-delayed readback (H4).
 |---|---|---|---|
 | 1 | Introduction | outline only | contribution list is final after the crossover runs |
 | 2 | Background & related work | **writable**, needs a literature search (no citations from memory) | — |
-| 3 | Platforms | **ready**: M5, RTX 3060 Ti (gen3 x16, ReBAR on/off) | P-4060 (November) |
+| 3 | Platforms | **draft:** `platforms_and_m1_results.md` | P-4060 (November) |
 | 4 | Microbenchmark method | **draft:** `methods_microbench.md` | — |
-| 5 | M1 results, idle GPU: the refuted H1 | **ready** (data final, `results/m1_report*`) | — |
+| 5 | M1 results, idle GPU: the refuted H1 | **draft:** `platforms_and_m1_results.md` (data final) | figure 1 to embed |
 | 6 | Payload crossover and GPU state (H1′) | predictions only (written 2026-10-13) | `m1_mac_ext` (10-16 evening), `m1_3060_ext` (PC, needs the bundle) |
 | 7 | Game workload & pipeline (S0–S3, K) | design only (docs/05) | M2–M4 |
 | 8 | Frame-time results (H2, H3, H5) | — | M4, M8 matrices |
