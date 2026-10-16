@@ -17,8 +17,8 @@ Nothing measured, nothing running._
   a real literature search; §6 only once both `_ext` series are in.
 - **M2 built on the Mac** (see the M2 section below); waiting for the [PC] golden check and the user's review.
   M2 report given to the user 10-16 ≈ 19:00 WIB (PNGs in `docs/img/floors/`); M3 starts only after the user accepts.
-- **Pending trigger:** Main sends "go lightbound" for the Mac ext run (to-do 2) **once a 35 W+ charger is in** (10-17: only a
-  20 W one here; #35 says 20 W would pass §2, but Main holds the run for a bigger charger). Launcher with guards:
+- **Pending trigger:** Main sends "go lightbound" for the Mac ext run (to-do 2) **on hold** (10-17: only a 20 W charger here;
+  #35 says 20 W passes §2; Main asks the user: run on 20 W now, or wait for a 35 W+ charger). Launcher with guards:
   scratchpad `run_mac_ext.sh` (re-create from M1_RESCOPE_PROPOSAL §4 + #35 guards if gone). On it: run with the frozen
   binary, then SendMessage Main "done". (Session moved into BattleStation 10-16 ≈ 19:10 WIB via `claude --continue`.)
 - **PC:** still at c593742 on GitHub (checked 10-16 08:31 WIB, `ls-remote` + GitHub API: last push 10-14 16:58 WIB). The user

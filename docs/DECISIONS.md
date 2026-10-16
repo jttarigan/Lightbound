@@ -353,7 +353,8 @@ Ambiguities resolved while building, per CLAUDE.md rule 4. Newest at the bottom.
       unplugged (declined 10-16), not the adapter's wattage.
     - **Guards:** start at ≥ 50 % battery; Low Power Mode off; lid open; `caffeinate -is`; log `pmset -g batt` and
       `pmset -g ac` (wattage) at the start and the end. A run whose power source leaves `AC Power` is invalid.
-    - **Open:** the adapter used for `m1_mac_ac` (10-13) was not recorded. If it was the same 20 W one (the only
-      charger now), the two series match. Otherwise the report notes the difference.
-    - **Lab scheduling (Main, 10-17 morning):** the run waits for a 35 W+ charger anyway (RTBench waits too).
-      #35 stays the protocol reading, and the fallback if no bigger charger comes in.
+    - **Adapter for `m1_mac_ac` (10-13): unknown** (Main, 10-17: pmset logs don't record the wattage). The report
+      lists it as unknown; from `m1_mac_ext` on, the wattage is logged.
+    - **Lab scheduling (Main, 10-17 morning):** the run is on hold while Main asks the user whether to run it now on
+      the 20 W adapter or wait for a 35 W+ charger (the user postponed RTBench's run on this adapter for
+      comparability). #35 is the protocol reading either way.
