@@ -32,6 +32,9 @@ No phones or tablets are needed.
    not during another project's quiet-Mac run; Main queued it for 10-16 evening after RTBench, exact time from Main). M2 work
    pauses during it. **Use the frozen binary** `build/frozen_ext_2d5c1ba/lightbound` (+ its `shaders/`; Metal Release, clean
    commit 2d5c1ba, code = 069a95e) as `--exe`, so M2 edits can't change or dirty the measured binary.
+   Provenance: built 10-16 08:37 WIB, before Xcode auto-updated to 27.1 at 10:14 (Main's notice); `xcrun metal` is
+   32023.921 before and after, the OS is unchanged, and the cache pins no SDK path. Builds after 10:14 use Apple clang 21.0.0
+   (Xcode 27.1); a plain incremental build still works. Record both facts in the run log.
 3. **[user]** carry `~/Desktop/lightbound-main-2026-10-13.bundle` (rebuilt 10-16 with the decisions) and
    `docs/PC_MESSAGE_2026-10-13.md` to the PC and start the PC Claude on the message.
 4. **[device: Windows PC, ≈ 3 h, unattended]** the same series on the 3060 Ti (`results\m1_3060_ext`), after the PC Claude
