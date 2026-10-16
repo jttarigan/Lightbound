@@ -26,7 +26,9 @@ No phones or tablets are needed.
 2. **[device: Mac on AC, ≈ 70 min, unattended, Mac otherwise quiet]** extension series `results/m1_mac_ext` (idle + hot,
    12 payloads; command in `docs/M1_RESCOPE_PROPOSAL.md` §4): charger, lid open, Low Power Mode off, `caffeinate -is`; no
    other session may run GPU work, builds or heavy jobs meanwhile. Needs a slot from Main when the Mac is quiet (evening/night,
-   not during another project's quiet-Mac run). M2 work pauses during it.
+   not during another project's quiet-Mac run; Main queued it for 10-16 evening after RTBench, exact time from Main). M2 work
+   pauses during it. **Use the frozen binary** `build/frozen_ext_2d5c1ba/lightbound` (+ its `shaders/`; Metal Release, clean
+   commit 2d5c1ba, code = 069a95e) as `--exe`, so M2 edits can't change or dirty the measured binary.
 3. **[user]** carry `~/Desktop/lightbound-main-2026-10-13.bundle` (rebuilt 10-16 with the decisions) and
    `docs/PC_MESSAGE_2026-10-13.md` to the PC and start the PC Claude on the message.
 4. **[device: Windows PC, ≈ 3 h, unattended]** the same series on the 3060 Ti (`results\m1_3060_ext`), after the PC Claude
