@@ -1,87 +1,43 @@
 # Work status (resume here)
 
-> **DEADLINE: the Windows PC's Update pause ends 2026-10-16 14:28 WIB.** The user extends it, or at least keeps the NVIDIA
-> driver at 566.36 (to-do 1).
+_Last updated 2026-10-16 ≈ 09:00 WIB (session 10, continued). The user decided M1 this morning; docs only, nothing measured,
+nothing running._
 
-_Last updated 2026-10-15 ≈ 15:45 WIB (session 10, saved at the user's sign-off; no code, no measurements. Nothing running.
-The afternoon brought only other projects' device holds; Lightbound used no device.
-Session 9 (10-13 evening) built the hot-GPU cells behind `--micro-gpuload` (DECISIONS #32) and drafted
-`docs/M1_RESCOPE_PROPOSAL.md` and `docs/PC_MESSAGE_2026-10-13.md`)._
+## RESUME HERE (2026-10-16)
+- **M1 decided: NO-GO on H1, re-scoped to the payload crossover (H1′)**, all as recommended (DECISIONS #33). H1′ with its
+  predictions, the M1 outcome, the gen3 platform definition, the ReBAR reporting rule and the extension (hot GPU + 12-point
+  payload grid) are now in `docs/06_RESEARCH_PROTOCOL.md` §1, §2 and §6. The proposal and the PC message carry dated
+  "approved / update" notes.
+- **Windows Update pause on the PC: extended by the user (10-16).** The PC Claude checks that the driver is still 566.36 before
+  its next run.
+- **4060 Ti: not before November** (the user can't do it sooner). Step D and M1's "[PC with 4060 Ti]" acceptance line wait;
+  accepted deviation (#33).
+- **Next milestone: M2, procedural floors** (`docs/02_PROCGEN.md`), CPU only. It may start before the extension is measured.
+- **PC:** still at c593742 on GitHub (checked 10-16 08:31 WIB, `ls-remote` + GitHub API: last push 10-14 16:58 WIB). The user
+  said "the PC says the new result is on GitHub", but nothing new had arrived. Ask the user for the PC's `git status -sb` /
+  `git log --oneline -3 origin/pc/m0-m1` if it comes up again.
 
-## Refresh 2026-10-15 (session 10)
-- **No user decisions yet** on 0 / a–d (to-do 2). Nothing measured since 10-13.
-- **PC:** fetched `pc/m0-m1` over HTTPS (reflog moved to c593742, 2026-10-14 16:58 WIB): docs only, the PC session paused
-  idle with a clean tree. It has **not** received the bundle or `docs/PC_MESSAGE_2026-10-13.md` yet (its log still says
-  "if a second card ever becomes available"). c593742 is merged into `main`, and the Desktop bundle was rebuilt from the new
-  `main`, so the PC can fast-forward (same file name, `~/Desktop/lightbound-main-2026-10-13.bundle`).
-- **SSH to GitHub still times out** (port 22, 10-15); `main` stays unpushed past baf605a.
-- **Mac clock checked 10-15 against GitHub's HTTP Date header: within 3 s.** The "Mac ≈ 35 min behind" note from 10-13 was
-  wrong or has gone away; Mac file times are WIB.
-- **LAB.md (devices) vs this file:** the 4060 Ti is "probably" the Ryzen 7 7700 PC's card, not confirmed. Protocol §2 wants it
-  in the same PC as the 3060 Ti, so where it goes is now an explicit user question (to-do 3).
-
-## RESUME HERE (2026-10-13, still current 10-15)
-- **M1 data is merged. The combined reports say NO-GO by protocol §6, and the decision is the user's** (to-do 2). The facts are in
-  "M1 combined report" below. Do not start M2 before the user decides.
-- **Pending question to the user (asked 2026-10-13, no answer yet).** The user said: "moving data is the strength, let's
-  evaluate this and try to exploit this". The evaluation is finding 9. I proposed, and recommended all three:
-  (1) record M1 as NO-GO on H1 and re-scope to the payload/N crossover, writing the new hypothesis down *before* measuring;
-  (2) extend the microbench with the hot-GPU cell and more payload sizes (1–4 MiB grid, up to 64 MiB, without `s2_rebar`):
-  ≈ 1 day of code, Mac ≈ 45 min, PC ≈ 1–2 h; (3) then M2. Step 2 changes the protocol, so draft the re-scope and the
-  hypothesis for the user's approval before writing code. If the user doesn't take this up, the hot-GPU test stays optional.
-- **4060 Ti series ≈ 2026-10-27 to 11-03** (card in service; to-dos 3, 5). **The PC's Windows Update pause ends 2026-10-16 14:28 WIB**
-  (to-do 1).
-- **Session 9 (2026-10-13 evening, user AFK, decisions pending):** the hot-GPU cell is **built and tested on both backends, off by
-  default** (`--micro-gpuload=idle|hot|both`, DECISIONS #32; details there). The decisions 0 and a–d are written out with
-  recommendations in `docs/M1_RESCOPE_PROPOSAL.md` (§1), which also holds the H1′ hypothesis and the §6 text to add if approved.
-  `docs/PC_MESSAGE_2026-10-13.md` tells the PC Claude that step D is back on and how to run the extension; both go to the PC
-  with `~/Desktop/lightbound-main-2026-10-13.bundle` (branch `main`). Main (the lab's cross-project session) has the decision
-  list for the user's checklist. Smoke numbers only (30 iterations, validation on, not measurements): M5 empty round trip
-  ≈ 77 µs hot vs ≈ 204 µs idle; load duty 1.00.
-
-## To-do (2026-10-15, in order)
+## To-do (2026-10-16, in order)
 Tags: **[solo]** = this session, unattended; **[device: X, ~time]** = needs a machine; **[user]** = the human's hands or a decision.
-Device slots come from Main's day plan (LAB.md). No phones or tablets are needed.
+No phones or tablets are needed.
 
-1. **[user, deadline 2026-10-16 14:28 WIB] Windows Update on the PC.** Extend the pause, or at least keep the NVIDIA driver at
-   566.36. Protocol §2 wants the same driver for both cards, and the 3060 Ti series ran on 566.36. Other projects may use the PC
-   meanwhile; they must keep its setup: driver, ReBAR on, Ultimate Performance, "Prefer maximum performance", and
-   `C:\dev\Lightbound` untouched.
-2. **[user] M1 go/no-go**, on the facts in "M1 combined report" below. The report tool says **NO-GO** by the letter of
-   protocol §6, with or without ReBAR: the M5 is slower than the 3060 Ti on both criterion cells. The second card can't
-   change that, because §6 needs the M5 clearly below *both* cards. Decide at the same time, each with my recommendation
-   (written out in `docs/M1_RESCOPE_PROPOSAL.md` §1):
-   (0) **NO-GO on H1, re-scope to the payload/N crossover (H1′ written before measuring), then M2.**
-   (a) **hot-GPU microbench cell** (finding 7): yes, run it. Hot M5 ≈ 55 µs empty vs 3060 Ti 60 µs, hot 1 MiB unmeasured.
-   (b) **PCIe gen3** (finding 5): accept the measured gen3 link as the platform definition.
-   (c) **ReBAR on: rt alone or rt + GPU read**: rt as the protocol defines it, with the sum as a secondary figure.
-   (d) **Repo public** (finding 6): keep it public for now, because anonymous HTTPS is the Mac's only way to fetch the PC's results.
-   M2 starts only after a GO or an approved re-scope.
-3. **[user] Where will the 4060 Ti go?** LAB.md says it is probably the Ryzen 7 7700 PC's card (in service, back ≈ 10-27 to
-   11-03). Protocol §2 compares the cards in the same PC. **Recommendation:** move it into the i7-12700F PC, same slot as the
-   3060 Ti, for step D. Keeping it in the Ryzen PC changes CPU, memory and chipset; then H5's link-width comparison is confounded
-   and I'd ask before planning further.
-4. **Only if 2a = yes (code done, DECISIONS #32):**
-   - **[device: Mac on AC, ≈ 70 min, unattended, Mac otherwise quiet]** extension series `results/m1_mac_ext` (idle + hot,
-     12 payloads; command in `docs/M1_RESCOPE_PROPOSAL.md` §4): charger, lid open, Low Power Mode off, `caffeinate -is`; no other
-     session may run GPU work, builds or heavy jobs meanwhile. Needs a slot when the user isn't using the Mac (evening/night).
-   - **[user]** carry `~/Desktop/lightbound-main-2026-10-13.bundle` and `docs/PC_MESSAGE_2026-10-13.md` to the PC and start
-     the PC Claude on the message (it also tells the PC step D is back on).
-   - **[device: Windows PC, ≈ 3 h, unattended]** the same series on the 3060 Ti (`results\m1_3060_ext`), after the PC Claude
-     fast-forwards and rebuilds (message §2–3). Nothing on the PC during the first ≈ 4 min.
-   - **[solo, ≈ 1 h]** fetch, report both with `micro_report.py` (`gpuload` column separates idle from hot), compute the crossover
-     with its run-to-run spread.
-5. **4060 Ti step D, ≈ 2026-10-27 to 11-03, after to-do 3.** Needed for M1 acceptance ("[PC with 4060 Ti]") and H5, not for the
-   go/no-go. **[user]** installs the card. **[device: Windows PC, exclusive, ≈ 3 days unattended (≈ 3 h without `s2_rebar`)]**
-   step D of the task file as written (`results\m1_4060`, gen3 x8 expected). Nothing on the PC during the first ≈ 4 min of each
-   run or during `s2_coherent` (the last ≈ 50 min). Then **[solo, ≈ 1 h]** fetch, merge, add P-4060 to the combined report.
-   If the card never comes back, the fallback is the narrowed-link 3060 Ti (finding 8, branch `mac/narrow-link`).
-6. **[solo] M2**, only after to-do 2 says GO or approves the re-scope.
-7. **[user, any time, low priority] Pushing.** SSH to GitHub still times out (port 22, checked 2026-10-15). Every `main`
-   commit after `origin/main` (baf605a) is unpushed (the PC's work is on `origin/pc/m0-m1` anyway), and so is
-   `mac/narrow-link`. Fix: a network where port 22 works, or an HTTPS token.
-
-**Deadline:** the PC's Windows Update pause ends 2026-10-16 14:28 WIB (to-do 1).
+1. **[solo] M2, procedural floors**, by `docs/07_MILESTONES.md`. Light code work, fine while the user is on the Mac (no GPU,
+   short builds).
+2. **[device: Mac on AC, ≈ 70 min, unattended, Mac otherwise quiet]** extension series `results/m1_mac_ext` (idle + hot,
+   12 payloads; command in `docs/M1_RESCOPE_PROPOSAL.md` §4): charger, lid open, Low Power Mode off, `caffeinate -is`; no
+   other session may run GPU work, builds or heavy jobs meanwhile. Needs a slot from Main when the Mac is quiet (evening/night,
+   not during another project's quiet-Mac run). M2 work pauses during it.
+3. **[user]** carry `~/Desktop/lightbound-main-2026-10-13.bundle` (rebuilt 10-16 with the decisions) and
+   `docs/PC_MESSAGE_2026-10-13.md` to the PC and start the PC Claude on the message.
+4. **[device: Windows PC, ≈ 3 h, unattended]** the same series on the 3060 Ti (`results\m1_3060_ext`), after the PC Claude
+   fast-forwards and rebuilds. Nothing on the PC during the first ≈ 4 min.
+5. **[solo, ≈ 1 h]** after 2 and 4: fetch, report both with `micro_report.py` (`gpuload` column), compute the crossover per GPU
+   state with its run-to-run spread, compare with the H1′ predictions.
+6. **4060 Ti step D, November** (the user's date). **[user]** installs it in the i7-12700F PC, same slot (protocol §2; if it goes
+   into another PC, ask before planning). **[device: Windows PC, exclusive, ≈ 3 days unattended]** step D as written
+   (`results\m1_4060`), then optionally `m1_4060_ext`. **[solo, ≈ 1 h]** merge and add P-4060 to the combined report.
+7. **[user, any time, low priority] Pushing.** SSH to GitHub still times out. Every `main` commit after `origin/main`
+   (baf605a) is unpushed, and so is `mac/narrow-link`. Fix: a network where port 22 works, or an HTTPS token.
 
 ## State
 
@@ -89,12 +45,12 @@ Device slots come from Main's day plan (LAB.md). No phones or tablets are needed
   `pc/m0-m1` was merged into `main` on 2026-10-13 (45b6182). Both Mac backends rebuilt warning-free; ctest 37/37 on each.
 - **M1 — Round-trip microbenchmark (GO/NO-GO gate):** the Mac (AC) and the RTX 3060 Ti (ReBAR on and off) are measured.
   The combined reports are `results/m1_report` (3060 Ti ReBAR on, the primary condition) and `results/m1_report_rebar-off`.
-  Both say **NO-GO** by protocol §6. Waiting for: the human's go/no-go (to-do 2), and for acceptance also the 4060 Ti
-  (to-dos 3 and 5). Do not start M2 before a GO. The hot-GPU cells (DECISIONS #32) are built, off by default, unmeasured.
+  Both say **NO-GO** by protocol §6. **Decided 2026-10-16: NO-GO on H1, re-scoped to H1′ (DECISIONS #33).** Acceptance still lacks the 4060 Ti
+  (November, accepted deviation). M2 may start. The hot-GPU cells (DECISIONS #32) are built, off by default, unmeasured.
 - **PC:** idle since 2026-10-13 10:30 (still idle 10-14, c593742, merged). All its work is merged: `docs/PC_REPORT.md` is the hand-over, and `docs/PC_PROGRESS.md`
   is the session log with the resume procedure. Step D (4060 Ti) waits for the card. The PC Claude must be told it is coming
   (to-do 5).
-- **Open human decisions:** go/no-go and its sub-decisions (to-do 2).
+- **Open human decisions:** none (M1 decided 2026-10-16).
 
 ## Resume checklist (Mac)
 ```

@@ -265,3 +265,27 @@ Ambiguities resolved while building, per CLAUDE.md rule 4. Newest at the bottom.
       idle on Metal, duty 1.00; MoltenVK 99 vs 218 µs, duty 1.01.
     - **Protocol:** docs/06 §6 is not edited. The text to add if the human approves, and the proposed
       payload grid for the crossover study, are in `docs/M1_RESCOPE_PROPOSAL.md`.
+
+## 2026-10-16 — M1 go/no-go (human decision)
+
+33. **M1 is NO-GO on H1; the study is re-scoped to the payload crossover (H1′).** The human approved
+    `docs/M1_RESCOPE_PROPOSAL.md` §1 as recommended ("go as you recommend"):
+    - **0.** H1 is refuted by the §6 criterion (idle GPU, ReBAR on and off). Instead of the pivot named in
+      §6, H1 is replaced by H1′, written on 2026-10-13 before any new measurement, with its predictions;
+      H2–H6 and the §7 cost model are unchanged. Protocol §1 and §6 are edited accordingly.
+    - **a.** The hot-GPU cells (#32) and the 12-point payload grid are measured as an extension
+      (`results/m1_mac_ext`, `results/m1_3060_ext`), in their own directories. The proposal left open which
+      GPU state the go criterion uses; since the go/no-go is now decided, the criterion stays on the idle
+      cells as written (what `micro_report.py` already does), and H1′ is evaluated on idle and hot
+      separately.
+    - **b.** The measured PCIe gen3 link is the platform definition (gen3 x16 for the 3060 Ti, gen3 x8
+      expected for the 4060 Ti).
+    - **c.** ReBAR on, `s2_direct`: `rt` as defined is primary, `rt` + GPU read is secondary.
+    - **d.** The repository stays public for now (anonymous HTTPS is the Mac's only fetch path while SSH
+      to GitHub times out).
+    - **4060 Ti:** the human can't install it before November, so step D waits until then. M1's
+      acceptance line "[PC with 4060 Ti]" stays open; that deviation is accepted, because the second card
+      can't change the go/no-go (§6 needs the M5 below both cards) and is needed only for H5.
+    - **Next milestone:** M2 (procedural floors, CPU only) may start before the extension is measured;
+      the proposal's "M2 (the agent system)" meant the later agent milestones. The N levels that bracket
+      the crossover matter from M4 on (§4 already spans 1k–100k, 1 MiB ≈ 37k agents).

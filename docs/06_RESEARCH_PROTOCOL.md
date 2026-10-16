@@ -6,7 +6,8 @@
 
 | ID | Hypothesis |
 |---|---|
-| H1 | Per-round-trip synchronization latency (GPU→CPU and CPU→GPU) is lower on M5 than on either discrete GPU, for all payload sizes tested. |
+| H1 | ~~Per-round-trip synchronization latency (GPU→CPU and CPU→GPU) is lower on M5 than on either discrete GPU, for all payload sizes tested.~~ **Refuted at M1** (NO-GO, decided 2026-10-16, DECISIONS #33): with an idle GPU the M5's empty and 1 MiB round trips are 2–3.5× slower than the RTX 3060 Ti's; the M5 wins only from a few MiB per direction. Replaced by H1′. |
+| H1′ | (Written 2026-10-13, before measuring; adopted 2026-10-16.) On unified memory the per-round-trip cost is nearly flat in payload up to ≈ 1 MiB and grows slowly beyond; over PCIe it grows linearly from ≈ 256 KiB. The two curves cross, and the crossover moves to smaller payloads when the GPU is busy. **Predictions:** idle-GPU crossover at 2.0–2.6 MiB per direction (vs RTX 3060 Ti); with the GPU busy, M5 ≈ 1.3× faster at 1 MiB and ≈ 1.8× at 4–16 MiB, crossover at or below 256 KiB. Tested by the §6 extension. |
 | H2 | At K = 1, the discrete GPUs sustain equal or higher agent counts within the frame budget (more bandwidth and compute). |
 | H3 | As K increases, the per-frame cost grows more slowly on M5; a crossover K* exists beyond which M5 sustains a higher N at 16.6 ms and 8.3 ms. |
 | H4 | Frame-delayed readback (S0) produces measurable decision staleness (mismatch vs same-frame oracle, stimulus-to-reaction delay) that S1/S2 eliminate. |
@@ -20,11 +21,12 @@ The expected **honest** outcome is a crossover (H2 + H3), not a universal win. R
 | ID | Hardware | API | Record |
 |---|---|---|---|
 | P-M5 | Apple M5 (record exact model, CPU/GPU core counts, RAM, chassis) | Metal | macOS version, power source, Low Power Mode off |
-| P-3060 | RTX 3060 Ti, PCIe 4.0 x16 | Vulkan | CPU model, RAM, driver version, ReBAR on/off, **measured** link gen/width |
-| P-4060 | RTX 4060 Ti, PCIe 4.0 x8 | Vulkan | same |
+| P-3060 | RTX 3060 Ti, PCIe 4.0 x16 (measured: gen3 x16, accepted 2026-10-16) | Vulkan | CPU model, RAM, driver version, ReBAR on/off, **measured** link gen/width |
+| P-4060 | RTX 4060 Ti, PCIe 4.0 x8 (expected: gen3 x8) | Vulkan | same |
 | P-M5-VK (optional control) | M5 via MoltenVK | Vulkan | MoltenVK version |
 
 - Run both RTX cards in the **same PC** (same CPU, RAM, OS, driver), one card installed at a time, same slot.
+- The measured link is the platform definition (DECISIONS #33): the PC's slot is gen3, so both cards run at gen3 and H5 compares x16 with x8 at gen3.
 - Verify link: `nvidia-smi --query-gpu=pcie.link.gen.current,pcie.link.width.current --format=csv` while under load (links downshift at idle). Log it in the run header.
 - PC: Windows power plan "High performance", GPU in "Prefer maximum performance". Mac: plugged in, no other apps, display on, brightness fixed.
 - Capture `bench/sysinfo` automatically at run start (CPU, GPU, driver/OS, memory, link, ReBAR, thermal state).
@@ -101,6 +103,13 @@ Audit matrix: all strategies, K ∈ {1..4}, N ∈ {10k, 50k}, 5 seeds × 1 rep.
 Repeat 2,000 iterations after 200 warm-up; both `--cpuwait=spin|block`; both `--submit=chain|perpass`. Also measure: empty round trip (P = 0, just signal/wait) and raw copy bandwidth.
 
 Report p50 / p99 of round-trip time, g2c and c2g separately, and effective bandwidth. **Go criterion:** the empty-round-trip and 1 MB round-trip p50 on M5 are clearly lower (by more than run-to-run noise) than on both RTX cards under the best Vulkan path. If not, stop and re-scope (paper pivots to staleness + energy + design-pattern contribution).
+
+**Outcome (2026-10-16, DECISIONS #33): NO-GO on H1**, by this criterion with the GPU idle, with ReBAR on and off. The human chose to re-scope to the payload crossover (H1′) rather than the pivot above; H2–H6 and §7 are unchanged. The criterion stays defined on the idle cells as written. Reporting rule for ReBAR on, `s2_direct`: `rt` as defined here is the primary figure, `rt` + the GPU's read pass a secondary one (ReBAR moves ≈ 80 µs from the GPU's read into the CPU's write).
+
+**Extension for H1′ (adopted 2026-10-16).**
+- *GPU state.* Each cell is measured twice: with the GPU otherwise idle (as above), and with a second queue running a calibrated ≈ 200 µs compute kernel back to back during the whole cell ("hot", cells named `<path>_hot`, `--micro-gpuload=both`, DECISIONS #32), the regime of a real frame (docs/05 §3). Idle cells run first. H1′ is evaluated on both states and reported separately; neither is pooled with the other.
+- *Payload grid:* `4K, 64K, 256K, 1M, 1536K, 2M, 3M, 4M, 8M, 16M, 32M, 64M`; paths `empty, s1_copy, s2_direct` on Metal and additionally `s2_hostcached` on Vulkan (no `s2_rebar`: ≈ 7 s per iteration at 16 MiB; no `s2_coherent`: uncached CPU reads). Results go to their own directories (`results/m1_mac_ext`, `results/m1_3060_ext`, `results/m1_4060_ext`), never pooled with the protocol series.
+- *Report:* the crossover per platform pair and GPU state (log–log interpolation between neighbouring payloads), with the run-to-run spread as the error bar, against the H1′ predictions.
 
 ## 7. Analytic cost model
 

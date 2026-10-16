@@ -2,6 +2,13 @@
 
 Read this when you resume on the PC. It arrives with a git bundle of the Mac's `main`; the user copies it.
 
+> **Update 2026-10-16 (read first).** The user decided M1 (DECISIONS #33): NO-GO on H1, re-scope to the payload
+> crossover (H1′, now in protocol §1/§6), and **yes to the extension in §3 below: run it on the 3060 Ti now**
+> (`results\m1_3060_ext`). The user extended the Windows Update pause (§4 done; check the driver is still 566.36
+> before the run and record it). **The 4060 Ti can't be installed before November**, so §1 (step D) waits; when
+> the card arrives, do §1 as written. Gen3 is accepted as the platform definition (decision b), and for ReBAR on
+> `s2_direct` report `rt` as primary and `rt` + GPU read as secondary (decision c).
+
 ## 1. Step D is back on: the RTX 4060 Ti exists
 Your `PC_REPORT.md` ("the human has no RTX 4060 Ti") and the "D (cancelled)" row in `PC_PROGRESS.md` are
 wrong, through no fault of yours: the user told the Mac on 2026-10-13 that the card is **in service and

@@ -3,6 +3,10 @@
 _Written before any new measurement, as the protocol asks (§1: hypotheses are stated in advance)._
 _Nothing here is in force until the user says so. Decisions are listed first; the reasoning follows._
 
+> **Approved 2026-10-16** as recommended (DECISIONS #33): decisions 0 and a–d. H1′ and the §6 text are now in
+> `docs/06_RESEARCH_PROTOCOL.md`. The 4060 Ti waits until November. "M2 (the agent system)" below should read
+> "the agent milestones (M3–M4)"; M2 is procedural floors and starts next.
+
 ## 1. Decisions needed (with recommendations)
 
 0. **M1 go/no-go.** By protocol §6 the combined report says **NO-GO**: with a cold GPU the M5's empty and
