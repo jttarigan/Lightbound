@@ -12,6 +12,9 @@ nothing running._
   its next run.
 - **4060 Ti: not before November** (the user can't do it sooner). Step D and M1's "[PC with 4060 Ti]" acceptance line wait;
   accepted deviation (#33).
+- **Paper started (user's request via Main, 10-16):** `docs/paper/OUTLINE.md` (section readiness, venue open = user's call) and
+  `docs/paper/methods_microbench.md` (§4 draft). Next in the draft order: §3 platforms + §5 M1 idle results, then related work after
+  a real literature search; §6 only once both `_ext` series are in.
 - **Next milestone: M2, procedural floors** (`docs/02_PROCGEN.md`), CPU only. It may start before the extension is measured.
 - **PC:** still at c593742 on GitHub (checked 10-16 08:31 WIB, `ls-remote` + GitHub API: last push 10-14 16:58 WIB). The user
   said "the PC says the new result is on GitHub", but nothing new had arrived. Ask the user for the PC's `git status -sb` /
