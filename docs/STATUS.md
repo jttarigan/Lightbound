@@ -61,9 +61,13 @@ No phones or tablets are needed.
    32023.921 before and after, the OS is unchanged, and the cache pins no SDK path. Builds after 10:14 use Apple clang 21.0.0
    (Xcode 27.1); a plain incremental build still works. Record both facts in the run log.
 3. **[user]** carry `~/Desktop/lightbound-main-2026-10-13.bundle` (rebuilt 10-16 at 364ffbf: decisions + M2) and
-   `docs/PC_MESSAGE_2026-10-13.md` to the PC and start the PC Claude on the message.
+   `docs/PC_MESSAGE_2026-10-13.md` to the PC and start the PC Claude on the message. (Bundle rebuilt again 10-17 for
+   the hold-file update below; the 10-16 copy is outdated.)
 4. **[device: Windows PC, ≈ 3 h, unattended]** the same series on the 3060 Ti (`results\m1_3060_ext`), after the PC Claude
-   fast-forwards and rebuilds. Nothing on the PC during the first ≈ 4 min.
+   fast-forwards and rebuilds. Nothing on the PC during the first ≈ 4 min. **The PC is shared with NeonSwarm training
+   since 10-17** (Main): every PC step is wrapped in the hold file `C:\dev\GPU_HOLD.txt` (create → wait ≤ 10 min for no
+   python in nvidia-smi → build/ctest → 10-min cooldown → measure → push → delete); the PC message's 10-17 update has the
+   steps, and the run log records whether training ran that day.
 5. **[solo, ≈ 1 h]** after 2 and 4: fetch, report both with `micro_report.py` (`gpuload` column), compute the crossover per GPU
    state with its run-to-run spread, compare with the H1′ predictions.
 6. **4060 Ti step D, November** (the user's date). **[user]** installs it in the i7-12700F PC, same slot (protocol §2; if it goes

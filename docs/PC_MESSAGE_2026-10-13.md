@@ -2,7 +2,29 @@
 
 Read this when you resume on the PC. It arrives with a git bundle of the Mac's `main`; the user copies it.
 
-> **Update 2026-10-16 (read first).** The user decided M1 (DECISIONS #33): NO-GO on H1, re-scope to the payload
+> **Update 2026-10-17 (read first): the PC is now shared with NeonSwarm's model training.** Another Claude
+> (NeonSwarm, `training/PC-AGENT.md` in its own repo) runs training on this PC: inventory, then ≈ 12 runs of
+> ≈ 70 min. It installs nothing, changes no settings, never touches `C:\dev\Lightbound`, and respects a **hold
+> file, `C:\dev\GPU_HOLD.txt`**: when the file exists, it stops at its next checkpoint (one every ≈ 3.5 min) and
+> starts nothing new until the file is gone. Wrap **everything** below (merge + rebuild + ctest incl. the golden
+> and `procgen performance` tests, the `m1_3060_ext` series, and step D in November) in this sequence:
+> 1. Create `C:\dev\GPU_HOLD.txt` with one line: `Lightbound <what>, start <YYYY-MM-DD HH:MM WIB>, expected end
+>    <HH:MM WIB>` (e.g. `Lightbound m1_3060_ext + M2 golden, start 2026-10-18 20:00 WIB, expected end 23:45 WIB`).
+> 2. Wait until `nvidia-smi --query-compute-apps=pid,process_name --format=csv,noheader` lists no python/training
+>    process (normally ≤ 4 min; wait up to ≈ 10 min). Never stop or kill NeonSwarm's processes yourself; if it
+>    is still running after 15 min, stop and tell the user.
+> 3. Merge, rebuild, ctest (§2 and the M2 note below), if not done yet. Then **cool down 10 min** with nothing
+>    running, then the usual "nothing on the PC during the first ≈ 4 min" of the series.
+> 4. Measure. Re-check step 2's query once at the start of the series and record its output.
+> 5. Push the results (gzipped, as before).
+> 6. Delete `C:\dev\GPU_HOLD.txt`. Also delete it if you stop early or for the day; before a `--resume`, repeat
+>    steps 1–3.
+>
+> In the series notes (and the `PC_PROGRESS.md` row) record: whether NeonSwarm training ran on the PC that day,
+> when its last process ended (from step 2), and the hold file's create and delete times. Step D (≈ 3 days)
+> needs the PC exclusively; Main has told NeonSwarm, but confirm with the user before you start it.
+
+> **Update 2026-10-16.** The user decided M1 (DECISIONS #33): NO-GO on H1, re-scope to the payload
 > crossover (H1′, now in protocol §1/§6), and **yes to the extension in §3 below: run it on the 3060 Ti now**
 > (`results\m1_3060_ext`). The user extended the Windows Update pause (§4 done; check the driver is still 566.36
 > before the run and record it). **The 4060 Ti can't be installed before November**, so §1 (step D) waits; when
