@@ -1,0 +1,22 @@
+[    0.000] INFO  main.cpp:179: lightbound 0.1.0-m1 | mode=microbench strategy=S2 k=1 delay=2 agents=20000 seed=1234 frames=2000 warmup=200 submit=chain cpuwait=spin threads=4 memvariant=default audit=off audio=on preset=none out=results/m1_mac_ext/_running_run1.csv tag=run1 power=off vsync=off validation=off micro-paths=empty,s1_copy,s2_direct micro-payloads=4K,64K,256K,1M,1536K,2M,3M,4M,8M,16M,32M,64M micro-gpuload=both
+[    0.013] INFO  MetalGfx.cpp:132: Metal device: Apple M5 (unified memory: yes, timestamps: stage-boundary, headless)
+[    0.043] INFO  Microbench.cpp:248: hot-GPU load: micro_burn 12614 steps = 178.8 us per dispatch, 2 in flight on second MTLCommandQueue
+[    0.185] INFO  Microbench.cpp:595: bw_d2h 64M: p50 1024.0 us = 65.54 GB/s
+[    0.325] INFO  Microbench.cpp:595: bw_h2d 64M: p50 1020.6 us = 65.75 GB/s
+[    0.325] INFO  Microbench.cpp:314: path empty             down=Shared up=Shared
+[    1.247] INFO  Microbench.cpp:536: empty             chain   spin      0  rt p50     211.0 us  p99     238.5  | g2c p50     41.7  c2g p50    169.0  | calib ±0.0 us
+[    2.172] INFO  Microbench.cpp:536: empty             chain   block     0  rt p50     204.9 us  p99     283.5  | g2c p50     51.7  c2g p50    153.9  | calib ±0.0 us
+[    3.713] INFO  Microbench.cpp:536: empty             perpass spin      0  rt p50     338.5 us  p99     560.8  | g2c p50     55.6  c2g p50    293.8  | calib ±0.0 us
+[    4.875] INFO  Microbench.cpp:536: empty             perpass block     0  rt p50     212.5 us  p99     531.0  | g2c p50     54.7  c2g p50    158.1  | calib ±0.0 us
+[    4.875] INFO  Microbench.cpp:314: path s1_copy           down=DeviceLocal up=DeviceLocal downStaging=Shared upStaging=Shared
+[    6.746] INFO  Microbench.cpp:536: s1_copy           chain   spin     4K  rt p50     496.1 us  p99     570.8  | g2c p50     96.7  c2g p50    394.9  | calib ±0.0 us
+[    8.816] INFO  Microbench.cpp:536: s1_copy           chain   spin    64K  rt p50     497.8 us  p99     574.5  | g2c p50    100.0  c2g p50    391.1  | calib ±0.0 us
+[   10.927] INFO  Microbench.cpp:536: s1_copy           chain   spin   256K  rt p50     507.5 us  p99     581.5  | g2c p50    109.2  c2g p50    379.7  | calib ±0.0 us
+[   13.322] INFO  Microbench.cpp:536: s1_copy           chain   spin     1M  rt p50     576.7 us  p99     686.6  | g2c p50    134.4  c2g p50    297.0  | calib ±0.0 us
+[   15.785] INFO  Microbench.cpp:536: s1_copy           chain   spin  1536K  rt p50     623.2 us  p99     717.6  | g2c p50    139.7  c2g p50    303.3  | calib ±0.0 us
+[   18.469] INFO  Microbench.cpp:536: s1_copy           chain   spin     2M  rt p50     686.4 us  p99     833.7  | g2c p50    169.0  c2g p50    327.4  | calib ±0.0 us
+[   21.264] INFO  Microbench.cpp:536: s1_copy           chain   spin     3M  rt p50     719.7 us  p99    1052.0  | g2c p50    237.8  c2g p50    269.5  | calib ±0.0 us
+[   24.006] INFO  Microbench.cpp:536: s1_copy           chain   spin     4M  rt p50     789.4 us  p99     934.8  | g2c p50    304.7  c2g p50    234.6  | calib ±0.0 us
+[   29.852] INFO  Microbench.cpp:536: s1_copy           chain   spin     8M  rt p50    1949.2 us  p99    2101.8  | g2c p50    583.1  c2g p50    855.4  | calib ±0.0 us
+[   37.174] INFO  Microbench.cpp:536: s1_copy           chain   spin    16M  rt p50    2078.9 us  p99    3088.0  | g2c p50    719.6  c2g p50    806.8  | calib ±0.0 us
+[   48.550] INFO  Microbench.cpp:536: s1_copy           chain   spin    32M  rt p50    3177.4 us  p99    3547.8  | g2c p50   1081.8  c2g p50   1085.9  | calib ±0.0 us
