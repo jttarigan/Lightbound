@@ -25,6 +25,13 @@ For H5's link-width comparison, both RTX cards run in the same slot (x16 vs x8, 
 
 ## §5 Results with the GPU idle: H1 is refuted
 
+![Figure 1](fig/fig1_roundtrip_vs_payload.png)
+
+*Figure 1. CPU↔GPU round trip against payload per direction, GPU otherwise idle, chain submission, spin wait;
+line = p50 pooled over three runs, band up to p99. (a) direct path, (b) copy path. The shaded column marks the
+crossover interpolated between the 1 and 4 MiB grid points; nothing was measured inside it. Regenerate with
+`python3 tools/analysis/paper_fig1.py` (reads `results/m1_report*/summary.csv`).*
+
 **The criterion, fixed in advance:** the M5's empty and 1 MiB round-trip p50 must be lower than both RTX cards'
 best Vulkan path by more than run-to-run noise. It fails on both cells, with and without ReBAR.
 
