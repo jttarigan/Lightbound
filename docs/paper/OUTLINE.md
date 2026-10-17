@@ -19,18 +19,18 @@ staleness of frame-delayed readback (H4).
 
 | § | Section | State | Waits on |
 |---|---|---|---|
-| 1 | Introduction | outline only | contribution list is final after the crossover runs |
-| 2 | Background & related work | **draft:** `related_work.md` (9 sources, checked; gap statement) | 6 open search topics listed there |
+| 1 | Introduction | **draft:** `introduction.md` (provisional contributions, placeholders) | contribution list is final after the crossover runs |
+| 2 | Background & related work | **draft:** `related_work.md` (13 sources; search status per topic, 10-17) | 1 paper to open (FGCS 2026), MoltenVK deck to read; full-text checks before submission |
 | 3 | Platforms | **draft:** `platforms_and_m1_results.md` | P-4060 (November) |
 | 4 | Microbenchmark method | **draft:** `methods_microbench.md` | — |
 | 5 | M1 results, idle GPU: the refuted H1 | **draft:** `platforms_and_m1_results.md` (data final) | figure 1 to embed |
-| 6 | Payload crossover and GPU state (H1′) | predictions only (written 2026-10-13) | `m1_mac_ext` (10-16 evening), `m1_3060_ext` (PC, needs the bundle) |
+| 6 | Payload crossover and GPU state (H1′) | predictions only (written 2026-10-13) | `m1_mac_ext` (needs a 35 W+ adapter, #35), `m1_3060_ext` (PC, needs the bundle) |
 | 7 | Game workload & pipeline (S0–S3, K) | design only (docs/05) | M2–M4 |
 | 8 | Frame-time results (H2, H3, H5) | — | M4, M8 matrices |
 | 9 | Cost model (§7) | equation only | microbench ext + K = 1 game runs |
 | 10 | Decision staleness (H4) | — | M3 oracle, M8 audit runs |
 | 11 | Energy (H6, secondary) | — | M8 |
-| 12 | Threats to validity | **partly ready**: gen3, Mac run-to-run fail, API difference, ReBAR | the rest with the game |
+| 12 | Threats to validity | **draft:** `threats_to_validity.md` (platform/API, measurement hygiene with the 10-17 evidence, run-to-run, interpretation) | 35 W+ adapter check; game-side threats with M3–M8 |
 | 13 | Conclusion | — | everything |
 
 **Draft order:** §4 (method), then §3 and §5 (facts already final), then §2 after a literature search, then §6
