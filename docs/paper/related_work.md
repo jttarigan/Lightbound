@@ -22,6 +22,7 @@
 | Cassagne25 | A. Cassagne, N. Amiot, M. Bouyer. *Dalek: An Unconventional and Energy-Aware Heterogeneous Cluster.* arXiv:2508.10481, 2025 | arXiv abstract + HTML full text §V-E | OpenCL launch latency (host call → kernel start): ≈ 5 µs RTX 4090 and Radeon 890M, 35–40 µs Intel iGPUs, ≈ 90 µs Arc 770 over Oculink |
 | Velicka25 | D. Velicka, O. Vysocky, L. Riha. *Methodology for GPU Frequency Switching Latency Measurement.* arXiv:2502.20075, 2025 | arXiv abstract | DVFS switching latency on GH200, A100, RTX Quadro 6000 (as the abstract names it); differs widely between GPUs |
 | Skrzypczak23 | J. Skrzypczak, P. Czarnul. *Efficient parallel implementation of crowd simulation using a hybrid CPU+GPU high performance computing system.* Simulation Modelling Practice and Theory 123 (2023) 102691. doi:10.1016/j.simpat.2022.102691 | search snippets + university repository listing (repository host unreachable 10-17) | workload side: OpenMP+CUDA crowd simulation with CPU–GPU load balancing, 10k–1M agents |
+| Velicka26 | D. Velička, O. Vysocky, (first name to check) Yasal, L. Riha. *An in-depth study of GPU frequency-scaling latency and its optimization on modern architectures.* Future Generation Computer Systems 179 (2026). DOI given as 10.1016/j.future.2025.10833 in a search result: **verify** (looks one digit short) | search result abstract (repository page rate-limited) | journal version of Velicka25: switching vs transition latency, LATEST tool, GH200 / A100 / RTX Quadro 6000; dataset on Zenodo (2025-09-29) |
 
 ## What they establish, and the gap we fill
 
@@ -70,8 +71,4 @@ evidence.
 | frame-delayed readback and staleness (H4) | **no academic source found**; only engine docs (Unity `AsyncGPUReadback`: "adds a few frames of latency"). §10 can state the gap. |
 | crowd/swarm with CPU decisions | Skrzypczak23 (HPC). Real-time game swarms: still open. |
 | ReBAR / BAR-mapped CPU writes | **no academic source found**; vendor explainers (Intel) and press only. For §5's ReBAR result, say "we are not aware of a published measurement". |
-| MoltenVK vs Metal overhead | Khronos Vulkanised 2023 talk "MoltenVK: Application portability with Vulkan on Metal" found, but the PDF could not be read here (no PDF tools). No controlled benchmark found. Not cited until read. |
-
-Not opened yet (rate-limited 10-17): *An in-depth study of GPU frequency-scaling latency and its optimization on
-modern architectures* (Future Generation Computer Systems, 2026; VSB Ostrava repository). Check authors and venue
-before citing.
+| MoltenVK vs Metal overhead | Khronos Vulkanised 2023 talk (B. Hollings, "MoltenVK: Layering Vulkan Over Metal", Feb 2023) covers status and conformance, **no overhead numbers**. No controlled benchmark found. The threat stays qualitative, and the optional MoltenVK control run (§12) is the only evidence we could add. |
