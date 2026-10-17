@@ -16,6 +16,23 @@ so re-check on the journal's page before submitting). Hybrid journals are free o
 | 4 | Journal of Computer Graphics Techniques (JCGT) | graphics practice incl. games; values reproducibility over novelty; publishes code | indexing not confirmed | diamond OA: free for authors and readers |
 | stretch | Simulation Modelling Practice and Theory (Elsevier) | Skrzypczak23 (GPU sync for simulations) appeared there | JCR Q1, IF ≈ 4.6 | free (hybrid); ≈ 4–6 months to publication |
 
+Precedents in The Journal of Supercomputing (checked 10-17; DOIs from Crossref unless marked):
+- Knap, Czarnul, *Performance evaluation of Unified Memory with prefetching and oversubscription … Pascal and Volta*,
+  75 (2019) 7625–7645, doi 10.1007/s11227-019-02966-8.
+- Jarząbek, Czarnul, *Performance evaluation of unified memory and dynamic parallelism … CUDA applications*,
+  73 (2017) 5378–5401, doi 10.1007/s11227-017-2091-x.
+- Yu, Childers, Huang, Qian, Wang, *A quantitative evaluation of unified memory in GPUs*, 76 (2020) 2958–2985,
+  doi 10.1007/s11227-019-03079-y.
+- Moreno et al., *Designing a benchmark for the performance evaluation of agent-based simulation applications on
+  HPC*, 75 (2019) 1524–1550, doi 10.1007/s11227-018-2688-8.
+- *Massively parallel modelling & simulation of large crowd with GPGPU*, 63 (2013) 675–690, doi 10.1007/s11227-011-0675-4
+  (Springer URL, not checked on Crossref).
+- TOUBKAL system characterization (2025), kernel-launch latency microbenchmarks, doi 10.1007/s11227-025-07858-8 (URL only).
+- Not found there: Apple silicon, Metal/Vulkan, or game workloads. Czarnul's group published both the CUDA-UM evaluations
+  (above) and Skrzypczak23 (hybrid CPU+GPU crowd simulation, SIMPAT), the two halves of our study.
+- Note for §2: "unified memory" in these papers is CUDA's software-managed page migration on a discrete GPU, not
+  physically shared memory. The paper must make the distinction explicit, and these papers are related work.
+
 Not recommended: Future Generation Computer Systems and J. Systems Architecture (Q1, more ambitious than asked); IEEE
 Access ($2,160 APC, official 2026 list) and PeerJ CS (≈ $1,395) only if open access is required. Conference dates
 checked the same day (ICPE 2027 paper Nov 16 2026; ISPASS ≈ Dec; HPG ≈ Apr; IISWC ≈ May–Jun) are kept for reference
