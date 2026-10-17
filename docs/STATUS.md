@@ -17,10 +17,14 @@ Nothing measured, nothing running._
   a real literature search; §6 only once both `_ext` series are in.
 - **M2 built on the Mac** (see the M2 section below); waiting for the [PC] golden check and the user's review.
   M2 report given to the user 10-16 ≈ 19:00 WIB (PNGs in `docs/img/floors/`); M3 starts only after the user accepts.
-- **Pending trigger:** Main sends "go lightbound" for the Mac ext run (to-do 2) **on hold** (10-17: only a 20 W charger here;
-  #35 says 20 W passes §2; Main asks the user: run on 20 W now, or wait for a 35 W+ charger). Launcher with guards:
-  scratchpad `run_mac_ext.sh` (re-create from M1_RESCOPE_PROPOSAL §4 + #35 guards if gone). On it: run with the frozen
-  binary, then SendMessage Main "done". (Session moved into BattleStation 10-16 ≈ 19:10 WIB via `claude --continue`.)
+- **Mac ext run NOT done (10-17 06:44–07:05 WIB, 20 W adapter, user-approved).** Attempt 1 stopped (Afterglow job, load 16),
+  attempt 2 stopped (Chrome animating, GPU 17–30 % busy). Attempt 3 (Chrome quit, GPU 0 %, load < 2, thermal nominal) was
+  stopped too: idle round trips are systematically ≈ +200 µs vs 10-13 (s1_copy 4K 496 vs 289 µs, 1M 577 vs 351; p99 tight,
+  so not noise). **The code is ruled out:** the 10-13 commit 055d696, rebuilt into `build/ref_055d696/`, gives the same numbers
+  as the frozen binary run back to back (s1_copy 4K 493/502 vs 497/504 µs). Prime suspect: the 20 W adapter (the M5 power
+  budget). Partial data set aside in the scratchpad, not used. **Next:** with a 35 W+ charger, first run the 2-min A/B
+  check (`--micro-paths=empty,s1_copy,s2_direct --micro-payloads=4K,1M`, both binaries); start `m1_mac_ext` only if it is
+  back at the 10-13 levels. Launcher: scratchpad `run_mac_ext.sh` (now `caffeinate -dis`: protocol §2 wants the display on).
 - **PC:** still at c593742 on GitHub (checked 10-16 08:31 WIB, `ls-remote` + GitHub API: last push 10-14 16:58 WIB). The user
   said "the PC says the new result is on GitHub", but nothing new had arrived. Ask the user for the PC's `git status -sb` /
   `git log --oneline -3 origin/pc/m0-m1` if it comes up again.

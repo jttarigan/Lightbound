@@ -358,3 +358,7 @@ Ambiguities resolved while building, per CLAUDE.md rule 4. Newest at the bottom.
     - **Lab scheduling (Main, 10-17 morning):** the run is on hold while Main asks the user whether to run it now on
       the 20 W adapter or wait for a 35 W+ charger (the user postponed RTBench's run on this adapter for
       comparability). #35 is the protocol reading either way.
+    - **Update 10-17 07:05:** on the 20 W adapter the idle round trips came out ≈ +200 µs slower than on 10-13, with the
+      code ruled out (the 10-13 binary gives the same numbers). So "AC Power" is not enough: the adapter can change the
+      measurement. **Revised rule:** a Mac run first passes a 2-min reference check against the 10-13 levels, and the adapter
+      wattage is recorded. The ext run waits for a 35 W+ charger.
