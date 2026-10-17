@@ -23,6 +23,10 @@
 | Velicka25 | D. Velicka, O. Vysocky, L. Riha. *Methodology for GPU Frequency Switching Latency Measurement.* IPDPS Workshops 2025, pp. 830–839, doi 10.1109/IPDPSW66978.2025.00133 (Crossref, 10-17); preprint arXiv:2502.20075 | arXiv abstract | DVFS switching latency on GH200, A100, RTX Quadro 6000 (as the abstract names it); differs widely between GPUs |
 | Skrzypczak23 | J. Skrzypczak, P. Czarnul. *Efficient parallel implementation of crowd simulation using a hybrid CPU+GPU high performance computing system.* Simulation Modelling Practice and Theory 123 (2023) 102691. doi:10.1016/j.simpat.2022.102691 | search snippets + university repository listing (repository host unreachable 10-17) | workload side: OpenMP+CUDA crowd simulation with CPU–GPU load balancing, 10k–1M agents |
 | Velicka26 | D. Velicka, O. Vysocky, O. Yasal, L. Riha. *An in-depth study of GPU frequency-scaling latency and its optimization on modern architectures.* Future Generation Computer Systems 179 (2026), article 108331, doi 10.1016/j.future.2025.108331 (verified on Crossref 10-17; the search result's DOI was one digit short) | search result abstract (repository page rate-limited) | journal version of Velicka25: switching vs transition latency, LATEST tool, GH200 / A100 / RTX Quadro 6000; dataset on Zenodo (2025-09-29) |
+| Schieffer24 | G. Schieffer, J. Wahlgren, J. Ren, J. Faj, I. Peng. *Harnessing Integrated CPU-GPU System Memory for HPC: a first look into Grace Hopper.* ICPP '24 (arXiv:2407.07850) | arXiv abstract page (10-17) | tightly coupled HPC node: system-allocated memory over coherent NVLink-C2C and one page table; six apps incl. oversubscription; no latency figures in the abstract |
+| Knap19 | M. Knap, P. Czarnul. *Performance evaluation of Unified Memory with prefetching and oversubscription for selected parallel CUDA applications on NVIDIA Pascal and Volta GPUs.* J. Supercomputing 75 (2019) 7625–7645, doi 10.1007/s11227-019-02966-8 | Crossref metadata + search snippet | **CUDA unified memory** (page migration on a discrete GPU), not shared physical memory: the terminology contrast in §1; target journal |
+| Jarzabek17 | Ł. Jarząbek, P. Czarnul. *Performance evaluation of unified memory and dynamic parallelism for selected parallel CUDA applications.* J. Supercomputing 73 (2017) 5378–5401, doi 10.1007/s11227-017-2091-x | Crossref metadata + search snippet | CUDA UM usually slower than explicit copies; same contrast; target journal (first name to check) |
+| Yu20 | Q. Yu, B. Childers, L. Huang, C. Qian, Z. Wang. *A quantitative evaluation of unified memory in GPUs.* J. Supercomputing 76 (2020) 2958–2985, doi 10.1007/s11227-019-03079-y | Crossref metadata + search snippet | where CUDA UM overhead comes from (OS involvement, many transfer requests); target journal |
 
 ## What they establish, and the gap we fill
 
@@ -33,6 +37,12 @@
 
   Wahlgren25 characterizes coherence overhead on MI300A's unified physical memory, and Spafford12 makes the same
   trade-off argument for early AMD APUs. Our M5 data agree: the cost sits in the hand-off, not in the bytes (§5).
+- **"Unified memory" means two different things.** On discrete NVIDIA GPUs it is CUDA's managed memory: one
+  address space, pages migrating over PCIe on demand. Its overhead against explicit copies is well measured,
+  including in our target journal (Jarzabek17, Knap19, Yu20). Tightly coupled nodes remove the migration: Grace
+  Hopper through a coherent link and one page table (Schieffer24), MI300A and Apple's SoCs through one physical memory
+  (Wahlgren25, Huebner25, Beischl26). Our M5 is in the second group and our PCIe baseline uses explicit buffers, not
+  CUDA UM, so the CUDA UM results are context, not a competing measurement.
 - **Copy vs zero-copy is workload-dependent** (Lumpp21 on embedded iGPUs; Spafford12). Our §6 crossover measures
   that dependence directly in payload size and GPU state, on one benchmark that runs unchanged on both platforms.
 - **Collaboration benchmarks** (GomezLuna17, Sun16) define the fine-grained CPU–GPU patterns, but they target

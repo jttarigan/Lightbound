@@ -4,7 +4,7 @@ _Not in the original plan: `docs/07_MILESTONES.md` M9 asks for `docs/RESULTS.md`
 (via Main, 2026-10-16) to start the paper where the data already allows it. Nothing here pre-empts results:
 sections that need unmeasured data stay as headings with the data they wait for._
 
-**Venue: a journal (the user, 2026-10-17: "not too ambitious").** No deadline, so the paper goes out once, complete
+**Venue: The Journal of Supercomputing (Springer), chosen by the user 2026-10-17.** Framing: HPC / heterogeneous-computing readers; the game is presented as an agent-based simulation with a real-time deadline (§1 draft 2). Earlier reasoning: No deadline, so the paper goes out once, complete
 (through M8), with an arXiv preprint allowed earlier. Shortlist (checked 10-17; metrics are from aggregators unless marked,
 so re-check on the journal's page before submitting). Hybrid journals are free on the subscription route.
 
@@ -38,8 +38,9 @@ Access ($2,160 APC, official 2026 list) and PeerJ CS (≈ $1,395) only if open a
 checked the same day (ICPE 2027 paper Nov 16 2026; ISPASS ≈ Dec; HPG ≈ Apr; IISWC ≈ May–Jun) are kept for reference
 only.
 
-**Working title:** _When does unified memory pay off? Fine-grained CPU–GPU round trips on Apple M5 vs discrete
-GPUs over PCIe, measured in a game workload_
+**Working title:** _When does shared CPU–GPU memory pay off? Fine-grained round trips on an Apple M5 and PCIe GPUs,
+measured in a real-time agent simulation_ (was "…unified memory… in a game workload": "unified memory" collides with
+CUDA UM for this journal's readers)
 
 **Contribution (as re-scoped, DECISIONS #33):** (1) a cross-backend round-trip microbenchmark with one shader
 source and identical buffer layouts; (2) the measured payload crossover between unified memory and PCIe, and its
@@ -49,8 +50,8 @@ staleness of frame-delayed readback (H4).
 
 | § | Section | State | Waits on |
 |---|---|---|---|
-| 1 | Introduction | **draft:** `introduction.md` (provisional contributions, placeholders) | contribution list is final after the crossover runs |
-| 2 | Background & related work | **draft:** `related_work.md` (14 sources; search status per topic, 10-17) | full-text checks and BibTeX before submission (DOIs of Velicka25/26 verified 10-17) |
+| 1 | Introduction | **draft 2:** `introduction.md` (J. Supercomputing framing, 10-17; provisional contributions, placeholders) | contribution list is final after the crossover runs |
+| 2 | Background & related work | **draft:** `related_work.md` (18 sources incl. J. Supercomputing CUDA-UM papers and Grace Hopper; search status per topic, 10-17) | full-text checks and BibTeX before submission (DOIs of Velicka25/26 verified 10-17) |
 | 3 | Platforms | **draft:** `platforms_and_m1_results.md` | P-4060 (November) |
 | 4 | Microbenchmark method | **draft:** `methods_microbench.md` | — |
 | 5 | M1 results, idle GPU: the refuted H1 | **draft:** `platforms_and_m1_results.md` (data final, figure 1 embedded) | — |
