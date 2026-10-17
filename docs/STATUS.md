@@ -62,7 +62,9 @@ No phones or tablets are needed.
    (Xcode 27.1); a plain incremental build still works. Record both facts in the run log.
 3. **[user]** carry `~/Desktop/lightbound-main-2026-10-13.bundle` (rebuilt 10-16 at 364ffbf: decisions + M2) and
    `docs/PC_MESSAGE_2026-10-13.md` to the PC and start the PC Claude on the message. (Bundle rebuilt again 10-17 for
-   the hold-file update below; the 10-16 copy is outdated.)
+   the hold-file update below; the 10-16 copy is outdated.) **Since 10-17 20:3x WIB main is on GitHub (559c377)**, so the
+   PC can `git fetch origin main` instead; the bundle is the fallback. **The user halted the PC run until Mon 10-19**
+   (at the office).
 4. **[device: Windows PC, ≈ 3 h, unattended]** the same series on the 3060 Ti (`results\m1_3060_ext`), after the PC Claude
    fast-forwards and rebuilds. Nothing on the PC during the first ≈ 4 min. **The PC is shared with NeonSwarm training
    since 10-17** (Main): every PC step is wrapped in the hold file `C:\dev\GPU_HOLD.txt` (create → wait ≤ 10 min for no
@@ -73,8 +75,8 @@ No phones or tablets are needed.
 6. **4060 Ti step D, November** (the user's date). **[user]** installs it in the i7-12700F PC, same slot (protocol §2; if it goes
    into another PC, ask before planning). **[device: Windows PC, exclusive, ≈ 3 days unattended]** step D as written
    (`results\m1_4060`), then optionally `m1_4060_ext`. **[solo, ≈ 1 h]** merge and add P-4060 to the combined report.
-7. **[user, any time, low priority] Pushing.** SSH to GitHub still times out. Every `main` commit after `origin/main`
-   (baf605a) is unpushed, and so is `mac/narrow-link`. Fix: a network where port 22 works, or an HTTPS token.
+7. ~~Pushing~~ **done 10-17 evening**: SSH port 22 worked again (Main checked 20:29 WIB); pushed main baf605a..559c377 and
+   `mac/narrow-link` (new branch on origin).
 
 ## State
 
