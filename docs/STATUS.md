@@ -1,9 +1,23 @@
 # Work status (resume here)
 
-_Last updated 2026-10-16 evening (session 10, continued). M1 decided this morning; paper drafts; M2 built on the Mac.
-Nothing measured, nothing running._
+_Last updated 2026-10-18 06:2x WIB (session 10, continued; saved before the laptop shuts down ≈ 07:20 WIB). Nothing
+measured, nothing running._
 
-## RESUME HERE (2026-10-16)
+## RESUME HERE (2026-10-18)
+- **PC run HELD by the user until Mon 10-19** (at the office). Nothing started on the PC. When it goes ahead: the PC
+  fetches `main` from GitHub (pushed 10-17, origin/main = f97f48d; the Desktop bundle @ 559c377 is the fallback) and
+  follows `docs/PC_MESSAGE_2026-10-13.md`, whose 10-17 update wraps every step in the hold file `C:\dev\GPU_HOLD.txt`
+  (the PC is shared with NeonSwarm training). Main asked for the exact lines the user should give the PC Claude; the
+  request was cancelled 10-17, so re-send them when Main asks again on 10-19.
+- **Mac ext run still waits for a 35 W+ charger** (unchanged, see the 10-17 item below).
+- **Paper: target journal = The Journal of Supercomputing** (user, 10-17). §1 rewritten for HPC readers (draft 2):
+  tightly coupled CPU–GPU nodes, the game presented as a real-time agent simulation, "shared physical memory" vs CUDA
+  unified memory. §2 now 18 sources (+ Grace Hopper ICPP'24 and three J. Supercomputing CUDA-UM papers); Velicka25/26 DOIs
+  verified. Shortlist, precedents and reasoning in `docs/paper/OUTLINE.md`. To do before polishing: the journal's
+  abstract/keyword limits and the Springer template. Paper commits after f97f48d are **local, not pushed** (no push
+  until the user says so).
+
+## Earlier (2026-10-16 / 10-17)
 - **M1 decided: NO-GO on H1, re-scoped to the payload crossover (H1′)**, all as recommended (DECISIONS #33). H1′ with its
   predictions, the M1 outcome, the gen3 platform definition, the ReBAR reporting rule and the extension (hot GPU + 12-point
   payload grid) are now in `docs/06_RESEARCH_PROTOCOL.md` §1, §2 and §6. The proposal and the PC message carry dated
