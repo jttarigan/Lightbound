@@ -4,25 +4,22 @@ _Not in the original plan: `docs/07_MILESTONES.md` M9 asks for `docs/RESULTS.md`
 (via Main, 2026-10-16) to start the paper where the data already allows it. Nothing here pre-empts results:
 sections that need unmeasured data stay as headings with the data they wait for._
 
-**Venue: not chosen (the user decides).** Candidates by fit: a workload-characterization / systems venue
-(ISPASS- or IISWC-style), or High-Performance Graphics; an arXiv preprint first in any case.
+**Venue: a journal (the user, 2026-10-17: "not too ambitious").** No deadline, so the paper goes out once, complete
+(through M8), with an arXiv preprint allowed earlier. Shortlist (checked 10-17; metrics are from aggregators unless marked,
+so re-check on the journal's page before submitting). Hybrid journals are free on the subscription route.
 
-Deadlines (checked 2026-10-17; only ICPE 2027 is announced, the others are the last edition's dates, so the 2027
-dates are a guess from the pattern):
+| rank | journal | why it fits | level | cost / speed |
+|---|---|---|---|---|
+| **1** | **The Journal of Supercomputing** (Springer) | scope names "performance measures and methods"; GPU measurement papers are common there | JCR Q2, IF ≈ 2.5–3.5 | free (hybrid); first decision median 18 days (Springer page) |
+| 2 | Concurrency and Computation: Practice and Experience (Wiley) | broad parallel/HPC "practice"; GPU benchmark papers in 2026 issues | JCR Q3, IF ≈ 1.5–2.2 (sources disagree) | free (hybrid; OA ≈ $4.7k) |
+| 3 | Entertainment Computing (Elsevier) | games and entertainment-technology architectures; leads with the game | JCR Q2, IF ≈ 2.4 | free (hybrid) |
+| 4 | Journal of Computer Graphics Techniques (JCGT) | graphics practice incl. games; values reproducibility over novelty; publishes code | indexing not confirmed | diamond OA: free for authors and readers |
+| stretch | Simulation Modelling Practice and Theory (Elsevier) | Skrzypczak23 (GPU sync for simulations) appeared there | JCR Q1, IF ≈ 4.6 | free (hybrid); ≈ 4–6 months to publication |
 
-| venue | fit | deadline | source |
-|---|---|---|---|
-| ICPE 2027 (research track; Gothenburg, May 24–28 2027) | measurement + cost model | abstract **Nov 9 2026**, paper **Nov 16 2026** (AoE) | icpe2027.spec.org/important-dates (official) |
-| ISPASS 2027 | performance analysis, microbenchmarks | likely early–mid Dec 2026 (2026 edition: Dec 5/12 2025) | aggregators; ispass.org not yet posted |
-| HPG 2027 | GPU / real-time graphics | likely early Apr 2027 (2026: abstract Apr 1, paper Apr 10) | highperformancegraphics.org/2026 |
-| IISWC 2027 | workload characterization (best fit for the game half) | likely late May–Jun 2027 (2026: May 21; 2025: Jun 21) | sigarch.org CFPs |
-| I3D 2027 | interactive graphics and games | 2026 dates conflict between listings (Jan 9 vs May) | easychair; i3dsymposium.org to check |
-
-The game half (§7–§11) needs M3–M8, so only the spring venues can carry the full paper. A November/December
-deadline would mean a microbenchmark-only paper (§3–§6 + §12), which needs both extension series within ≈ 3–7
-weeks and would take the crossover result out of the game paper. Recommendation (for the user to decide): one full
-paper aimed at IISWC 2027, with HPG 2027 as the earlier option if M8 is done by March; an arXiv preprint when §6
-is written.
+Not recommended: Future Generation Computer Systems and J. Systems Architecture (Q1, more ambitious than asked); IEEE
+Access ($2,160 APC, official 2026 list) and PeerJ CS (≈ $1,395) only if open access is required. Conference dates
+checked the same day (ICPE 2027 paper Nov 16 2026; ISPASS ≈ Dec; HPG ≈ Apr; IISWC ≈ May–Jun) are kept for reference
+only.
 
 **Working title:** _When does unified memory pay off? Fine-grained CPU–GPU round trips on Apple M5 vs discrete
 GPUs over PCIe, measured in a game workload_
