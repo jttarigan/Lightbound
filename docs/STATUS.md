@@ -1,7 +1,21 @@
 # Work status (resume here)
 
-_Last updated 2026-10-18 06:2x WIB (session 10, continued; saved before the laptop shuts down ≈ 07:20 WIB). Nothing
-measured, nothing running._
+_Last updated 2026-10-19 00:4x WIB (session 11, saved at Main's request when the user closed sessions for the night).
+Nothing measured, nothing running, no device touched since 10-17._
+
+## RESUME HERE (2026-10-19)
+- **PC run today (Mon 10-19) in the afternoon, with the user attending** (Main, 00:40 WIB). Order on the PC:
+  **Lightbound goes first** and holds `C:\dev\GPU_HOLD.txt` for the whole run, **then NeonTide (≈ 1.5 h), then
+  NeonSwarm training**. Lightbound's run = `m1_3060_ext` (≈ 3 h) + the MSVC golden-hash check for M2, as in
+  `docs/PC_MESSAGE_2026-10-13.md` (10-17 update: create the hold file → wait ≤ 10 min for no python in nvidia-smi →
+  build/ctest → 10-min cooldown → measure → push → delete the hold file). The PC fetches `main` from GitHub
+  (origin/main has the PC message; the local commits since are paper/STATUS only, so the PC doesn't need them).
+  When Main asks, send the exact lines the user gives the PC Claude. Tell Main and NeonTide when the hold file is deleted.
+- **Mac ext run still waits for ≥ 35 W.** Candidate sources: a HAGIBIS PD hub (maybe this evening, 10-19) or the Anker
+  100 W power bank. Check both preconditions before starting (adapter ≥ 35 W in `pmset -g ac` and battery current
+  ≥ −100 mA), then the 2-min A/B check first (see 10-17 below), and book a quiet-Mac slot through Main.
+- **Needs the user** (unchanged from 10-18 evening below): AI-use declaration wording, title-page data, Zenodo DOI or
+  not, push of the local commits since f97f48d (paper + STATUS), M2 review.
 
 ## 2026-10-18 evening (user AFK 18:15–≈20:20 WIB, blanket OK via Main: agent-only work, own recommendation on reversible choices)
 - **Done:** paper to-do "journal limits + template". The journal's rules are in `docs/paper/OUTLINE.md` "Submission
@@ -20,7 +34,7 @@ measured, nothing running._
   declare it. (b) Title-page data: authors, affiliation, phone. (c) Data/code availability: the repo is public; whether
   to archive it with a DOI (e.g. Zenodo) is the user's call. (d) Push the paper commits (still local).
 
-## RESUME HERE (2026-10-18)
+## 2026-10-18 morning
 - **PC run HELD by the user until Mon 10-19** (at the office). Nothing started on the PC. When it goes ahead: the PC
   fetches `main` from GitHub (pushed 10-17, origin/main = f97f48d; the Desktop bundle @ 559c377 is the fallback) and
   follows `docs/PC_MESSAGE_2026-10-13.md`, whose 10-17 update wraps every step in the hold file `C:\dev\GPU_HOLD.txt`
@@ -33,8 +47,8 @@ measured, nothing running._
 - **Paper: target journal = The Journal of Supercomputing** (user, 10-17). §1 rewritten for HPC readers (draft 2):
   tightly coupled CPU–GPU nodes, the game presented as a real-time agent simulation, "shared physical memory" vs CUDA
   unified memory. §2 now 18 sources (+ Grace Hopper ICPP'24 and three J. Supercomputing CUDA-UM papers); Velicka25/26 DOIs
-  verified. Shortlist, precedents and reasoning in `docs/paper/OUTLINE.md`. To do before polishing: the journal's
-  abstract/keyword limits and the Springer template. Paper commits after f97f48d are **local, not pushed** (no push
+  verified. Shortlist, precedents and reasoning in `docs/paper/OUTLINE.md`. Journal limits, abstract,
+  keywords and refs.bib: done 10-18 evening (above). Paper commits after f97f48d are **local, not pushed** (no push
   until the user says so).
 
 ## Earlier (2026-10-16 / 10-17)
