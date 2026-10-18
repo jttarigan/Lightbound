@@ -27,6 +27,9 @@ measured, nothing running._
   (the PC is shared with NeonSwarm training). Main asked for the exact lines the user should give the PC Claude; the
   request was cancelled 10-17, so re-send them when Main asks again on 10-19.
 - **Mac ext run still waits for a 35 W+ charger** (unchanged, see the 10-17 item below).
+  Precondition per LAB.md (10-18, RTBench's measurement): adapter ≥ 35 W in `pmset -g ac` **and** battery current
+  ≥ −100 mA (`ioreg -rn AppleSmartBattery | grep -i amperage`). The 20 W adapter can show "charging" while the battery drains.
+  Log both in the run log.
 - **Paper: target journal = The Journal of Supercomputing** (user, 10-17). §1 rewritten for HPC readers (draft 2):
   tightly coupled CPU–GPU nodes, the game presented as a real-time agent simulation, "shared physical memory" vs CUDA
   unified memory. §2 now 18 sources (+ Grace Hopper ICPP'24 and three J. Supercomputing CUDA-UM papers); Velicka25/26 DOIs
