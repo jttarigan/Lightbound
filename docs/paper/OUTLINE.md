@@ -80,7 +80,7 @@ staleness of frame-delayed readback (H4).
 |---|---|---|---|
 | — | Abstract & keywords | **draft 1:** `abstract.md` (143 / 150 words, 6 keywords, 10-18) | §6 crossover and §9 model numbers |
 | 1 | Introduction | **draft 2:** `introduction.md` (J. Supercomputing framing, 10-17; provisional contributions, placeholders) | contribution list is final after the crossover runs |
-| 2 | Background & related work | **draft:** `related_work.md` (18 sources incl. J. Supercomputing CUDA-UM papers and Grace Hopper; search status per topic, 10-17) | full-text checks and BibTeX before submission (DOIs of Velicka25/26 verified 10-17) |
+| 2 | Background & related work | **draft:** `related_work.md` (18 sources incl. J. Supercomputing CUDA-UM papers and Grace Hopper; search status per topic, 10-17) | full-text checks before submission; BibTeX for all 18 in `refs.bib` (10-18) |
 | 3 | Platforms | **draft:** `platforms_and_m1_results.md` | P-4060 (November) |
 | 4 | Microbenchmark method | **draft:** `methods_microbench.md` | — |
 | 5 | M1 results, idle GPU: the refuted H1 | **draft:** `platforms_and_m1_results.md` (data final, figure 1 embedded) | — |

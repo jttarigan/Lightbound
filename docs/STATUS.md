@@ -7,6 +7,8 @@ measured, nothing running._
 - **Done:** paper to-do "journal limits + template". The journal's rules are in `docs/paper/OUTLINE.md` "Submission
   requirements". The abstract (draft 1, 143/150 words with placeholders) and 6 keywords are in `docs/paper/abstract.md`.
   Fig. 1 now meets the figure rules (174 mm wide, Arial embedded, text ≥ 8 pt, "Fig. 1" caption).
+  BibTeX for all 18 related-work sources: `docs/paper/refs.bib` (Crossref/arXiv). Two fixes to the §2 table came out of it:
+  Lumpp21 has three authors (H. D. Patel was missing), and Jarzabek17's first name is Łukasz.
 - **Decided by agent under the user's 18:15 blanket OK** (all reversible):
   1. The paper stays in Markdown until the results sections exist. It moves to the Springer Nature LaTeX template
      (`sn-jnl`, flat folder) at the polish pass. There is no TeX on the Mac; Overleaf or a local install is the user's call then.
