@@ -86,5 +86,5 @@ results and the refuted hypothesis, and §6 the crossover and its dependence on 
 simulation and its coupling strategies, and §8 its measured step times. §9 fits and tests the cost model, §10
 measures decision staleness, and §11 energy. §12 discusses threats to validity, and §13 concludes.
 
-<!-- Final pass: confirm the journal's abstract/keyword limits and reference style (Springer Nature LaTeX template,
-     sn-jnl) before polishing; keep the 16.7 ms framing as the only game-specific motivation in §1. -->
+<!-- Journal limits and reference style confirmed 2026-10-18 (OUTLINE.md "Submission requirements"; abstract in
+     abstract.md). Final pass: keep the 16.7 ms framing as the only game-specific motivation in §1. -->

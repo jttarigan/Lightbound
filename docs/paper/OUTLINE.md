@@ -38,6 +38,34 @@ Access ($2,160 APC, official 2026 list) and PeerJ CS (≈ $1,395) only if open a
 checked the same day (ICPE 2027 paper Nov 16 2026; ISPASS ≈ Dec; HPG ≈ Apr; IISWC ≈ May–Jun) are kept for reference
 only.
 
+**Submission requirements** (journal's submission-guidelines page, link.springer.com/journal/11227/submission-guidelines,
+checked 2026-10-18; Springer Nature policy pages for AI and preprints, same day):
+- **Abstract 100–150 words**, no undefined abbreviations or unspecified references; **4–6 keywords**. Draft 1:
+  `abstract.md` (143 words with placeholders).
+- **No length limit stated.** Headings: decimal numbering, at most 3 levels. Footnotes, not endnotes; a footnote may
+  not be only a citation.
+- **Format:** LaTeX preferred (Word accepted), **Springer Nature LaTeX template** (`sn-jnl` class; the page links
+  the `sn-basic.bst` reference style) from springernature.com/gp/authors/campaigns/latex-author-support. The full
+  editable source is required at every submission and revision, **flat: no subfolders** (figures and .bib included).
+- **References:** numbered in square brackets in citation order, cited and published/accepted works only, full DOI
+  links, LTWA journal abbreviations. arXiv preprints may be cited (Springer Nature preprint policy).
+- **Title page:** title, author names, affiliations and addresses, corresponding author's e-mail, telephone (fax).
+- **Declarations before the references:** funding; competing interests; **data availability (required for original
+  research)**; code availability; author contributions (entered in the submission system). Ethics/consent: not
+  applicable (no human or animal participants).
+- **Figures:** Helvetica or Arial lettering at 8–12 pt print size, lines ≥ 0.3 pt, vector (EPS/PDF) for line art,
+  RGB, legible in black and white, captions "**Fig. 1** …" in the text, not in the file. Width 84 mm (one column) or
+  174 mm (full), max height 234 mm (the page also lists 119 mm for small-format journals; which one applies is to be
+  checked against a recent issue). **Fig. 1 fixed 10-18:** 174 mm wide, Arial embedded (TrueType), all text ≥ 8 pt,
+  legend "shared memory" instead of "unified", caption "**Fig. 1**"; markers and direct labels keep it legible in
+  black and white. Still open: EPS (if the PDF isn't accepted) and the flat-folder layout.
+- **Preprints:** allowed on any server (arXiv included) and not prior publication; disclose the preprint's DOI and
+  licence at submission.
+- **AI use (Springer Nature policy):** an LLM cannot be an author. Use beyond copy-editing (readability, style,
+  grammar) must be **declared in the Methods section** (or a suitable section). This draft is written with an AI
+  assistant, so a declaration is needed. Its wording is the user's decision (see STATUS, "needs the user").
+- **Peer-review model** (single or double anonymous): not stated on the page; check in the submission system.
+
 **Working title:** _When does shared CPU–GPU memory pay off? Fine-grained round trips on an Apple M5 and PCIe GPUs,
 measured in a real-time agent simulation_ (was "…unified memory… in a game workload": "unified memory" collides with
 CUDA UM for this journal's readers)
@@ -50,6 +78,7 @@ staleness of frame-delayed readback (H4).
 
 | § | Section | State | Waits on |
 |---|---|---|---|
+| — | Abstract & keywords | **draft 1:** `abstract.md` (143 / 150 words, 6 keywords, 10-18) | §6 crossover and §9 model numbers |
 | 1 | Introduction | **draft 2:** `introduction.md` (J. Supercomputing framing, 10-17; provisional contributions, placeholders) | contribution list is final after the crossover runs |
 | 2 | Background & related work | **draft:** `related_work.md` (18 sources incl. J. Supercomputing CUDA-UM papers and Grace Hopper; search status per topic, 10-17) | full-text checks and BibTeX before submission (DOIs of Velicka25/26 verified 10-17) |
 | 3 | Platforms | **draft:** `platforms_and_m1_results.md` | P-4060 (November) |

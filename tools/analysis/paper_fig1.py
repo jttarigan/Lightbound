@@ -21,7 +21,7 @@ ROOT = Path(__file__).resolve().parents[2]
 # on the surface, so every series is also direct-labeled and has its own marker.
 SERIES = [
     # (label, report dir, platform, color, marker)
-    ("Apple M5 (unified)", "m1_report", "P-M5", "#2a78d6", "o"),
+    ("Apple M5 (shared memory)", "m1_report", "P-M5", "#2a78d6", "o"),
     ("RTX 3060 Ti, ReBAR on", "m1_report", "P-3060", "#eb6834", "s"),
     ("RTX 3060 Ti, ReBAR off", "m1_report_rebar-off", "P-3060", "#1baf7a", "^"),
 ]
@@ -45,10 +45,13 @@ def main() -> None:
     args = ap.parse_args()
     args.out.mkdir(parents=True, exist_ok=True)
 
-    plt.rcParams.update({"font.size": 9, "axes.edgecolor": MUTED, "axes.labelcolor": INK,
+    # Journal figure rules (docs/paper/OUTLINE.md "Submission requirements"): Arial/Helvetica, 8-12 pt at print
+    # size, fonts embedded in the vector file, full width 174 mm.
+    plt.rcParams.update({"font.family": "sans-serif", "font.sans-serif": ["Arial", "Helvetica"],
+                         "pdf.fonttype": 42, "ps.fonttype": 42, "font.size": 9, "axes.edgecolor": MUTED, "axes.labelcolor": INK,
                          "xtick.color": MUTED, "ytick.color": MUTED, "figure.facecolor": SURFACE,
                          "axes.facecolor": SURFACE, "savefig.facecolor": SURFACE})
-    fig, axes = plt.subplots(1, 2, figsize=(7.2, 3.1), sharey=True, constrained_layout=True)
+    fig, axes = plt.subplots(1, 2, figsize=(174 / 25.4, 3.1), sharey=True, constrained_layout=True)
     for ax, (path, title) in zip(axes, [("s2_direct", "(a) direct path, s2_direct"),
                                         ("s1_copy", "(b) copy path, s1_copy")]):
         ends = []
@@ -88,7 +91,7 @@ def main() -> None:
         for s in ("top", "right"):
             ax.spines[s].set_visible(False)
     axes[0].set_ylabel("round trip, µs (p50; band to p99)")
-    axes[0].annotate("idle crossover,\ninterpolated", (2.3 * (1 << 20), 60), ha="center", fontsize=7,
+    axes[0].annotate("idle crossover,\ninterpolated", (2.3 * (1 << 20), 60), ha="center", fontsize=8,
                      color=MUTED)
     handles, labels = axes[0].get_legend_handles_labels()
     fig.legend(handles, labels, loc="outside upper center", ncol=3, frameon=False, fontsize=8)

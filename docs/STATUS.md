@@ -3,6 +3,21 @@
 _Last updated 2026-10-18 06:2x WIB (session 10, continued; saved before the laptop shuts down ≈ 07:20 WIB). Nothing
 measured, nothing running._
 
+## 2026-10-18 evening (user AFK 18:15–≈20:20 WIB, blanket OK via Main: agent-only work, own recommendation on reversible choices)
+- **Done:** paper to-do "journal limits + template". The journal's rules are in `docs/paper/OUTLINE.md` "Submission
+  requirements". The abstract (draft 1, 143/150 words with placeholders) and 6 keywords are in `docs/paper/abstract.md`.
+  Fig. 1 now meets the figure rules (174 mm wide, Arial embedded, text ≥ 8 pt, "Fig. 1" caption).
+- **Decided by agent under the user's 18:15 blanket OK** (all reversible):
+  1. The paper stays in Markdown until the results sections exist. It moves to the Springer Nature LaTeX template
+     (`sn-jnl`, flat folder) at the polish pass. There is no TeX on the Mac; Overleaf or a local install is the user's call then.
+  2. Keywords: Shared physical memory · CPU–GPU synchronization · Round-trip latency · Heterogeneous computing ·
+     Apple silicon · Agent-based simulation.
+  3. Fig. 1's legend and the §5 table say "shared memory" instead of "unified", matching §1's terminology.
+- **Needs the user:** (a) **AI-use declaration.** Springer Nature requires AI use beyond copy-editing to be
+  declared in the Methods section, and this draft is written with an AI assistant, so the user decides how to
+  declare it. (b) Title-page data: authors, affiliation, phone. (c) Data/code availability: the repo is public; whether
+  to archive it with a DOI (e.g. Zenodo) is the user's call. (d) Push the paper commits (still local).
+
 ## RESUME HERE (2026-10-18)
 - **PC run HELD by the user until Mon 10-19** (at the office). Nothing started on the PC. When it goes ahead: the PC
   fetches `main` from GitHub (pushed 10-17, origin/main = f97f48d; the Desktop bundle @ 559c377 is the fallback) and
