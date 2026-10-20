@@ -1,9 +1,33 @@
 # Work status (resume here)
 
-_Last updated 2026-10-19 00:4x WIB (session 11, saved at Main's request when the user closed sessions for the night).
-Nothing measured, nothing running, no device touched since 10-17._
+_Last updated 2026-10-20 07:4x WIB (session 12). Mac A/B 02:32 FAILED (dark wake); display test 05:45 rules out displays and dark wake; launch-context retest cancelled 07:33 (user took the Mac); ext series not run._
 
-## RESUME HERE (2026-10-19)
+## RESUME HERE (2026-10-20)
+- **Mac ext series NOT run; the M5 spin-wait slowdown is unexplained.** Two checks tonight, both via Main's slots
+  (README + data: `results/m1_mac_40w_check/`, gitignored, not committed):
+  1. 02:32 A/B, 40 W hub, 0 mA: FAILED (spin cells +100…+250 µs vs `m1_mac_ac`, which was measured **09-24**, not 10-13).
+     It turned out to run in **macOS dark wake** (Main, from pmset's log).
+  2. 05:45 display test, full wake, 12 runs: internal panel only and all displays asleep are both +170…+280 µs.
+  **Ruled out:** code (old = new binary), charger (20 W and 40 W both slow), ultrawide/display activity, dark wake.
+  The 10-17 runs were in full wake too. Block-wait cells match or beat 09-24; only spin-wait is slow. In spin mode the
+  CPU's 1 MiB read is 3× slower (45 vs 14 µs) and the GPU 1 MiB copy 3× (65 vs 21 µs).
+- **Lead (not proven): launch context.** Since 10-16 19:26 every session runs under BattleStation's pty daemon (node,
+  parent launchd); 09-24 predates it. Lightbound sets no thread QoS. Nice is ruled out: 05:58 session runs at nice 5 were as
+  slow as nice 0. **The 05:58 Terminal-vs-session test was INCONCLUSIVE (my driver bug: empty window id, no Terminal runs).**
+  **Retest:** the 07:57 slot was **cancelled at 07:33** (the user is back on the MacBook); Main asks the user for a new 8-min
+  slot (the run needs ≈ 6 min). Nothing on the Mac before Main's message. Driver ready in the scratchpad and in
+  `results/m1_mac_40w_check/launch_0558/lc2.sh` (full-wake gate before the window opens and before every run, since at 07:32,
+  after RTBench's caffeinate ended, systemstate showed only "CPU Network" = dark wake). The session-12 scratchpad is gone
+  after the 07:36 shutdown, so run the saved copy: `LC_SP=<new scratchpad> LC_END='YYYY-mm-dd HH:MM:SS' caffeinate -is
+  results/m1_mac_40w_check/launch_0558/lc2.sh` (LC_END = slot end minus ≈ 40 s). Everything needed is in `results/m1_mac_40w_check/`. RTBench launches from
+  Terminal.app tonight, which gives a second data point. If Terminal is fast, protocol §2 must name the launch context (or the
+  bench sets its own QoS: a code change, so ask the user first). If not, ask the user what else changed between 09-24 and 10-17.
+- **Side effect:** my 03:20 display pre-check put the ultrawide into standby (DP link down); left for the user (mouse touch
+  or the monitor's power button). It also ran outside my slot while NeonReactor's series was armed: no pre-checks outside slots.
+- **PC run of 10-19 afternoon:** outcome not recorded in this session; check GitHub / ask Main.
+- **Z Fold 8 (borrowed from 10-20):** told Main "no gain" for Lightbound (no Android build; not paper-final).
+
+## 2026-10-19 (previous resume point)
 - **PC run today (Mon 10-19) in the afternoon, with the user attending** (Main, 00:40 WIB). Order on the PC:
   **Lightbound goes first** and holds `C:\dev\GPU_HOLD.txt` for the whole run, **then NeonTide (≈ 1.5 h), then
   NeonSwarm training**. Lightbound's run = `m1_3060_ext` (≈ 3 h) + the MSVC golden-hash check for M2, as in
