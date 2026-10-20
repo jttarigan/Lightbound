@@ -1,8 +1,24 @@
 # Work status (resume here)
 
-_Last updated 2026-10-20 07:4x WIB (session 12). Mac A/B 02:32 FAILED (dark wake); display test 05:45 rules out displays and dark wake; launch-context retest cancelled 07:33 (user took the Mac); ext series not run._
+_Last updated 2026-10-20 16:56 WIB (session 13, closed by Main: idle agents shut down). Launch-context retest still unscheduled; nothing run this session._
 
-## RESUME HERE (2026-10-20)
+## RESUME HERE (2026-10-20 16:56, session 13)
+- **Nothing run, no device touched.** Fresh start + state review only.
+- **Launch-context retest (to-do 1 below) still UNSCHEDULED.** The user said (≈ 11:40) they will tell this session when the
+  Mac is free for a quick run. Agreed with the user: ≈ 8 min hands-off, lid open, on the 40 W hub; **BattleStation window
+  may be minimized** (helps: its window redraws at ≈ 6–8 % CPU; the pty daemon keeps running, so the S condition is
+  unchanged; the 05:45 test showed window visibility doesn't matter); other agents may stay **idle but running** (02:32 and
+  05:45 had 9 idle sessions). Log "BattleStation minimized" in the run log. A Terminal.app window opens and closes itself
+  (the user OK'd the plan; re-confirm the window when they give the go). On go: heads-up to Main (no builds/GPU jobs for 8 min)
+  → full-wake + battery-current check → `lc2.sh` (command below). Avoid overlapping another project's Mac-driven device run
+  (e.g. NeonSwarm drove POCO jobs from the Mac 11:43–≈12:15): check the load and ask that project first.
+- **GitHub (ls-remote, 10-20 ≈ 11:35 WIB):** `pc/m0-m1` still c593742 (10-14), origin/main f97f48d, `mac/narrow-link` ec93327.
+  **No 10-19 PC result was pushed**: ask the user / Main whether the PC run happened. Local `main` is 10 commits ahead
+  of origin (paper + STATUS), unpushed until the user says so.
+- **Open asks for the user:** (1) the 8-min Mac slot; (2) did the 10-19 PC run happen?; (3) M2 review; (4) push the local
+  commits; (5) paper: AI-use declaration wording, title-page data, Zenodo DOI or not.
+
+## 2026-10-20 07:4x (session 12)
 - **Mac ext series NOT run; the M5 spin-wait slowdown is unexplained.** Two checks tonight, both via Main's slots
   (README + data: `results/m1_mac_40w_check/`, gitignored, not committed):
   1. 02:32 A/B, 40 W hub, 0 mA: FAILED (spin cells +100…+250 µs vs `m1_mac_ac`, which was measured **09-24**, not 10-13).
