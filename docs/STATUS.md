@@ -1,8 +1,16 @@
 # Work status (resume here)
 
-_Last updated 2026-10-20 16:56 WIB (session 13, closed by Main: idle agents shut down). Launch-context retest still unscheduled; nothing run this session._
+_Last updated 2026-10-21 ≈ 06:30 WIB (session 14, closed by Main: Mac shutdown). Launch-context retest still unscheduled; nothing run this session._
 
-## RESUME HERE (2026-10-20 16:56, session 13)
+## RESUME HERE (2026-10-21 ≈ 06:30, session 14)
+- **Nothing run, no device touched.** Fresh start + state review (10-20 ≈ 18:00), then idle through other projects'
+  device runs (Fold 8, iPhone 12, KS, iPad Pro) and RTBench's quiet-Mac window (Main's "Mac free" 06:26 WIB).
+- **Launch-context retest still UNSCHEDULED.** The Mac was on battery (81 %) on 10-20 evening; the retest needs the user's
+  go + a Main slot + AC ≥ 35 W with battery current ≈ 0 mA, and must not overlap another project's Mac-driven device run.
+- **Open asks for the user unchanged** (session 13 list below): Mac slot; did the 10-19 PC run happen; M2 review; push the
+  local commits (now 12 ahead of origin); paper AI-use wording, title-page data, Zenodo DOI. None were answered this session.
+
+## 2026-10-20 16:56 (session 13)
 - **Nothing run, no device touched.** Fresh start + state review only.
 - **Launch-context retest (to-do 1 below) still UNSCHEDULED.** The user said (≈ 11:40) they will tell this session when the
   Mac is free for a quick run. Agreed with the user: ≈ 8 min hands-off, lid open, on the 40 W hub; **BattleStation window
