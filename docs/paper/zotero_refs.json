@@ -1,0 +1,743 @@
+{
+ "zotero_user": 5591478,
+ "style": "springer-basic-brackets",
+ "synced": "2026-10-21 13:56 UTC",
+ "keys": {
+  "Beischl26": "9RHUAUDT",
+  "Feng25": "MFGDN9HN",
+  "Huebner25": "B5Q9E3C9",
+  "Wahlgren25": "Z6B26CZ6",
+  "Spafford12": "XFCXEPHQ",
+  "Gera18": "SUVUGF4V",
+  "GomezLuna17": "IXIHP6NZ",
+  "Sun16": "S8VS4KSE",
+  "Lumpp21": "EAW8456R",
+  "Maczan26": "Q7E37WC4",
+  "Cassagne25": "TE2TJ63A",
+  "Velicka25": "JH7NE5WJ",
+  "Skrzypczak23": "HHZZZEFU",
+  "Velicka26": "63M2D7IM",
+  "Schieffer24": "MF5ZZ8WX",
+  "Knap19": "W5GC85GQ",
+  "Jarzabek17": "VRGFJE8P",
+  "Yu20": "ZXCPKCWA"
+ },
+ "items": {
+  "ZXCPKCWA": {
+   "id": "ZXCPKCWA",
+   "type": "article-journal",
+   "container-title": "The Journal of Supercomputing",
+   "DOI": "10.1007/s11227-019-03079-y",
+   "ISSN": "1573-0484",
+   "issue": "4",
+   "note": "Citation Key: Yu20",
+   "page": "2958-2985",
+   "title": "A quantitative evaluation of unified memory in GPUs",
+   "URL": "https://doi.org/10.1007/s11227-019-03079-y",
+   "volume": "76",
+   "author": [
+    {
+     "family": "Yu",
+     "given": "Qi"
+    },
+    {
+     "family": "Childers",
+     "given": "Bruce"
+    },
+    {
+     "family": "Huang",
+     "given": "Libo"
+    },
+    {
+     "family": "Qian",
+     "given": "Cheng"
+    },
+    {
+     "family": "Wang",
+     "given": "Zhiying"
+    }
+   ],
+   "issued": {
+    "date-parts": [
+     [
+      2020
+     ]
+    ]
+   }
+  },
+  "VRGFJE8P": {
+   "id": "VRGFJE8P",
+   "type": "article-journal",
+   "container-title": "The Journal of Supercomputing",
+   "DOI": "10.1007/s11227-017-2091-x",
+   "ISSN": "1573-0484",
+   "issue": "12",
+   "note": "Citation Key: Jarzabek17",
+   "page": "5378-5401",
+   "title": "Performance evaluation of unified memory and dynamic parallelism for selected parallel CUDA applications",
+   "URL": "https://doi.org/10.1007/s11227-017-2091-x",
+   "volume": "73",
+   "author": [
+    {
+     "family": "Jarząbek",
+     "given": "Łukasz"
+    },
+    {
+     "family": "Czarnul",
+     "given": "Paweł"
+    }
+   ],
+   "issued": {
+    "date-parts": [
+     [
+      2017,
+      6
+     ]
+    ]
+   }
+  },
+  "W5GC85GQ": {
+   "id": "W5GC85GQ",
+   "type": "article-journal",
+   "container-title": "The Journal of Supercomputing",
+   "DOI": "10.1007/s11227-019-02966-8",
+   "ISSN": "1573-0484",
+   "issue": "11",
+   "note": "Citation Key: Knap19",
+   "page": "7625-7645",
+   "title": "Performance evaluation of Unified Memory with prefetching and oversubscription for selected parallel CUDA applications on NVIDIA Pascal and Volta GPUs",
+   "URL": "https://doi.org/10.1007/s11227-019-02966-8",
+   "volume": "75",
+   "author": [
+    {
+     "family": "Knap",
+     "given": "Marcin"
+    },
+    {
+     "family": "Czarnul",
+     "given": "Paweł"
+    }
+   ],
+   "issued": {
+    "date-parts": [
+     [
+      2019,
+      8
+     ]
+    ]
+   }
+  },
+  "MF5ZZ8WX": {
+   "id": "MF5ZZ8WX",
+   "type": "paper-conference",
+   "collection-title": "ICPP ’24",
+   "container-title": "Proceedings of the 53rd International Conference on Parallel Processing",
+   "DOI": "10.1145/3673038.3673110",
+   "note": "Citation Key: Schieffer24",
+   "page": "199-209",
+   "publisher": "ACM",
+   "title": "Harnessing Integrated CPU-GPU System Memory for HPC: a first look into Grace Hopper",
+   "URL": "https://doi.org/10.1145/3673038.3673110",
+   "author": [
+    {
+     "family": "Schieffer",
+     "given": "Gabin"
+    },
+    {
+     "family": "Wahlgren",
+     "given": "Jacob"
+    },
+    {
+     "family": "Ren",
+     "given": "Jie"
+    },
+    {
+     "family": "Faj",
+     "given": "Jennifer"
+    },
+    {
+     "family": "Peng",
+     "given": "Ivy"
+    }
+   ],
+   "issued": {
+    "date-parts": [
+     [
+      2024,
+      8
+     ]
+    ]
+   }
+  },
+  "63M2D7IM": {
+   "id": "63M2D7IM",
+   "type": "article-journal",
+   "container-title": "Future Generation Computer Systems",
+   "DOI": "10.1016/j.future.2025.108331",
+   "ISSN": "0167-739X",
+   "note": "Citation Key: Velicka26",
+   "page": "108331",
+   "title": "An in-depth study of GPU frequency-scaling latency and its optimization on modern architectures",
+   "URL": "https://doi.org/10.1016/j.future.2025.108331",
+   "volume": "179",
+   "author": [
+    {
+     "family": "Velicka",
+     "given": "Daniel"
+    },
+    {
+     "family": "Vysocky",
+     "given": "Ondrej"
+    },
+    {
+     "family": "Yasal",
+     "given": "Osman"
+    },
+    {
+     "family": "Riha",
+     "given": "Lubomir"
+    }
+   ],
+   "issued": {
+    "date-parts": [
+     [
+      2026,
+      6
+     ]
+    ]
+   }
+  },
+  "HHZZZEFU": {
+   "id": "HHZZZEFU",
+   "type": "article-journal",
+   "container-title": "Simulation Modelling Practice and Theory",
+   "DOI": "10.1016/j.simpat.2022.102691",
+   "ISSN": "1569-190X",
+   "note": "Citation Key: Skrzypczak23",
+   "page": "102691",
+   "title": "Efficient parallel implementation of crowd simulation using a hybrid CPU+GPU high performance computing system",
+   "URL": "https://doi.org/10.1016/j.simpat.2022.102691",
+   "volume": "123",
+   "author": [
+    {
+     "family": "Skrzypczak",
+     "given": "Jakub"
+    },
+    {
+     "family": "Czarnul",
+     "given": "Paweł"
+    }
+   ],
+   "issued": {
+    "date-parts": [
+     [
+      2023,
+      2
+     ]
+    ]
+   }
+  },
+  "JH7NE5WJ": {
+   "id": "JH7NE5WJ",
+   "type": "paper-conference",
+   "container-title": "2025 IEEE International Parallel and Distributed Processing Symposium Workshops (IPDPSW)",
+   "DOI": "10.1109/ipdpsw66978.2025.00133",
+   "note": "Citation Key: Velicka25",
+   "page": "830-839",
+   "publisher": "IEEE",
+   "title": "Methodology for GPU Frequency Switching Latency Measurement",
+   "URL": "https://doi.org/10.1109/ipdpsw66978.2025.00133",
+   "author": [
+    {
+     "family": "Velicka",
+     "given": "Daniel"
+    },
+    {
+     "family": "Vysocky",
+     "given": "Ondrej"
+    },
+    {
+     "family": "Riha",
+     "given": "Lubomir"
+    }
+   ],
+   "issued": {
+    "date-parts": [
+     [
+      2025,
+      6
+     ]
+    ]
+   }
+  },
+  "TE2TJ63A": {
+   "id": "TE2TJ63A",
+   "type": "article",
+   "DOI": "10.48550/arXiv.2508.10481",
+   "note": "Citation Key: Cassagne25",
+   "number": "arXiv:2508.10481",
+   "publisher": "arXiv",
+   "title": "Dalek: An Unconventional and Energy-Aware Heterogeneous Cluster",
+   "URL": "https://arxiv.org/abs/2508.10481",
+   "author": [
+    {
+     "family": "Cassagne",
+     "given": "Adrien"
+    },
+    {
+     "family": "Amiot",
+     "given": "Noé"
+    },
+    {
+     "family": "Bouyer",
+     "given": "Manuel"
+    }
+   ],
+   "issued": {
+    "date-parts": [
+     [
+      2025
+     ]
+    ]
+   }
+  },
+  "Q7E37WC4": {
+   "id": "Q7E37WC4",
+   "type": "article",
+   "DOI": "10.48550/arXiv.2608.08730",
+   "note": "Citation Key: Maczan26",
+   "number": "arXiv:2608.08730",
+   "publisher": "arXiv",
+   "title": "Measuring and Reducing WebGPU Dispatch Overhead for LLM Inference",
+   "URL": "https://arxiv.org/abs/2608.08730",
+   "author": [
+    {
+     "family": "Maczan",
+     "given": "Jędrzej"
+    }
+   ],
+   "issued": {
+    "date-parts": [
+     [
+      2026
+     ]
+    ]
+   }
+  },
+  "EAW8456R": {
+   "id": "EAW8456R",
+   "type": "paper-conference",
+   "container-title": "2021 58th ACM/IEEE Design Automation Conference (DAC)",
+   "DOI": "10.1109/dac18074.2021.9586304",
+   "note": "Citation Key: Lumpp21",
+   "page": "685-690",
+   "publisher": "IEEE",
+   "title": "A Framework for Optimizing CPU-iGPU Communication on Embedded Platforms",
+   "URL": "https://doi.org/10.1109/dac18074.2021.9586304",
+   "author": [
+    {
+     "family": "Lumpp",
+     "given": "Francesco"
+    },
+    {
+     "family": "Patel",
+     "given": "Hiren D."
+    },
+    {
+     "family": "Bombieri",
+     "given": "Nicola"
+    }
+   ],
+   "issued": {
+    "date-parts": [
+     [
+      2021,
+      12
+     ]
+    ]
+   }
+  },
+  "S8VS4KSE": {
+   "id": "S8VS4KSE",
+   "type": "paper-conference",
+   "container-title": "2016 IEEE International Symposium on Workload Characterization (IISWC)",
+   "DOI": "10.1109/iiswc.2016.7581262",
+   "note": "Citation Key: Sun16",
+   "page": "1-10",
+   "publisher": "IEEE",
+   "title": "Hetero-mark, a benchmark suite for CPU-GPU collaborative computing",
+   "URL": "https://doi.org/10.1109/iiswc.2016.7581262",
+   "author": [
+    {
+     "family": "Sun",
+     "given": "Yifan"
+    },
+    {
+     "family": "Gong",
+     "given": "Xiang"
+    },
+    {
+     "family": "Ziabari",
+     "given": "Amir Kavyan"
+    },
+    {
+     "family": "Yu",
+     "given": "Leiming"
+    },
+    {
+     "family": "Li",
+     "given": "Xiangyu"
+    },
+    {
+     "family": "Mukherjee",
+     "given": "Saoni"
+    },
+    {
+     "family": "McCardwell",
+     "given": "Carter"
+    },
+    {
+     "family": "Villegas",
+     "given": "Alejandro"
+    },
+    {
+     "family": "Kaeli",
+     "given": "David"
+    }
+   ],
+   "issued": {
+    "date-parts": [
+     [
+      2016,
+      9
+     ]
+    ]
+   }
+  },
+  "IXIHP6NZ": {
+   "id": "IXIHP6NZ",
+   "type": "paper-conference",
+   "container-title": "2017 IEEE International Symposium on Performance Analysis of Systems and Software (ISPASS)",
+   "DOI": "10.1109/ispass.2017.7975269",
+   "note": "Citation Key: GomezLuna17",
+   "page": "43-54",
+   "publisher": "IEEE",
+   "title": "Chai: Collaborative heterogeneous applications for integrated-architectures",
+   "URL": "https://doi.org/10.1109/ispass.2017.7975269",
+   "author": [
+    {
+     "family": "Gómez-Luna",
+     "given": "Juan"
+    },
+    {
+     "family": "El Hajj",
+     "given": "Izzat"
+    },
+    {
+     "family": "Chang",
+     "given": "Li-Wen"
+    },
+    {
+     "family": "García-Flores",
+     "given": "Victor"
+    },
+    {
+     "family": "Garcia de Gonzalo",
+     "given": "Simon"
+    },
+    {
+     "family": "Jablin",
+     "given": "Thomas B."
+    },
+    {
+     "family": "Peña",
+     "given": "Antonio J."
+    },
+    {
+     "family": "Hwu",
+     "given": "Wen-mei"
+    }
+   ],
+   "issued": {
+    "date-parts": [
+     [
+      2017,
+      4
+     ]
+    ]
+   }
+  },
+  "SUVUGF4V": {
+   "id": "SUVUGF4V",
+   "type": "paper-conference",
+   "container-title": "2018 IEEE International Symposium on Performance Analysis of Systems and Software (ISPASS)",
+   "DOI": "10.1109/ispass.2018.00027",
+   "note": "Citation Key: Gera18",
+   "page": "139-148",
+   "publisher": "IEEE",
+   "title": "Performance Characterisation and Simulation of Intel’s Integrated GPU Architecture",
+   "URL": "https://doi.org/10.1109/ispass.2018.00027",
+   "author": [
+    {
+     "family": "Gera",
+     "given": "Prasun"
+    },
+    {
+     "family": "Kim",
+     "given": "Hyojong"
+    },
+    {
+     "family": "Kim",
+     "given": "Hyesoon"
+    },
+    {
+     "family": "Hong",
+     "given": "Sunpyo"
+    },
+    {
+     "family": "George",
+     "given": "Vinod"
+    },
+    {
+     "family": "Luk",
+     "given": "Chi-Keung"
+    }
+   ],
+   "issued": {
+    "date-parts": [
+     [
+      2018,
+      4
+     ]
+    ]
+   }
+  },
+  "XFCXEPHQ": {
+   "id": "XFCXEPHQ",
+   "type": "paper-conference",
+   "collection-title": "CF′12",
+   "container-title": "Proceedings of the 9th conference on Computing Frontiers",
+   "DOI": "10.1145/2212908.2212924",
+   "note": "Citation Key: Spafford12",
+   "page": "103-112",
+   "publisher": "ACM",
+   "title": "The tradeoffs of fused memory hierarchies in heterogeneous computing architectures",
+   "URL": "https://doi.org/10.1145/2212908.2212924",
+   "author": [
+    {
+     "family": "Spafford",
+     "given": "Kyle L."
+    },
+    {
+     "family": "Meredith",
+     "given": "Jeremy S."
+    },
+    {
+     "family": "Lee",
+     "given": "Seyong"
+    },
+    {
+     "family": "Li",
+     "given": "Dong"
+    },
+    {
+     "family": "Roth",
+     "given": "Philip C."
+    },
+    {
+     "family": "Vetter",
+     "given": "Jeffrey S."
+    }
+   ],
+   "issued": {
+    "date-parts": [
+     [
+      2012,
+      5
+     ]
+    ]
+   }
+  },
+  "Z6B26CZ6": {
+   "id": "Z6B26CZ6",
+   "type": "paper-conference",
+   "container-title": "2025 IEEE International Symposium on Workload Characterization (IISWC)",
+   "DOI": "10.1109/iiswc66894.2025.00038",
+   "note": "Citation Key: Wahlgren25",
+   "page": "368-380",
+   "publisher": "IEEE",
+   "title": "Dissecting CPU-GPU Unified Physical Memory on AMD MI300A APUs",
+   "URL": "https://doi.org/10.1109/iiswc66894.2025.00038",
+   "author": [
+    {
+     "family": "Wahlgren",
+     "given": "Jacob"
+    },
+    {
+     "family": "Schieffer",
+     "given": "Gabin"
+    },
+    {
+     "family": "Shi",
+     "given": "Ruimin"
+    },
+    {
+     "family": "León",
+     "given": "Edgar A."
+    },
+    {
+     "family": "Pearce",
+     "given": "Roger"
+    },
+    {
+     "family": "Gokhale",
+     "given": "Maya"
+    },
+    {
+     "family": "Peng",
+     "given": "Ivy"
+    }
+   ],
+   "issued": {
+    "date-parts": [
+     [
+      2025,
+      10
+     ]
+    ]
+   }
+  },
+  "B5Q9E3C9": {
+   "id": "B5Q9E3C9",
+   "type": "article",
+   "DOI": "10.48550/arXiv.2502.05317",
+   "note": "Citation Key: Huebner25",
+   "number": "arXiv:2502.05317",
+   "publisher": "arXiv",
+   "title": "Apple vs. Oranges: Evaluating the Apple Silicon M-Series SoCs for HPC Performance and Efficiency",
+   "URL": "https://arxiv.org/abs/2502.05317",
+   "author": [
+    {
+     "family": "Hübner",
+     "given": "Paul"
+    },
+    {
+     "family": "Hu",
+     "given": "Andong"
+    },
+    {
+     "family": "Peng",
+     "given": "Ivy"
+    },
+    {
+     "family": "Markidis",
+     "given": "Stefano"
+    }
+   ],
+   "issued": {
+    "date-parts": [
+     [
+      2025
+     ]
+    ]
+   }
+  },
+  "MFGDN9HN": {
+   "id": "MFGDN9HN",
+   "type": "article",
+   "DOI": "10.48550/arXiv.2501.14925",
+   "note": "Citation Key: Feng25",
+   "number": "arXiv:2501.14925",
+   "publisher": "arXiv",
+   "title": "Profiling Apple Silicon Performance for ML Training",
+   "URL": "https://arxiv.org/abs/2501.14925",
+   "author": [
+    {
+     "family": "Feng",
+     "given": "Dahua"
+    },
+    {
+     "family": "Xu",
+     "given": "Zhiming"
+    },
+    {
+     "family": "Wang",
+     "given": "Rongxiang"
+    },
+    {
+     "family": "Lin",
+     "given": "Felix Xiaozhu"
+    }
+   ],
+   "issued": {
+    "date-parts": [
+     [
+      2025
+     ]
+    ]
+   }
+  },
+  "9RHUAUDT": {
+   "id": "9RHUAUDT",
+   "type": "paper-conference",
+   "collection-title": "DaMoN ’26",
+   "container-title": "Proceedings of the 22nd International Workshop on Data Management on New Hardware",
+   "DOI": "10.1145/3789237.3809127",
+   "note": "Citation Key: Beischl26",
+   "page": "1-10",
+   "publisher": "ACM",
+   "title": "Evaluating Apple Silicon for Data Processing",
+   "URL": "https://doi.org/10.1145/3789237.3809127",
+   "author": [
+    {
+     "family": "Beischl",
+     "given": "Alexander"
+    },
+    {
+     "family": "Morozov",
+     "given": "Mykola"
+    },
+    {
+     "family": "Jungmair",
+     "given": "Michael"
+    },
+    {
+     "family": "Haussmann",
+     "given": "Lukas"
+    },
+    {
+     "family": "Neumann",
+     "given": "Thomas"
+    }
+   ],
+   "issued": {
+    "date-parts": [
+     [
+      2026,
+      5
+     ]
+    ]
+   }
+  }
+ },
+ "bib": {
+  "9RHUAUDT": "Beischl A, Morozov M, Jungmair M, et al (2026) Evaluating Apple Silicon for Data Processing. In: Proceedings of the 22nd International Workshop on Data Management on New Hardware. ACM, pp 1&#x2013;10",
+  "MFGDN9HN": "Feng D, Xu Z, Wang R, Lin FX (2025) Profiling Apple Silicon Performance for ML Training",
+  "B5Q9E3C9": "H&#xFC;bner P, Hu A, Peng I, Markidis S (2025) Apple vs. Oranges: Evaluating the Apple Silicon M-Series SoCs for HPC Performance and Efficiency",
+  "Z6B26CZ6": "Wahlgren J, Schieffer G, Shi R, et al (2025) Dissecting CPU-GPU Unified Physical Memory on AMD MI300A APUs. In: 2025 IEEE International Symposium on Workload Characterization (IISWC). IEEE, pp 368&#x2013;380",
+  "XFCXEPHQ": "Spafford KL, Meredith JS, Lee S, et al (2012) The tradeoffs of fused memory hierarchies in heterogeneous computing architectures. In: Proceedings of the 9th conference on Computing Frontiers. ACM, pp 103&#x2013;112",
+  "SUVUGF4V": "Gera P, Kim H, Kim H, et al (2018) Performance Characterisation and Simulation of Intel&#x2019;s Integrated GPU Architecture. In: 2018 IEEE International Symposium on Performance Analysis of Systems and Software (ISPASS). IEEE, pp 139&#x2013;148",
+  "IXIHP6NZ": "G&#xF3;mez-Luna J, El Hajj I, Chang L-W, et al (2017) Chai: Collaborative heterogeneous applications for integrated-architectures. In: 2017 IEEE International Symposium on Performance Analysis of Systems and Software (ISPASS). IEEE, pp 43&#x2013;54",
+  "S8VS4KSE": "Sun Y, Gong X, Ziabari AK, et al (2016) Hetero-mark, a benchmark suite for CPU-GPU collaborative computing. In: 2016 IEEE International Symposium on Workload Characterization (IISWC). IEEE, pp 1&#x2013;10",
+  "EAW8456R": "Lumpp F, Patel HD, Bombieri N (2021) A Framework for Optimizing CPU-iGPU Communication on Embedded Platforms. In: 2021 58th ACM/IEEE Design Automation Conference (DAC). IEEE, pp 685&#x2013;690",
+  "Q7E37WC4": "Maczan J (2026) Measuring and Reducing WebGPU Dispatch Overhead for LLM Inference",
+  "TE2TJ63A": "Cassagne A, Amiot N, Bouyer M (2025) Dalek: An Unconventional and Energy-Aware Heterogeneous Cluster",
+  "JH7NE5WJ": "Velicka D, Vysocky O, Riha L (2025) Methodology for GPU Frequency Switching Latency Measurement. In: 2025 IEEE International Parallel and Distributed Processing Symposium Workshops (IPDPSW). IEEE, pp 830&#x2013;839",
+  "HHZZZEFU": "Skrzypczak J, Czarnul P (2023) Efficient parallel implementation of crowd simulation using a hybrid CPU+GPU high performance computing system. Simulation Modelling Practice and Theory 123:102691. https://doi.org/10.1016/j.simpat.2022.102691",
+  "63M2D7IM": "Velicka D, Vysocky O, Yasal O, Riha L (2026) An in-depth study of GPU frequency-scaling latency and its optimization on modern architectures. Future Generation Computer Systems 179:108331. https://doi.org/10.1016/j.future.2025.108331",
+  "MF5ZZ8WX": "Schieffer G, Wahlgren J, Ren J, et al (2024) Harnessing Integrated CPU-GPU System Memory for HPC: a first look into Grace Hopper. In: Proceedings of the 53rd International Conference on Parallel Processing. ACM, pp 199&#x2013;209",
+  "W5GC85GQ": "Knap M, Czarnul P (2019) Performance evaluation of Unified Memory with prefetching and oversubscription for selected parallel CUDA applications on NVIDIA Pascal and Volta GPUs. The Journal of Supercomputing 75:7625&#x2013;7645. https://doi.org/10.1007/s11227-019-02966-8",
+  "VRGFJE8P": "Jarz&#x105;bek &#x141;, Czarnul P (2017) Performance evaluation of unified memory and dynamic parallelism for selected parallel CUDA applications. The Journal of Supercomputing 73:5378&#x2013;5401. https://doi.org/10.1007/s11227-017-2091-x",
+  "ZXCPKCWA": "Yu Q, Childers B, Huang L, et al (2020) A quantitative evaluation of unified memory in GPUs. The Journal of Supercomputing 76:2958&#x2013;2985. https://doi.org/10.1007/s11227-019-03079-y"
+ }
+}
