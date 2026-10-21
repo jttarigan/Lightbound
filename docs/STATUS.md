@@ -1,8 +1,31 @@
 # Work status (resume here)
 
-_Last updated 2026-10-21 ≈ 06:30 WIB (session 14, closed by Main: Mac shutdown). Launch-context retest still unscheduled; nothing run this session._
+_Last updated 2026-10-21 ≈ 09:25 WIB (session 15: solo stretch on Main's 09:15 relay; no device, no Mac-measured run)._
 
-## RESUME HERE (2026-10-21 ≈ 06:30, session 14)
+## RESUME HERE (2026-10-21 ≈ 09:25, session 15)
+- **Solo work done (Main's relay 09:15: user busy; solo only, no devices, no Mac runs, no push).** Commits:
+  1. `0e7abb4` results/m1_mac_40w_check committed (git add -f; the pmset sleep/wake log stays local, public repo) +
+     **`tools/rusage_wrap.py`** (runs a command, reads its exit rusage RUSAGE_INFO_V6 without root: P-core share, P/E GHz,
+     QoS) + **driver `lc3.sh`** = lc2 with every bench wrapped. Reason: `taskinfo` needs root, so lc2's per-run dumps
+     would have been empty. Offline hint (Mac busy, not evidence): a 1-s busy loop launched from a session ran 74–99 %
+     on P-cores at ≈ 3.3 GHz, QoS legacy; the whole session tree (node daemon → claude → zsh) is QoS legacy, **nice 5**.
+  2. `a00ddfe` paper §12.2 rewritten: adapter claim withdrawn (40 W showed the same shift); new item 5 = the unexplained
+     spin-wait shift vs 09-24, what is ruled out, §5's verdict holds in both states (block-wait cells: M5 `s2_direct` 1 MiB
+     205–222 vs PC 145–161 µs), the interpolated crossover does not. Dark-wake gate in item 4. §1 contribution 5 + OUTLINE.
+  3. `e7f9527` **`tools/analysis/crossover.py`** (to-do 5 ready) + `results/m1_crossover/`. M1 data, best path, chain/spin:
+     **2.38 MiB vs 3060 ReBAR on (runs 2.25–2.44), 2.98 MiB ReBAR off (2.78–3.06)**. §5 had "2.0–2.6 MiB" (only ReBAR on
+     matched; it is also H1′'s prediction interval, unchanged). §5, §9 (≈ 89k / 112k agents) and Fig. 1 fixed: its grey
+     column was a fixed 2.0–2.6 MiB matching neither direct-path crossing (1.63 / 2.98); now data-driven.
+- **Retest: use `lc3.sh`, not lc2:** `LC_SP=<scratchpad> LC_END='YYYY-mm-dd HH:MM:SS' caffeinate -is
+  results/m1_mac_40w_check/launch_0558/lc3.sh`. Per run it logs P-core share and GHz (`ru_<i>_<c>.json`), which tells
+  directly whether the spinning bench runs on E-cores. Note: S runs inherit nice 5 from the daemon tree now (T runs nice 0;
+  nice was ruled out 10-20).
+- **Open asks for the user:** (1) the 8-min Mac slot; (2) did the 10-19 PC run happen; (3) M2 review; (4) push the
+  local commits (16 ahead of origin); (5) paper: AI-use wording, title-page data, Zenodo DOI; (6) new: the ReBAR-off
+  crossover (≈ 112k agents) lies beyond the N grid 1k–100k: extend the grid later (M4/M8)? (7) new, only if the retest
+  does not restore the 09-24 levels: how the paper handles the spin-wait shift (§12.2 item 5 comment).
+
+## 2026-10-21 ≈ 06:30 (session 14)
 - **Nothing run, no device touched.** Fresh start + state review (10-20 ≈ 18:00), then idle through other projects'
   device runs (Fold 8, iPhone 12, KS, iPad Pro) and RTBench's quiet-Mac window (Main's "Mac free" 06:26 WIB).
 - **Launch-context retest still UNSCHEDULED.** The Mac was on battery (81 %) on 10-20 evening; the retest needs the user's
@@ -168,6 +191,8 @@ No phones or tablets are needed.
    steps, and the run log records whether training ran that day.
 5. **[solo, ≈ 1 h]** after 2 and 4: fetch, report both with `micro_report.py` (`gpuload` column), compute the crossover per GPU
    state with its run-to-run spread, compare with the H1′ predictions.
+   **Tool ready (10-21):** `python3 tools/analysis/crossover.py M5=results/m1_mac_ext 3060=results/m1_3060_ext --shared M5
+   --modes all --out results/crossover_ext` (writes crossover.md with the H1′ verdicts; M1 preview in `results/m1_crossover/`).
 6. **4060 Ti step D, November** (the user's date). **[user]** installs it in the i7-12700F PC, same slot (protocol §2; if it goes
    into another PC, ask before planning). **[device: Windows PC, exclusive, ≈ 3 days unattended]** step D as written
    (`results\m1_4060`), then optionally `m1_4060_ext`. **[solo, ≈ 1 h]** merge and add P-4060 to the combined report.
