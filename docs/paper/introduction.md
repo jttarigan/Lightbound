@@ -69,9 +69,10 @@ when the GPU is busy, as it is inside a real time step**. We answer it in three 
    simulation with K round trips per step (H2, H3, H5). *(waits for M4–M8)*
 4. The accuracy cost of the asynchronous alternative: how often agents decide differently when GPU results arrive
    one step late, measured against a same-step oracle (H4). *(waits for M3, M8)*
-5. A practical account of measurement hygiene for microsecond-scale GPU latency on a laptop-class SoC. Two effects
-   cost us runs: an under-powered adapter that still reports "AC Power", and background GPU clients. Both shift idle
-   round trips by hundreds of microseconds (§12). *(evidence in hand; one claim waits for a run on a 35 W+ adapter)*
+5. A practical account of measurement hygiene for microsecond-scale GPU latency on a laptop-class SoC. Background
+   GPU clients, CPU contention and an undetected dark wake cost us runs, and a shift of 100–280 µs in spin-wait
+   round trips survived every power, display and wake condition we tried (§12). *(evidence in hand; the shift's
+   cause is still open, 2026-10-21)*
 
 **Scope and what we do not claim.**
 - We compare two **platforms** (hardware, OS, driver and API together), not memory architectures in isolation (§12).

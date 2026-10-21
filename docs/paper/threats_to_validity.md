@@ -1,8 +1,9 @@
-# §12 Threats to validity (partial draft, 2026-10-17)
+# §12 Threats to validity (partial draft, 2026-10-17; §12.2 revised 2026-10-21)
 
 <!-- Sources: docs/06 §9 (the protocol's threat list), DECISIONS #17, #23, #30, #32, #33, #35,
      results/m1_report*/report.md, docs/PC_REPORT.md, results/m1_mac_20w_check/README.md (10-17 diagnostic),
-     docs/STATUS.md 10-17. Game-side threats (bot workload, behaviour design, float equivalence) wait for M3–M8. -->
+     results/m1_mac_40w_check/README.md (10-20 diagnostics: 40 W A/B, display/wake test, launch-context attempt),
+     docs/STATUS.md 10-17 to 10-21. Game-side threats (bot workload, behaviour design, float equivalence) wait for M3–M8. -->
 
 ## 12.1 Platform and API differences
 
@@ -28,19 +29,17 @@
 
 The M5 is the author's daily machine, not a dedicated benchmark host. Its round trips are latency-bound and sit
 close to the GPU's power-management decisions (§5), so they are far more sensitive to the environment than
-bandwidth figures. We found four ways the environment can bias a series, each with evidence from our own runs:
+bandwidth figures. We found five ways the environment can bias a series or cast doubt on one, each with evidence
+from our own runs:
 
 1. **Power source.** A series on battery was excluded, and the protocol requires the Mac to be plugged in.
-   *Plugged in is not sufficient, though.* On a 20 W USB-C adapter, macOS reported "AC Power" and Low Power Mode
-   was off. Even so, idle round trips came out ≈ 200 µs slower than in the accepted series
-   (`s1_copy` 4 KiB p50 ≈ 500 vs 289–294 µs). The CPU was idle, the GPU was idle and the thermal state was
-   nominal. The binary is ruled out: the original series' commit, rebuilt and run alternately with the current
-   binary, gave the same numbers within 2 %. We suspect the adapter limits the SoC's power budget, but that is
-   not proven. Rule adopted: before a Mac series, a two-minute reference check of the empty, `s1_copy` and
-   `s2_direct` cells against the accepted levels; the adapter's wattage (`pmset -g ac`) goes into every series'
-   notes. The accepted 10-13 series predates that rule, so its adapter is recorded as unknown.
-   <!-- results/m1_mac_20w_check/README.md; DECISIONS #35. Re-check the claim once a 35 W+ adapter run exists:
-        if it reproduces the 10-13 levels, state the adapter effect as measured; if not, rewrite this item. -->
+   "Plugged in" is not a measurement, though: macOS reports "AC Power" on an under-powered 20 W adapter as well.
+   Every series therefore logs the adapter's wattage (`pmset -g ac`) and the battery current, and starts only on a
+   supply of at least 35 W with the battery neither charging nor draining. We first suspected the 20 W adapter of
+   the shift in item 5; a check on a 40 W supply with the battery at 0 mA showed the same shift, so the adapter
+   was not its cause.
+   <!-- results/m1_mac_20w_check/README.md (20 W, 10-17); results/m1_mac_40w_check/README.md + power_log.csv
+        (40 W, 0 mA, 10-20 02:32); DECISIONS #35. -->
 2. **Other processes using the GPU.** A browser tab that animates kept the GPU 17–30 % busy (IOAccelerator
    "Device Utilization") with no benchmark running. Under that load, idle cells were 1.5–3× slower and
    erratic: `s1_copy` 1 MiB p50 525 vs 351 µs, p99 1780 vs 516 µs. Rule: no other GPU client; a series starts
@@ -48,11 +47,38 @@ bandwidth figures. We found four ways the environment can bias a series, each wi
 3. **CPU contention.** A concurrent 8-core analysis job (load average 14–16) inflated the p99 of the first cells
    about twofold. The same start rule catches it.
 4. **Display and sleep state.** The protocol keeps the display on. Preventing only system sleep
-   (`caffeinate -is`) lets the display sleep after 10 minutes, so runs now use `caffeinate -dis`.
+   (`caffeinate -is`) lets the display sleep after 10 minutes, so runs use `caffeinate -dis`. A sleep-prevention
+   assertion does not end a maintenance *dark wake* (display off, system partly awake), though, and one of our
+   checks ran in a dark wake without our noticing. Runs now start only in full wake (`pmset -g systemstate`
+   lists the graphics capability) and re-check it before every process. In that check, dark wake made no
+   difference beyond item 5: full-wake runs three hours later were as slow.
+   <!-- results/m1_mac_40w_check/README.md: 02:32 check in DarkWake (pmset log), 05:45 full-wake test. -->
+5. **A persistent shift we have not explained.** Since at least 2026-10-17, every check on the M5 has measured
+   *spin-wait* round trips ≈ 100–280 µs slower than the accepted series of 2026-09-24, for example `s1_copy` 1 MiB
+   (chained submit) p50 ≈ 575 vs 352 µs. *Block-wait* cells are unaffected: within 11 µs at 4 KiB, and 84–140 µs
+   faster at 1 MiB. In spin mode, the work on both processors slows down: the CPU's own read of 1 MiB takes 45 vs
+   14 µs and the GPU's 1 MiB copy 65 vs 21 µs. Each of the following was ruled out by a direct comparison: the
+   binary (the accepted series' commit, rebuilt and alternated with the current binary, agrees within 2 %); the
+   power supply (20 W and 40 W, item 1); the external display and display activity (internal panel only, and all
+   displays asleep); dark versus full wake (item 4); and the process's nice level (0 vs 5). One difference is
+   still untested: the accepted series was launched from a terminal application, the later checks from a
+   detached terminal-session service. Consequences: the accepted M5 idle numbers (§5) describe a machine state that
+   we can no longer reproduce, and whether that state or the present one is typical of the platform is open.
+   §5's verdict does not depend on it. In the present state the M5's block-wait cells are still slower than the
+   3060 Ti's best path (`s2_direct` 1 MiB, chained, p50 205–222 vs 145–161 µs; on the PC, block and spin wait differ by
+   ≤ 6 µs). The interpolated crossover does depend on it: it rests on the M5's 1 MiB level and would move to smaller
+   payloads if the present block-wait level held. No M5 extension series is measured until a two-minute reference
+   check of the empty, `s1_copy` and `s2_direct` cells reproduces the accepted levels.
+   <!-- results/m1_mac_40w_check/display_0545/compare.txt (spin and block deltas, legs), ab_compare.txt (binary A/B),
+        launch_0558/ (nice 5 runs; Terminal arm failed). OPEN: if the launch-context retest (lc3.sh) does not
+        restore the 09-24 levels, how the paper handles the shift (re-measure the idle reference in the present
+        state? report both?) is the user's decision. PC block vs spin: results/m1_report*/summary.csv
+        (chain, idle). -->
 
 In each case the first minute of cells showed the problem against the accepted levels, and the attempt was
-stopped and discarded, never repaired or pooled. A practical lesson for latency studies on laptops: "on AC" and
-"idle" have to be checked by measurement, not assumed.
+stopped and discarded, never repaired or pooled. A practical lesson for latency studies on laptops: "on AC",
+"idle" and "awake" have to be checked by measurement, not assumed, and a reference check before every series
+catches what the checklist misses.
 
 ## 12.3 Run-to-run variation
 
