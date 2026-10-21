@@ -1,0 +1,87 @@
+== precheck 2026-10-21 12:53:29 WIB (UTC 05:53:29)
+ac:  Wattage = 35W
+ac:  Current = 1740mA
+ac:  Voltage = 20000mV
+ac:  AdapterID = 28699
+ac:  Manufacturer = Apple Inc.
+ac:  Family Code = 0xe000400a
+ac:  Serial String = <redacted>
+ac:  Adapter Name = 35W USB-C Power Adapter 
+ac:  Hardware Version = 1.0
+ac:  Firmware Version = 01070076
+battery: 80 %  InstantAmperage 0 mA
+systemstate: Current System Capabilities are: CPU Graphics Audio Network 
+systemstate: Current Power State: 4
+therm: Note: No thermal warning level has been recorded
+therm: Note: No performance warning level has been recorded
+therm: Note: No CPU power status has been recorded
+lowpowermode: 0
+loadavg: { 1.88 1.99 2.22 }
+gpu util: 6 %
+top cpu:
+   %CPU   PID COMM
+   33.1  1688 claude
+    6.6  1684 claude
+    6.4   414 /System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer
+    4.1  1642 /Users/jostarigan/Project/BattleStation/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Helper.app/Contents/MacOS/Electron Helper
+    4.0  1687 claude
+    3.3  1644 /Users/jostarigan/Project/BattleStation/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Helper (Renderer).app/Contents/MacOS/Electron Helper (Renderer)
+    2.6  1675 claude
+    1.9  1676 claude
+displays:
+          G34w-30:
+            Resolution: 3440 x 1440 (UWQHD - Ultra-Wide Quad HD)
+            UI Looks like: 3440 x 1440 @ 165.00Hz
+            Main Display: Yes
+            Mirror: Off
+            Online: Yes
+          Color LCD:
+            Resolution: 2880 x 1864 Retina
+            Mirror: Off
+            Online: Yes
+GATE FAIL: GPU util 6 % > 5
+GATES: FAIL
+== precheck 2026-10-21 12:53:49 WIB (UTC 05:53:49)
+ac:  Wattage = 35W
+ac:  Current = 1740mA
+ac:  Voltage = 20000mV
+ac:  AdapterID = 28699
+ac:  Manufacturer = Apple Inc.
+ac:  Family Code = 0xe000400a
+ac:  Serial String = <redacted>
+ac:  Adapter Name = 35W USB-C Power Adapter 
+ac:  Hardware Version = 1.0
+ac:  Firmware Version = 01070076
+battery: 80 %  InstantAmperage 0 mA
+systemstate: Current System Capabilities are: CPU Graphics Audio Network 
+systemstate: Current Power State: 4
+therm: Note: No thermal warning level has been recorded
+therm: Note: No performance warning level has been recorded
+therm: Note: No CPU power status has been recorded
+lowpowermode: 0
+loadavg: { 1.56 1.91 2.19 }
+gpu util: 1 %
+top cpu:
+   %CPU   PID COMM
+    2.1 17336 /bin/zsh
+    0.9 17337 /bin/zsh
+    0.8  1688 claude
+    0.7 17339 tee
+    0.5   407 /usr/sbin/notifyd
+    0.5  1684 claude
+    0.4   578 /System/Library/DriverExtensions/com.apple.AppleUserHIDDrivers.dext/com.apple.AppleUserHIDDrivers
+    0.4     1 /sbin/launchd
+displays:
+          G34w-30:
+            Resolution: 3440 x 1440 (UWQHD - Ultra-Wide Quad HD)
+            UI Looks like: 3440 x 1440 @ 165.00Hz
+            Main Display: Yes
+            Mirror: Off
+            Online: Yes
+          Color LCD:
+            Resolution: 2880 x 1864 Retina
+            Mirror: Off
+            Online: Yes
+GATES: PASS
+12:53:50 start lc3.sh, LC_END 2026-10-21 13:01:20
+12:58:11 lc3.sh exit 0

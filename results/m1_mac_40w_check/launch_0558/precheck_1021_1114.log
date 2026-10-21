@@ -1,0 +1,45 @@
+== precheck 2026-10-21 11:14:35 WIB (UTC 04:14:35)
+ac:  Wattage = 35W
+ac:  Current = 1740mA
+ac:  Voltage = 20000mV
+ac:  AdapterID = 28699
+ac:  Manufacturer = Apple Inc.
+ac:  Family Code = 0xe000400a
+ac:  Serial String = <redacted>
+ac:  Adapter Name = 35W USB-C Power Adapter 
+ac:  Hardware Version = 1.0
+ac:  Firmware Version = 01070076
+battery: 80 %  InstantAmperage 0 mA
+systemstate: Current System Capabilities are: CPU Graphics Audio Network 
+systemstate: Current Power State: 4
+therm: Note: No thermal warning level has been recorded
+therm: Note: No performance warning level has been recorded
+therm: Note: No CPU power status has been recorded
+lowpowermode: 0
+loadavg: { 3.66 5.64 6.29 }
+gpu util: 45 %
+top cpu:
+   %CPU   PID COMM
+  139.2 16312 /Applications/Unity/Hub/Editor/6000.5.9f1/Unity.app/Contents/MacOS/Unity
+   78.6   746 /System/Library/PrivateFrameworks/MediaAnalysis.framework/Versions/A/mediaanalysisd
+   70.3  9804 /System/Library/PrivateFrameworks/ModelCatalogRuntime.framework/Versions/A/modelcatalogd
+   41.1 16315 /Applications/Unity/Hub/Editor/6000.5.9f1/Unity.app/Contents/Helpers/PackageManager/Server/UnityPackageManager
+   31.3  9543 /System/Library/PrivateFrameworks/XprotectFramework.framework/Versions/A/XPCServices/XprotectService.xpc/Contents/MacOS/XprotectService
+   11.0  9788 /usr/libexec/mobileassetd
+    8.9  1392 /System/Applications/Music.app/Contents/MacOS/Music
+    8.8  1688 claude
+displays:
+          G34w-30:
+            Resolution: 3440 x 1440 (UWQHD - Ultra-Wide Quad HD)
+            UI Looks like: 3440 x 1440 @ 165.00Hz
+            Main Display: Yes
+            Mirror: Off
+            Online: Yes
+          Color LCD:
+            Resolution: 2880 x 1864 Retina
+            Mirror: Off
+            Online: Yes
+GATE FAIL: 1-min load 3.66 >= 3
+GATE FAIL: GPU util 45 % > 5
+GATES: FAIL
+11:14:36 gate failed: not starting

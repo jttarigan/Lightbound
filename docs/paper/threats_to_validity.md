@@ -60,9 +60,13 @@ from our own runs:
    14 µs and the GPU's 1 MiB copy 65 vs 21 µs. Each of the following was ruled out by a direct comparison: the
    binary (the accepted series' commit, rebuilt and alternated with the current binary, agrees within 2 %); the
    power supply (20 W and 40 W, item 1); the external display and display activity (internal panel only, and all
-   displays asleep); dark versus full wake (item 4); and the process's nice level (0 vs 5). One difference is
-   still untested: the accepted series was launched from a terminal application, the later checks from a
-   detached terminal-session service. Consequences: the accepted M5 idle numbers (§5) describe a machine state that
+   displays asleep); dark versus full wake (item 4); the process's nice level (0 vs 5); and the launch context
+   (a terminal application, as for the accepted series, versus a detached terminal-session service: four
+   alternating runs each, spin cells +109–243 vs +111–262 µs). One process-level clue: the benchmark spent only
+   68–90 % of its CPU time on the performance cores, and across eight runs the share correlates with the empty
+   spin round trip (r = −0.89; the 90 % run measured 299 µs against 434–471 µs). This is consistent with the
+   spinning thread being placed on efficiency cores part of the time, but whole-process counters cannot show
+   it. Consequences: the accepted M5 idle numbers (§5) describe a machine state that
    we can no longer reproduce, and whether that state or the present one is typical of the platform is open.
    §5's verdict does not depend on it. In the present state the M5's block-wait cells are still slower than the
    3060 Ti's best path (`s2_direct` 1 MiB, chained, p50 205–222 vs 145–161 µs; on the PC, block and spin wait differ by
@@ -70,9 +74,10 @@ from our own runs:
    payloads if the present block-wait level held. No M5 extension series is measured until a two-minute reference
    check of the empty, `s1_copy` and `s2_direct` cells reproduces the accepted levels.
    <!-- results/m1_mac_40w_check/display_0545/compare.txt (spin and block deltas, legs), ab_compare.txt (binary A/B),
-        launch_0558/ (nice 5 runs; Terminal arm failed). OPEN: if the launch-context retest (lc3.sh) does not
-        restore the 09-24 levels, how the paper handles the shift (re-measure the idle reference in the present
-        state? report both?) is the user's decision. PC block vs spin: results/m1_report*/summary.csv
+        launch_0558/ (nice 5 runs; Terminal arm failed), launch_1253/ (2026-10-21 retest: launch context ruled out;
+        ru_*.json = exit rusage per run). OPEN: the launch-context retest did not restore the 09-24 levels, so how
+        the paper handles the shift (re-measure the idle reference in the present state? report both?) is the
+        user's decision. PC block vs spin: results/m1_report*/summary.csv
         (chain, idle). -->
 
 In each case the first minute of cells showed the problem against the accepted levels, and the attempt was

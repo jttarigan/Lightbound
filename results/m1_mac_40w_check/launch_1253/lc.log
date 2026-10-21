@@ -1,0 +1,36 @@
+12:53:52 created tty /dev/ttys022
+12:53:52 Terminal window id 1196; sys=CPU+Graphics+Audio+Network+/ps4; load 1.52
+12:53:55 run 1_S start: sys=CPU+Graphics+Audio+Network+/ps4; load 1.52
+12:53:58   bench 17434 31 5 SN
+ parents: Python <- zsh
+12:54:24   exit 0; pcore 0.684 GHz 2.454/P 2.8/E 1.704 cpu 15.084s qos {'default': 0.0, 'background': 0.0, 'utility': 0.0, 'legacy': 1.0}
+12:54:27 run 2_T start: sys=CPU+Graphics+Audio+Network+/ps4; load 1.98
+12:54:30   bench 17493 31 0 S+
+ parents: Python <- 
+12:54:56   exit 0; pcore 0.686 GHz 2.46/P 2.812/E 1.694 cpu 14.976s qos {'default': 0.0, 'background': 0.0, 'utility': 0.0, 'legacy': 1.0}
+12:54:59 run 3_T start: sys=CPU+Graphics+Audio+Network+/ps4; load 2.38
+12:55:03   bench 17577 31 0 R+
+ parents: Python <- 
+12:55:29   exit 0; pcore 0.681 GHz 2.481/P 2.807/E 1.783 cpu 14.99s qos {'default': 0.0, 'background': 0.0, 'utility': 0.0, 'legacy': 1.0}
+12:55:32 run 4_S start: sys=CPU+Graphics+Audio+Network+/ps4; load 1.97
+12:55:35   bench 17657 31 5 SN
+ parents: Python <- zsh
+12:56:01   exit 0; pcore 0.699 GHz 2.511/P 2.838/E 1.753 cpu 14.767s qos {'default': 0.0, 'background': 0.0, 'utility': 0.0, 'legacy': 1.0}
+12:56:04 run 5_S start: sys=CPU+Graphics+Audio+Network+/ps4; load 2.27
+12:56:07   bench 17713 31 5 RN
+ parents: Python <- zsh
+12:56:33   exit 0; pcore 0.752 GHz 2.55/P 2.823/E 1.726 cpu 14.81s qos {'default': 0.0, 'background': 0.0, 'utility': 0.0, 'legacy': 1.0}
+12:56:36 run 6_T start: sys=CPU+Graphics+Audio+Network+/ps4; load 2.30
+12:56:39   bench 17777 31 0 S+
+ parents: Python <- 
+12:57:05   exit 0; pcore 0.698 GHz 2.571/P 2.961/E 1.668 cpu 14.6s qos {'default': 0.0, 'background': 0.0, 'utility': 0.0, 'legacy': 1.0}
+12:57:08 run 7_T start: sys=CPU+Graphics+Audio+Network+/ps4; load 2.19
+12:57:11   bench 17875 31 0 R+
+ parents: Python <- 
+12:57:37   exit 0; pcore 0.9 GHz 2.864/P 2.975/E 1.863 cpu 13.834s qos {'default': 0.0, 'background': 0.0, 'utility': 0.0, 'legacy': 1.0}
+12:57:40 run 8_S start: sys=CPU+Graphics+Audio+Network+/ps4; load 2.51
+12:57:43   bench 17965 31 5 SN
+ parents: Python <- zsh
+12:58:09   exit 0; pcore 0.676 GHz 2.535/P 2.988/E 1.591 cpu 14.872s qos {'default': 0.0, 'background': 0.0, 'utility': 0.0, 'legacy': 1.0}
+12:58:09 runs finished
+12:58:11 cleanup: tty /dev/ttys022 gone? yes; windows now: 254, 1196; sys=CPU+Graphics+Audio+Network+/ps4

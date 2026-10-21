@@ -52,3 +52,24 @@ ext series was not started.
   session ran 74–99 % on P-cores at ≈ 3.3 GHz, QoS legacy; the session tree (node daemon, claude, zsh) is QoS legacy at nice 5.
   So a session-launched CPU-bound process does reach the P-cores; whether the bench's *spinning* thread does is what v3 records.
 - Not committed (public repo): `display_0545/pmset_sleep_wake_10-17_to_10-20.txt` (the Mac's sleep/wake history); it stays local.
+
+## Launch-context retest (2026-10-21 12:53–12:58 WIB, `launch_1253/`, Main's slot, user's go via Main): launch context RULED OUT
+
+- Driver `launch_0558/go.sh` → `pre.sh` gate (35 W Apple adapter, 80 % at 0 mA, full wake, GPU ≤ 5 %, load < 3; the first
+  check at 12:53:29 failed on GPU 6 % after TopDownBoxy's run, the second at 12:53:49 passed: GPU 1 %, load 1.56) → `lc3.sh`
+  (frozen binary, cells empty/s1_copy/s2_direct × 4K/1M, alternating S T T S S T T S, ≈ 29 s each) → postcheck. Full wake
+  before every run, load 1.5–2.5, thermal nominal. Ultrawide G34w-30 3440×1440 @ 165 Hz + internal panel online; Music playing
+  (user's, ≈ 9 % + coreaudiod 8 %); Main held `caffeinate -dis`; NPUBench's co-sim SIGSTOPped, other agents idle.
+  S runs at nice 5 (daemon tree), T runs at nice 0 (Terminal window 1196, closed afterwards).
+- Result (`compare.txt`, median over 4 runs of per-run p50): **T is as slow as S.** Spin cells vs 09-24: S +111…+262 µs,
+  T +109…+243 µs; T − S within ±23 µs in 11 of 12 spin cells (s1_copy perpass 4K: −114, one multimodal cell). Block cells
+  match 09-24 at 4K (±5 µs) and beat it at 1M (−80…−133 µs), as on 10-20. Nice 5 vs 0: irrelevant again.
+- Exit rusage (`ru_*.json`, whole process, all threads): 68–75 % of CPU time on P-cores in 7 runs, 90 % in run 7T;
+  P-cores ≈ 2.8–3.0 GHz, E-cores ≈ 1.6–1.9 GHz; QoS legacy 100 % in both contexts. Run 7T had the fastest empty spin rt
+  (299 vs 434–471 µs; 09-24: 249): across the 8 runs r(P-core share, empty spin rt) = −0.89 (s1_copy 1M spin −0.70, 4K −0.40).
+  In the same runs the CPU's 1 MiB read takes 32–45 µs in spin mode and 15–16 µs in block mode. Consistent with the spinning
+  bench thread spending part of its time on E-cores, but the process-level counters can't attribute time to that thread.
+- Also noted: 09-24 runs started at thermal state "fair", all checks since at "nominal". Same macOS build 25G83 and driver.
+- Next (needs the user): what else changed on the Mac between 09-24 and 10-17? Optional code-level test (a code change, so ask
+  first): the bench thread sets QOS_CLASS_USER_INTERACTIVE, or logs per-thread counters, to see whether P-core placement
+  restores the 09-24 spin levels.

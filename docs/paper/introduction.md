@@ -71,7 +71,7 @@ when the GPU is busy, as it is inside a real time step**. We answer it in three 
    one step late, measured against a same-step oracle (H4). *(waits for M3, M8)*
 5. A practical account of measurement hygiene for microsecond-scale GPU latency on a laptop-class SoC. Background
    GPU clients, CPU contention and an undetected dark wake cost us runs, and a shift of 100–280 µs in spin-wait
-   round trips survived every power, display and wake condition we tried (§12). *(evidence in hand; the shift's
+   round trips survived every power, display, wake and launch condition we tried (§12). *(evidence in hand; the shift's
    cause is still open, 2026-10-21)*
 
 **Scope and what we do not claim.**

@@ -1,0 +1,43 @@
+== precheck 2026-10-21 12:58:11 WIB (UTC 05:58:11)
+ac:  Wattage = 35W
+ac:  Current = 1740mA
+ac:  Voltage = 20000mV
+ac:  AdapterID = 28699
+ac:  Manufacturer = Apple Inc.
+ac:  Family Code = 0xe000400a
+ac:  Serial String = <redacted>
+ac:  Adapter Name = 35W USB-C Power Adapter 
+ac:  Hardware Version = 1.0
+ac:  Firmware Version = 01070076
+battery: 80 %  InstantAmperage 0 mA
+systemstate: Current System Capabilities are: CPU Graphics Audio Network 
+systemstate: Current Power State: 4
+therm: Note: No thermal warning level has been recorded
+therm: Note: No performance warning level has been recorded
+therm: Note: No CPU power status has been recorded
+lowpowermode: 0
+loadavg: { 2.44 2.19 2.23 }
+gpu util: 57 %
+top cpu:
+   %CPU   PID COMM
+    6.2   415 /System/Library/PrivateFrameworks/TCC.framework/Support/tccd
+    5.9   414 /System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer
+    3.3   417 /System/Library/CoreServices/loginwindow.app/Contents/MacOS/loginwindow
+    3.2   383 /System/Library/CoreServices/launchservicesd
+    3.0   426 /usr/libexec/trustd
+    2.6  1417 claude
+    2.2   427 /usr/libexec/runningboardd
+    1.7   668 /System/Library/PrivateFrameworks/TCC.framework/Support/tccd
+displays:
+          G34w-30:
+            Resolution: 3440 x 1440 (UWQHD - Ultra-Wide Quad HD)
+            UI Looks like: 3440 x 1440 @ 165.00Hz
+            Main Display: Yes
+            Mirror: Off
+            Online: Yes
+          Color LCD:
+            Resolution: 2880 x 1864 Retina
+            Mirror: Off
+            Online: Yes
+GATE FAIL: GPU util 57 % > 5
+GATES: FAIL

@@ -1,6 +1,6 @@
 # Work status (resume here)
 
-_Last updated 2026-10-21 ≈ 09:25 WIB (session 15: solo stretch on Main's 09:15 relay; no device, no Mac-measured run)._
+_Last updated 2026-10-21 ≈ 13:00 WIB (session 15: solo stretch, then the launch-context retest 12:53–12:58: ruled out)._
 
 ## RESUME HERE (2026-10-21 ≈ 09:25, session 15)
 - **Solo work done (Main's relay 09:15: user busy; solo only, no devices, no Mac runs, no push).** Commits:
@@ -20,8 +20,15 @@ _Last updated 2026-10-21 ≈ 09:25 WIB (session 15: solo stretch on Main's 09:15
   results/m1_mac_40w_check/launch_0558/lc3.sh`. Per run it logs P-core share and GHz (`ru_<i>_<c>.json`), which tells
   directly whether the spinning bench runs on E-cores. Note: S runs inherit nice 5 from the daemon tree now (T runs nice 0;
   nice was ruled out 10-20).
-- **Open asks for the user:** (1) the 8-min Mac slot; (2) did the 10-19 PC run happen; (3) M2 review; (4) push the
-  local commits (16 ahead of origin); (5) paper: AI-use wording, title-page data, Zenodo DOI; (6) new: the ReBAR-off
+- **Launch-context retest DONE 12:53–12:58 WIB (Main's slot, user's go via Main): launch context RULED OUT.** 8/8 runs
+  (S T T S S T T S); spin cells vs 09-24: Terminal +109…+243 µs, session +111…+262 µs; block cells fine. Nice irrelevant again.
+  Clue: the bench got only 68–75 % of its CPU time on P-cores (90 % in run 7T, which had the fastest empty spin rt: 299 vs
+  434–471 µs; r = −0.89). Data `results/m1_mac_40w_check/launch_1253/`, README section, §12.2 item 5 updated. The 11:14
+  attempt was gated out (Unity play-test, GPU 45 %), see `precheck_1021_1114.log`. **Ext series still blocked** (the shift
+  stays). Next needs the user: what else changed on the Mac between 09-24 and 10-17? Optional code test (ask first): the
+  bench thread sets QOS_CLASS_USER_INTERACTIVE (or logs per-thread counters) to see if P-core placement restores 09-24.
+- **Open asks for the user:** (1) ~~the 8-min Mac slot~~ done; new: what changed on the Mac 09-24 → 10-17, and OK for the QoS code test?; (2) did the 10-19 PC run happen; (3) M2 review; (4) push the
+  local commits (18 ahead of origin); (5) paper: AI-use wording, title-page data, Zenodo DOI; (6) new: the ReBAR-off
   crossover (≈ 112k agents) lies beyond the N grid 1k–100k: extend the grid later (M4/M8)? (7) new, only if the retest
   does not restore the 09-24 levels: how the paper handles the spin-wait shift (§12.2 item 5 comment).
 
