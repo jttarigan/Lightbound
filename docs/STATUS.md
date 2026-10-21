@@ -19,6 +19,8 @@ _Last updated 2026-10-21 ≈ 21:15 WIB (session 16: references into Zotero; Word
   local API was down at 20:5x, so the build does not depend on it). related_work.md prose now cites all 18 with [Key]
   brackets (Gera18 and Velicka26 added). Smoke test: every part parses, `textutil` reads the file. **Not yet opened in
   Word** (no GUI from this session while the user play-tests).
+  21:3x: **§6 drafted** as far as it can be (`docs/paper/crossover.md`: 6.1 H1′ as pre-registered with its predictions and
+  how §5's interpolation sits against them, 6.2 measurement; 6.3 placeholder) and wired into the build.
 - **Open asks for the user (new, paper):** (8) open `docs/paper/lightbound_jsc.docx` in Word and run Zotero → Refresh: if the
   citations renumber and the list re-renders, the build counts as done; (9) title page is prefilled from the NPUBenchSwarm
   manuscript (name, USU affiliation) with e-mail/telephone placeholders: confirm; (10) reference style: Springer basic
