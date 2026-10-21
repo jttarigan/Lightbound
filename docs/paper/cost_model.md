@@ -40,9 +40,11 @@ GPU→CPU hand-off, independent of N. This is a fixed term the microbenchmark do
 <!-- kTilePx = 16 (src/procgen/FloorData.h); cell = 16 px (docs/05 §5). Bench floors are 200×200 at depth 5. -->
 
 Averaged over the two directions, a round trip moves ≈ 28 B per agent, so 1 MiB per direction is ≈ 37k agents.
-The idle-GPU crossover interpolated in §5 (2.0–2.6 MiB per direction) is therefore ≈ 75k–100k agents. That lies
-inside the protocol's N grid (1k–100k) and below the capacity of 131,072. The model thus makes a testable
-prediction about the game, not only about the benchmark. If the hot-GPU crossover moves down as H1′ predicts
+The idle-GPU crossover interpolated in §5 is therefore ≈ 89k agents with ReBAR on (≈ 2.4 MiB per direction),
+at the top of the protocol's N grid (1k–100k), and ≈ 112k with ReBAR off (≈ 3.0 MiB), beyond the grid but below
+the capacity of 131,072. The model thus makes a testable prediction about the game, not only about the benchmark.
+<!-- results/m1_crossover/crossover.md, best path; agents = bytes / 28. Was "2.0–2.6 MiB ≈ 75k–100k" until
+     2026-10-21. The ReBAR-off crossover lies outside the N grid: whether to extend the grid is open (ask). --> If the hot-GPU crossover moves down as H1′ predicts
 (to ≤ 256 KiB), the game's crossover in N moves to ≲ 10k agents.
 
 These agent counts ignore the `CellRange` intercept. With it, the GPU→CPU direction reaches a given payload with

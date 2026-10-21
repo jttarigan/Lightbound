@@ -28,9 +28,10 @@ For H5's link-width comparison, both RTX cards run in the same slot (x16 vs x8, 
 ![Fig. 1](fig/fig1_roundtrip_vs_payload.png)
 
 **Fig. 1** *CPU↔GPU round trip against payload per direction, GPU otherwise idle, chain submission, spin wait;
-line = p50 pooled over three runs, band up to p99. (a) direct path, (b) copy path. The shaded column marks the
-crossover interpolated between the 1 and 4 MiB grid points; nothing was measured inside it. Regenerate with
-`python3 tools/analysis/paper_fig1.py` (reads `results/m1_report*/summary.csv`).*
+line = p50 pooled over three runs, band up to p99. (a) direct path, (b) copy path. The grey column in each panel
+spans where the M5's curve crosses the 3060 Ti's, interpolated in log–log between neighbouring grid points (min–max
+over the nine pairs of runs and both ReBAR settings); nothing was measured inside it. Regenerate with
+`python3 tools/analysis/paper_fig1.py` (reads `results/m1_report*/summary.csv` and `results/m1_crossover/crossover.csv`).*
 
 **The criterion, fixed in advance:** the M5's empty and 1 MiB round-trip p50 must be lower than both RTX cards'
 best Vulkan path by more than run-to-run noise. It fails on both cells, with and without ReBAR.
@@ -57,8 +58,14 @@ reading directly. The multimodality is also why the M5 fails the run-to-run acce
 **Where the M5 wins: payload cost.** From 4 KiB to 1 MiB the M5's `s2_direct` round trip grows only from 201
 to 305 µs. The 3060 Ti's grows from 60 to 207 µs (ReBAR on) and keeps growing linearly with payload. At 16 MiB
 the M5 is 1.7–2.8× faster on the direct path and ≈ 2.5× on the copy path. Raw copy bandwidth is ≈ 4.5× that of
-the gen3 x16 link. Between the 1 and 4 MiB grid points, log–log interpolation puts the crossover at ≈ 2.0–2.6 MiB
-per direction. Nothing was measured between those points; the §6 extension measures it.
+the gen3 x16 link. Against the 3060 Ti's best path, log–log interpolation between the 1 and 4 MiB grid points puts
+the crossover at ≈ 2.4 MiB per direction with ReBAR on (2.25–2.44 MiB over the nine pairs of runs) and ≈ 3.0 MiB
+with ReBAR off (2.78–3.06 MiB). Path by path, the curves of Fig. 1 cross at ≈ 1.6 MiB (direct path, ReBAR on),
+≈ 3.0 MiB (direct path, ReBAR off) and ≈ 1.2 MiB (copy path, both settings). Nothing was measured between 1 and
+4 MiB; the §6 extension measures it.
+<!-- results/m1_crossover/crossover.md (tools/analysis/crossover.py; idle, chain/spin). Until 2026-10-21 this said
+     "≈ 2.0–2.6 MiB", which matched only the ReBAR-on best path and is also H1′'s prediction interval; the
+     prediction itself (protocol §1) is unchanged. -->
 
 **ReBAR changes only `s2_direct`.** With ReBAR on, the CPU→GPU buffer lives in device memory, so the CPU's
 1 MiB write crosses PCIe (96 vs 33 µs), while the GPU's read pass, which `rt` excludes, becomes almost free
