@@ -3,6 +3,8 @@
 _Last updated 2026-10-21 ≈ 21:45 WIB (session 16: references into Zotero; Word manuscript with live Zotero fields; §6 draft; to-do list refreshed)._
 
 ## RESUME HERE (2026-10-21 21:45, session 16: Zotero + Word manuscript; to-do list refreshed below)
+- **Closed 22:4x WIB on the user's "call it off tonight, continue tomorrow" (via Main).** Nothing run on any device. Quiet-Mac
+  blocks tonight (TopDownBoxy, VisServe) are other projects'; Lightbound resumes tomorrow with the to-do list below.
 - **Zotero (user's rule via Main, 17:5x; LAB.md "References: Zotero + Word"):** all 18 refs.bib entries added through
   the web API to the new collection `Lightbound` (GMGWF6JT); none was in the library before (DOI/arXiv + title check),
   all 18 synced to the desktop. `tools/zotero_add.py` (rerun-safe), keys in `docs/paper/zotero_map.json`. Sun16 author
