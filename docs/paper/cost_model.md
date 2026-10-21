@@ -27,7 +27,10 @@ error as MAPE per platform, and the predicted against measured crossover K\*.
 
 ## 9.2 Payload per round trip, in agents
 
-From the buffer layouts (docs/05 §5), one round trip moves:
+From the buffer layouts, one round trip moves the bytes of Table 7.
+<!-- docs/05 §5 -->
+
+**Table 7** Bytes per round trip
 
 | direction | buffers | bytes |
 |---|---|---|

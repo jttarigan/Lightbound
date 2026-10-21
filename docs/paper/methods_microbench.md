@@ -28,7 +28,9 @@ be 2 for the copy path and 0 for the direct paths (invariant R7). Every reported
 
 Both backends implement the same thin interface: timeline objects with GPU signal and wait, CPU signal and wait,
 memory classes, GPU timestamps and clock calibration. Kernels come from a single Slang source, compiled to MSL
-and SPIR-V, with identical thread-group sizes and buffer layouts checked by a unit test (R1).
+and SPIR-V, with identical thread-group sizes and buffer layouts checked by a unit test (R1). Table 2 maps the interface to the two APIs.
+
+**Table 2** The synchronization interface on the two APIs
 
 | | Metal (M5) | Vulkan 1.3 (RTX) |
 |---|---|---|
@@ -43,6 +45,10 @@ segment submitted when its turn comes). CPU waiting is either `spin` or `block`.
 chain/spin.
 
 ## 4.3 Memory paths
+
+Table 3 lists the memory paths.
+
+**Table 3** Memory paths, per direction
 
 | path | GPU-written, CPU-read | CPU-written, GPU-read |
 |---|---|---|

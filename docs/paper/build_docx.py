@@ -374,17 +374,21 @@ def blocks_xml(lines):
                     out.append(list_para(" ".join(item), level, 1 if m.group(2) == "- " else num_id))
                     continue
                 if not lines[i].strip():
-                    # a blank line, then an indented paragraph: still inside the list
-                    j = i + 1
-                    if j < len(lines) and lines[j].startswith("  ") and lines[j].strip() and not LIST_RE.match(lines[j]):
+                    # blank lines inside a list: the next item continues it ("loose" list), and an
+                    # indented paragraph belongs to the item above
+                    j = i
+                    while j < len(lines) and not lines[j].strip():
+                        j += 1
+                    if j < len(lines) and LIST_RE.match(lines[j]):
+                        i = j
+                        continue
+                    if j < len(lines) and lines[j].startswith("  ") and not LIST_RE.match(lines[j]):
                         chunk = []
                         while j < len(lines) and lines[j].strip() and not LIST_RE.match(lines[j]):
                             chunk.append(lines[j].strip())
                             j += 1
                         out.append(para("Normal", " ".join(chunk), extra_ppr='<w:ind w:left="720"/>'))
                         i = j
-                        if i < len(lines) and not lines[i].strip() and i + 1 < len(lines) and LIST_RE.match(lines[i + 1]):
-                            i += 1
                         continue
                     break
                 break

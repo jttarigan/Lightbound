@@ -31,47 +31,38 @@
 
 ## What they establish, and the gap we fill
 
-- **Unified memory doesn't remove synchronization cost; it moves it.** Beischl26 measures this on Apple Silicon:
+- **Unified memory doesn't remove synchronization cost; it moves it.** Beischl et al. [Beischl26] measure this on Apple Silicon:
   - shared buffers get a coherence pass at kernel launch (once per newly allocated buffer, 70–120 GB/s on M4 Pro);
   - Metal kernel start-up costs 28–79 µs to encode plus 14–17 µs (M4 Pro) or 65–75 µs (M3 Ultra) to dispatch;
   - managing memory explicitly cuts per-run coherence overhead below 0.06 ms.
 
-  Wahlgren25 characterizes coherence overhead on MI300A's unified physical memory, and Spafford12 makes the same
-  trade-off argument for early AMD APUs. Our M5 data agree: the cost sits in the hand-off, not in the bytes (§5).
+  Wahlgren et al. [Wahlgren25] characterize coherence overhead on MI300A's unified physical memory, and Spafford et al. [Spafford12] make the same trade-off argument for early AMD APUs. Our M5 data agree: the cost sits in the hand-off, not in the bytes (§5).
 - **"Unified memory" means two different things.** On discrete NVIDIA GPUs it is CUDA's managed memory: one
   address space, pages migrating over PCIe on demand. Its overhead against explicit copies is well measured,
-  including in our target journal (Jarzabek17, Knap19, Yu20). Tightly coupled nodes remove the migration: Grace
-  Hopper through a coherent link and one page table (Schieffer24), MI300A and Apple's SoCs through one physical memory
-  (Wahlgren25, Huebner25, Beischl26). Our M5 is in the second group and our PCIe baseline uses explicit buffers, not
+  including in this journal [Jarzabek17, Knap19, Yu20]. Tightly coupled nodes remove the migration: Grace
+  Hopper through a coherent link and one page table [Schieffer24], MI300A and Apple's SoCs through one physical memory [Wahlgren25, Huebner25, Beischl26]. Our M5 is in the second group and our PCIe baseline uses explicit buffers, not
   CUDA UM, so the CUDA UM results are context, not a competing measurement.
-- **Copy vs zero-copy is workload-dependent** (Lumpp21 on embedded iGPUs; Spafford12). Our §6 crossover measures
+- **Copy vs zero-copy is workload-dependent**, on embedded iGPUs [Lumpp21] as on early APUs [Spafford12]. Our §6 crossover measures
   that dependence directly in payload size and GPU state, on one benchmark that runs unchanged on both platforms.
-- **Collaboration benchmarks** (GomezLuna17, Sun16) define the fine-grained CPU–GPU patterns, but they target
-  integrated architectures through OpenCL, CUDA or C++ AMP. Neither compares a unified-memory SoC with a discrete GPU
+- **Collaboration benchmarks** [GomezLuna17, Sun16] define the fine-grained CPU–GPU patterns, but they target integrated architectures through OpenCL, CUDA or C++ AMP, and Gera et al. [Gera18] characterize Intel's integrated GPU with microbenchmarks that include CPU–GPU cache sharing. Neither compares a unified-memory SoC with a discrete GPU
   on one shader source with identical buffer layouts.
-- **Apple Silicon studies** (Feng25, Huebner25, Beischl26) look at ML training, HPC kernels and databases.
-  - Feng25 already points to kernel launch time as a factor in the gap with NVIDIA.
+- **Apple Silicon studies** [Feng25, Huebner25, Beischl26] look at ML training, HPC kernels and databases.
+  - Feng et al. [Feng25] already point to kernel launch time as a factor in the gap with NVIDIA.
   - None measures repeated round trips within a real-time frame budget, or the GPU power-state effect we see in
     the CPU→GPU hand-off (§5, §6).
 
-- **Launch and dispatch overhead are known to be tens of µs, but measured one way.** Maczan26 separates the
-  marginal cost of a dispatch (24–36 µs Vulkan, 32–71 µs Metal) from the synchronization that a naive single-op
-  timing folds in (450 of 497 µs). Cassagne25 reports host-to-kernel-start latency from ≈ 5 µs (RTX 4090) to
+- **Launch and dispatch overhead are known to be tens of µs, but measured one way.** Maczan [Maczan26] separates the marginal cost of a dispatch (24–36 µs Vulkan, 32–71 µs Metal) from the synchronization that a naive single-op
+  timing folds in (450 of 497 µs). Cassagne et al. [Cassagne25] report host-to-kernel-start latency from ≈ 5 µs (RTX 4090) to
   35–40 µs (Intel iGPUs). Both measure the CPU→GPU direction only. Our round trip is exactly the part they exclude:
   the full hand-off in both directions, repeated within a frame, which is what a game pays for each K.
-- **GPU power-state transitions are slow and vendor-specific.** Velicka25 measures DVFS switching latency on
-  data-centre NVIDIA GPUs. We found no study of idle-state exit latency, on Apple or NVIDIA. So §5/§6 can only say
+- **GPU power-state transitions are slow and vendor-specific.** Velicka et al. [Velicka25, Velicka26] measure DVFS switching latency on data-centre NVIDIA GPUs and find that it differs widely between GPUs. We found no study of idle-state exit latency, on Apple or NVIDIA. So Sects. 5 and 6 can only say
   the multimodal M5 hand-off is "consistent with" a power-state effect, and the hot-GPU cells test that reading
   directly.
-- **Workload side.** Hybrid CPU+GPU crowd simulation exists as an HPC problem (Skrzypczak23: load balancing over
-  10k–1M agents, throughput-oriented). Real-time swarms with CPU-side decisions inside a 16.7 ms frame are not
+- **Workload side.** Hybrid CPU+GPU crowd simulation exists as an HPC problem [Skrzypczak23]: load balancing over 10k–1M agents, throughput-oriented. Real-time swarms with CPU-side decisions inside a 16.7 ms frame are not
   studied there.
 
-**Gap (to state carefully, "we are not aware of"):** this search found no peer-reviewed measurement of
-fine-grained, multiple-per-frame CPU–GPU round trips that compares a unified-memory SoC with PCIe GPUs on
-identical algorithms, ties the result to a game workload, or studies ReBAR's effect on the CPU→GPU write path.
-ReBAR coverage found so far is consumer game benchmarks only (TechPowerUp, Guru3D, PCGH), which is not citable as
-evidence.
+**Gap.** We are not aware of a peer-reviewed measurement of fine-grained, multiple-per-step CPU–GPU round trips that compares a shared-memory SoC with PCIe GPUs on identical algorithms, ties the result to a real-time agent workload, or studies ReBAR's effect on the CPU→GPU write path. The ReBAR measurements we found are consumer game benchmarks, not controlled latency studies.
+<!-- Search notes: "we are not aware of" is deliberate; ReBAR coverage found = TechPowerUp, Guru3D, PCGH (not citable). -->
 
 ## Search status (2026-10-17)
 

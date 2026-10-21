@@ -50,7 +50,8 @@ checked 2026-10-18; Springer Nature policy pages for AI and preprints, same day)
   **Lab rule (user, 2026-10-21, LAB.md "References: Zotero + Word"): the manuscript is Word with live Zotero
   fields** (Word is accepted here), so the sn-jnl LaTeX plan of 10-18 is replaced. References live in the Zotero
   collection `Lightbound` (GMGWF6JT; added by `tools/zotero_add.py`, keys in `zotero_map.json`); the Word build
-  adapts NPUBenchSwarm's `build_docx.py` to Springer's Word template, done only once the user's Zotero Refresh works.
+  is `docs/paper/build_docx.py` → `lightbound_jsc.docx` (plain Word document, Springer basic numeric style; 10-21),
+  counted as done only once the user's Zotero Refresh works on it.
 - **References:** numbered in square brackets in citation order, cited and published/accepted works only, full DOI
   links, LTWA journal abbreviations. arXiv preprints may be cited (Springer Nature preprint policy).
 - **Title page:** title, author names, affiliations and addresses, corresponding author's e-mail, telephone (fax).

@@ -23,7 +23,9 @@ Every frame therefore needs at least one GPU→CPU→GPU round trip, and better 
 
 ## 7.2 One frame
 
-Per simulation tick (60 Hz fixed step; in bench mode one tick per rendered frame, vsync off):
+Per simulation tick (60 Hz fixed step; in bench mode one tick per rendered frame, vsync off), the passes are those of Table 5.
+
+**Table 5** The passes of one simulation step
 
 | pass | where | work |
 |---|---|---|
@@ -44,7 +46,9 @@ This gives the game a natural reason to pay for more round trips, rather than an
 ## 7.3 Strategies
 
 The game code receives `const Perception*` and writes `Intent*`, and never knows how they were supplied
-(invariant R2). The orchestrator implements four strategies:
+(invariant R2). The orchestrator implements four strategies (Table 6).
+
+**Table 6** Transfer strategies
 
 | | name | data path | round trips per frame |
 |---|---|---|---|

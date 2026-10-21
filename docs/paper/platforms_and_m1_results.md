@@ -6,6 +6,8 @@
 
 ## §3 Platforms
 
+**Table 1** The two platforms
+
 | | P-M5 | P-3060 |
 |---|---|---|
 | system | MacBook Air 15" (Mac17,4), fanless | desktop, MSI MS-B9241 board |
@@ -30,11 +32,12 @@ For H5's link-width comparison, both RTX cards run in the same slot (x16 vs x8, 
 **Fig. 1** *CPU↔GPU round trip against payload per direction, GPU otherwise idle, chain submission, spin wait;
 line = p50 pooled over three runs, band up to p99. (a) direct path, (b) copy path. The grey column in each panel
 spans where the M5's curve crosses the 3060 Ti's, interpolated in log–log between neighbouring grid points (min–max
-over the nine pairs of runs and both ReBAR settings); nothing was measured inside it. Regenerate with
-`python3 tools/analysis/paper_fig1.py` (reads `results/m1_report*/summary.csv` and `results/m1_crossover/crossover.csv`).*
+over the nine pairs of runs and both ReBAR settings); nothing was measured inside it.*
+<!-- Regenerate with `python3 tools/analysis/paper_fig1.py` (reads `results/m1_report*/summary.csv` and `results/m1_crossover/crossover.csv`). -->
 
-**The criterion, fixed in advance:** the M5's empty and 1 MiB round-trip p50 must be lower than both RTX cards'
-best Vulkan path by more than run-to-run noise. It fails on both cells, with and without ReBAR.
+**The criterion, fixed in advance:** the M5's empty and 1 MiB round-trip p50 must be lower than both RTX cards' best Vulkan path by more than run-to-run noise. It fails on both cells, with and without ReBAR (Table 4).
+
+**Table 4** Round trip p50 / p99 in µs with the GPU idle (chain submission, spin wait, three runs pooled), and raw copy bandwidth
 
 | | M5 (shared memory) | 3060 Ti, ReBAR on | 3060 Ti, ReBAR off |
 |---|---:|---:|---:|

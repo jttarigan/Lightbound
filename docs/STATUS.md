@@ -1,6 +1,6 @@
 # Work status (resume here)
 
-_Last updated 2026-10-21 ≈ 18:05 WIB (session 16: references into Zotero)._
+_Last updated 2026-10-21 ≈ 21:15 WIB (session 16: references into Zotero; Word manuscript with live Zotero fields built)._
 
 ## 2026-10-21 ≈ 18:05 (session 16)
 - **Zotero (user's rule via Main, 17:5x; LAB.md "References: Zotero + Word"):** all 18 refs.bib entries added through
@@ -11,6 +11,19 @@ _Last updated 2026-10-21 ≈ 18:05 WIB (session 16: references into Zotero)._
   Timing: tomorrow daytime, or after the quiet block if the user wants it tonight.
 - **Quiet-Mac block 19:00–≈ 21:45 WIB tonight** (Main): no builds or CPU-heavy work then.
 
+- **20:45–21:1x (user via Main: non-measurement work, no asking): Word manuscript BUILT.** `docs/paper/build_docx.py`
+  assembles the drafts in OUTLINE order into **`docs/paper/lightbound_jsc.docx`** (committed): 21 live ZOTERO_ITEM fields,
+  one ZOTERO_BIBL field with all 18 references in citation order (Springer basic numeric style, `springer-basic-brackets`),
+  Zotero document prefs, Fig. 1 embedded, 7 table captions added to the drafts, placeholders for §6/§8/§10/§11/§13 and a
+  Declarations block. `zotero_refs.json` = CSL data + rendered entries from the **web API** (`--sync`; the desktop app's
+  local API was down at 20:5x, so the build does not depend on it). related_work.md prose now cites all 18 with [Key]
+  brackets (Gera18 and Velicka26 added). Smoke test: every part parses, `textutil` reads the file. **Not yet opened in
+  Word** (no GUI from this session while the user play-tests).
+- **Open asks for the user (new, paper):** (8) open `docs/paper/lightbound_jsc.docx` in Word and run Zotero → Refresh: if the
+  citations renumber and the list re-renders, the build counts as done; (9) title page is prefilled from the NPUBenchSwarm
+  manuscript (name, USU affiliation) with e-mail/telephone placeholders: confirm; (10) reference style: Springer basic
+  prints no DOI for conference papers and no arXiv id for preprints; pick another Springer style in Zotero or accept;
+  (11) the cost-model formula is a monospaced block, not a Word equation (polish pass).
 ## RESUME HERE (2026-10-21 ≈ 09:25, session 15)
 - **Solo work done (Main's relay 09:15: user busy; solo only, no devices, no Mac runs, no push).** Commits:
   1. `0e7abb4` results/m1_mac_40w_check committed (git add -f; the pmset sleep/wake log stays local, public repo) +
