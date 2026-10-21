@@ -1,8 +1,8 @@
 # Work status (resume here)
 
-_Last updated 2026-10-21 ≈ 21:15 WIB (session 16: references into Zotero; Word manuscript with live Zotero fields built)._
+_Last updated 2026-10-21 ≈ 21:45 WIB (session 16: references into Zotero; Word manuscript with live Zotero fields; §6 draft; to-do list refreshed)._
 
-## 2026-10-21 ≈ 18:05 (session 16)
+## RESUME HERE (2026-10-21 21:45, session 16: Zotero + Word manuscript; to-do list refreshed below)
 - **Zotero (user's rule via Main, 17:5x; LAB.md "References: Zotero + Word"):** all 18 refs.bib entries added through
   the web API to the new collection `Lightbound` (GMGWF6JT); none was in the library before (DOI/arXiv + title check),
   all 18 synced to the desktop. `tools/zotero_add.py` (rerun-safe), keys in `docs/paper/zotero_map.json`. Sun16 author
@@ -26,7 +26,7 @@ _Last updated 2026-10-21 ≈ 21:15 WIB (session 16: references into Zotero; Word
   manuscript (name, USU affiliation) with e-mail/telephone placeholders: confirm; (10) reference style: Springer basic
   prints no DOI for conference papers and no arXiv id for preprints; pick another Springer style in Zotero or accept;
   (11) the cost-model formula is a monospaced block, not a Word equation (polish pass).
-## RESUME HERE (2026-10-21 ≈ 09:25, session 15)
+## 2026-10-21 ≈ 09:25–16:30 (session 15)
 - **Solo work done (Main's relay 09:15: user busy; solo only, no devices, no Mac runs, no push).** Commits:
   1. `0e7abb4` results/m1_mac_40w_check committed (git add -f; the pmset sleep/wake log stays local, public repo) +
      **`tools/rusage_wrap.py`** (runs a command, reads its exit rusage RUSAGE_INFO_V6 without root: P-core share, P/E GHz,
