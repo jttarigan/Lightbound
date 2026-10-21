@@ -1,6 +1,15 @@
 # Work status (resume here)
 
-_Last updated 2026-10-21 ≈ 15:30 WIB (session 15: solo stretch, then the launch-context retest 12:53–12:58: ruled out)._
+_Last updated 2026-10-21 ≈ 18:05 WIB (session 16: references into Zotero)._
+
+## 2026-10-21 ≈ 18:05 (session 16)
+- **Zotero (user's rule via Main, 17:5x; LAB.md "References: Zotero + Word"):** all 18 refs.bib entries added through
+  the web API to the new collection `Lightbound` (GMGWF6JT); none was in the library before (DOI/arXiv + title check),
+  all 18 synced to the desktop. `tools/zotero_add.py` (rerun-safe), keys in `docs/paper/zotero_map.json`. Sun16 author
+  fixed to McCardwell. **Next: the Word build** (adapt NPUBenchSwarm's `build_docx.py` to Springer's Word template,
+  ≈ 1.5–2 h; replaces the sn-jnl LaTeX plan, OUTLINE updated); done only after the user's Zotero Refresh in Word works.
+  Timing: tomorrow daytime, or after the quiet block if the user wants it tonight.
+- **Quiet-Mac block 19:00–≈ 21:45 WIB tonight** (Main): no builds or CPU-heavy work then.
 
 ## RESUME HERE (2026-10-21 ≈ 09:25, session 15)
 - **Solo work done (Main's relay 09:15: user busy; solo only, no devices, no Mac runs, no push).** Commits:

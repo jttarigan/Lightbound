@@ -47,6 +47,10 @@ checked 2026-10-18; Springer Nature policy pages for AI and preprints, same day)
 - **Format:** LaTeX preferred (Word accepted), **Springer Nature LaTeX template** (`sn-jnl` class; the page links
   the `sn-basic.bst` reference style) from springernature.com/gp/authors/campaigns/latex-author-support. The full
   editable source is required at every submission and revision, **flat: no subfolders** (figures and .bib included).
+  **Lab rule (user, 2026-10-21, LAB.md "References: Zotero + Word"): the manuscript is Word with live Zotero
+  fields** (Word is accepted here), so the sn-jnl LaTeX plan of 10-18 is replaced. References live in the Zotero
+  collection `Lightbound` (GMGWF6JT; added by `tools/zotero_add.py`, keys in `zotero_map.json`); the Word build
+  adapts NPUBenchSwarm's `build_docx.py` to Springer's Word template, done only once the user's Zotero Refresh works.
 - **References:** numbered in square brackets in citation order, cited and published/accepted works only, full DOI
   links, LTWA journal abbreviations. arXiv preprints may be cited (Springer Nature preprint policy).
 - **Title page:** title, author names, affiliations and addresses, corresponding author's e-mail, telephone (fax).
@@ -80,7 +84,7 @@ staleness of frame-delayed readback (H4).
 |---|---|---|---|
 | — | Abstract & keywords | **draft 1:** `abstract.md` (143 / 150 words, 6 keywords, 10-18) | §6 crossover and §9 model numbers |
 | 1 | Introduction | **draft 2:** `introduction.md` (J. Supercomputing framing, 10-17; provisional contributions, placeholders) | contribution list is final after the crossover runs |
-| 2 | Background & related work | **draft:** `related_work.md` (18 sources incl. J. Supercomputing CUDA-UM papers and Grace Hopper; search status per topic, 10-17) | full-text checks before submission; BibTeX for all 18 in `refs.bib` (10-18) |
+| 2 | Background & related work | **draft:** `related_work.md` (18 sources incl. J. Supercomputing CUDA-UM papers and Grace Hopper; search status per topic, 10-17) | full-text checks before submission; BibTeX for all 18 in `refs.bib` (10-18); all 18 in Zotero collection `Lightbound` (10-21) |
 | 3 | Platforms | **draft:** `platforms_and_m1_results.md` | P-4060 (November) |
 | 4 | Microbenchmark method | **draft:** `methods_microbench.md` | — |
 | 5 | M1 results, idle GPU: the refuted H1 | **draft:** `platforms_and_m1_results.md` (data final, figure 1 embedded) | — |
