@@ -1,6 +1,6 @@
 # Work status (resume here)
 
-_Last updated 2026-10-21 ≈ 13:00 WIB (session 15: solo stretch, then the launch-context retest 12:53–12:58: ruled out)._
+_Last updated 2026-10-21 ≈ 15:30 WIB (session 15: solo stretch, then the launch-context retest 12:53–12:58: ruled out)._
 
 ## RESUME HERE (2026-10-21 ≈ 09:25, session 15)
 - **Solo work done (Main's relay 09:15: user busy; solo only, no devices, no Mac runs, no push).** Commits:
@@ -27,8 +27,8 @@ _Last updated 2026-10-21 ≈ 13:00 WIB (session 15: solo stretch, then the launc
   attempt was gated out (Unity play-test, GPU 45 %), see `precheck_1021_1114.log`. **Ext series still blocked** (the shift
   stays). Next needs the user: what else changed on the Mac between 09-24 and 10-17? Optional code test (ask first): the
   bench thread sets QOS_CLASS_USER_INTERACTIVE (or logs per-thread counters) to see if P-core placement restores 09-24.
-- **Open asks for the user:** (1) ~~the 8-min Mac slot~~ done; new: what changed on the Mac 09-24 → 10-17, and OK for the QoS code test?; (2) did the 10-19 PC run happen; (3) M2 review; (4) push the
-  local commits (17 ahead of origin); (5) paper: AI-use wording, title-page data, Zenodo DOI; (6) new: the ReBAR-off
+- **Open asks for the user:** (1) ~~the 8-min Mac slot~~ done; new: what changed on the Mac 09-24 → 10-17, and OK for the QoS code test?; (2) the PC: per Main (10-21 ≈ 15:30 WIB) the 10-19 PC session most likely never happened (GitHub: pc/m0-m1 still c593742, main f97f48d; NeonTide's PC run still pending; NeonSwarm itself says it has not trained on the PC since 10-19: its PC flow first needs the user to push its pc-training branch, which hasn't happened; only the user can rule out a run started by hand); update (Main, 16:20): NeonTide's PC results show a PC session DID run on 10-20 12:02–12:11 WIB (the PC's logs print UTC labelled as WIB), driver still 566.36; whether m1_3060_ext ran in it, and GPU_HOLD.txt, still unknown; Main put it on one PC checklist for the user, so hold PC plans until they answer; (3) M2 review; (4) push the
+  local commits (19 ahead of origin); (5) paper: AI-use wording, title-page data, Zenodo DOI; (6) new: the ReBAR-off
   crossover (≈ 112k agents) lies beyond the N grid 1k–100k: extend the grid later (M4/M8)? (7) new, only if the retest
   does not restore the 09-24 levels: how the paper handles the spin-wait shift (§12.2 item 5 comment).
 
