@@ -206,7 +206,7 @@ No phones or tablets are needed.
    flag, off by default, R1-neutral)? Then **[solo]** the change + **[device: Mac AC, ≈ 8 min, Main slot]** retest with
    `lc3.sh`. If the 09-24 levels come back, 3 can run; if not, **[user]** decides how the paper handles the shift
    (re-measure the idle reference in the present state, or report both; §12.2 item 5 comment).
-3. **[device: Mac on AC, ≈ 70 min, unattended, Mac otherwise quiet]** **[device: Mac on AC, ≈ 70 min, unattended, Mac otherwise quiet]** extension series `results/m1_mac_ext` (idle + hot,
+3. **[device: Mac on AC, ≈ 70 min, unattended, Mac otherwise quiet]** extension series `results/m1_mac_ext` (idle + hot,
    12 payloads; command in `docs/M1_RESCOPE_PROPOSAL.md` §4): charger, lid open, Low Power Mode off, `caffeinate -is`; no
    other session may run GPU work, builds or heavy jobs meanwhile. Needs a slot from Main when the Mac is quiet (evening/night,
    not during another project's quiet-Mac run; Main queued it for 10-16 evening after RTBench, exact time from Main). M2 work
@@ -216,7 +216,7 @@ No phones or tablets are needed.
    32023.921 before and after, the OS is unchanged, and the cache pins no SDK path. Builds after 10:14 use Apple clang 21.0.0
    (Xcode 27.1); a plain incremental build still works. Record both facts in the run log.
 4. **[user] PC checklist (Main, 10-21):** did `m1_3060_ext` run in the 10-20 PC session; is `C:\dev\GPU_HOLD.txt` gone; driver
-   still 566.36? Then, if it did not run, **[device: Windows PC, ≈ 3 h, unattended]** **[device: Windows PC, ≈ 3 h, unattended]** the same series on the 3060 Ti (`results\m1_3060_ext`), after the PC Claude
+   still 566.36? Then, if it did not run, **[device: Windows PC, ≈ 3 h, unattended]** the same series on the 3060 Ti (`results\m1_3060_ext`), after the PC Claude
    fast-forwards and rebuilds. Nothing on the PC during the first ≈ 4 min. **The PC is shared with NeonSwarm training
    since 10-17** (Main): every PC step is wrapped in the hold file `C:\dev\GPU_HOLD.txt` (create → wait ≤ 10 min for no
    python in nvidia-smi → build/ctest → 10-min cooldown → measure → push → delete); the PC message's 10-17 update has the
@@ -231,7 +231,7 @@ No phones or tablets are needed.
    the style/DOI fix, rebuild (`python3 docs/paper/build_docx.py`, `--sync` after any Zotero edit).
 7. **[user] Paper decisions:** AI-use declaration wording (Springer: in Methods), Zenodo DOI or not, extend the N grid beyond
    100k for the ReBAR-off crossover (≈ 112k agents)?
-8. **4060 Ti step D, November** (the user's date). **4060 Ti step D, November** (the user's date). **[user]** installs it in the i7-12700F PC, same slot (protocol §2; if it goes
+8. **4060 Ti step D, November** (the user's date). **[user]** installs it in the i7-12700F PC, same slot (protocol §2; if it goes
    into another PC, ask before planning). **[device: Windows PC, exclusive, ≈ 3 days unattended]** step D as written
    (`results\m1_4060`), then optionally `m1_4060_ext`. **[solo, ≈ 1 h]** merge and add P-4060 to the combined report.
 9. **[user] Push** the local commits (25 ahead of origin at 21:40).
