@@ -508,22 +508,25 @@ def styles_xml():
     font = lambda f: f'<w:rFonts w:ascii="{f}" w:hAnsi="{f}" w:cs="{f}" w:eastAsia="{f}"/>'
     size = lambda pt: f'<w:sz w:val="{int(pt * 2)}"/><w:szCs w:val="{int(pt * 2)}"/>'
     sp = lambda before=0, after=120, line=240: f'<w:spacing w:before="{before}" w:after="{after}" w:line="{line}" w:lineRule="auto"/>'
+    # element order inside pPr (keepNext, keepLines, spacing, ind, contextualSpacing, jc, outlineLvl) and
+    # rPr (rFonts, b, i, sz) follows the schema; Word reports out-of-order parts as unreadable
+    keep = "<w:keepNext/><w:keepLines/>"
     s = [style("Normal", "Normal", default=True, ppr=sp(), rpr=font("Times New Roman") + size(11)),
-         style("Title", "Title", ppr=sp(0, 240) + '<w:keepNext/>', rpr=size(16) + "<w:b/><w:bCs/>"),
+         style("Title", "Title", ppr="<w:keepNext/>" + sp(0, 240), rpr="<w:b/><w:bCs/>" + size(16)),
          style("Author", "Author", ppr=sp(0, 60), rpr=size(12)),
-         style("Affiliation", "Affiliation", ppr=sp(0, 60), rpr=size(10) + "<w:i/><w:iCs/>"),
+         style("Affiliation", "Affiliation", ppr=sp(0, 60), rpr="<w:i/><w:iCs/>" + size(10)),
          style("Abstract", "Abstract", ppr=sp(0, 120) + '<w:ind w:left="567" w:right="567"/>', rpr=size(10.5)),
          style("Keywords", "Keywords", ppr=sp(0, 240) + '<w:ind w:left="567" w:right="567"/>', rpr=size(10.5)),
-         style("Heading1", "heading 1", ppr=sp(360, 120) + "<w:keepNext/><w:keepLines/><w:outlineLvl w:val=\"0\"/>",
-               rpr=size(13) + "<w:b/><w:bCs/>"),
-         style("Heading2", "heading 2", ppr=sp(240, 120) + "<w:keepNext/><w:keepLines/><w:outlineLvl w:val=\"1\"/>",
-               rpr=size(11.5) + "<w:b/><w:bCs/>"),
-         style("Heading3", "heading 3", ppr=sp(200, 80) + "<w:keepNext/><w:keepLines/><w:outlineLvl w:val=\"2\"/>",
-               rpr=size(11) + "<w:b/><w:bCs/><w:i/><w:iCs/>"),
+         style("Heading1", "heading 1", ppr=keep + sp(360, 120) + '<w:outlineLvl w:val="0"/>',
+               rpr="<w:b/><w:bCs/>" + size(13)),
+         style("Heading2", "heading 2", ppr=keep + sp(240, 120) + '<w:outlineLvl w:val="1"/>',
+               rpr="<w:b/><w:bCs/>" + size(11.5)),
+         style("Heading3", "heading 3", ppr=keep + sp(200, 80) + '<w:outlineLvl w:val="2"/>',
+               rpr="<w:b/><w:bCs/><w:i/><w:iCs/>" + size(11)),
          style("ListParagraph", "List Paragraph", ppr=sp(0, 60) + '<w:contextualSpacing/>'),
-         style("Caption", "caption", ppr=sp(120, 60) + "<w:keepNext/>", rpr=size(10)),
+         style("Caption", "caption", ppr="<w:keepNext/>" + sp(120, 60), rpr=size(10)),
          style("FigureCaption", "Figure Caption", ppr=sp(60, 240), rpr=size(10)),
-         style("Figure", "Figure", ppr=sp(120, 0) + '<w:keepNext/><w:jc w:val="center"/>'),
+         style("Figure", "Figure", ppr="<w:keepNext/>" + sp(120, 0) + '<w:jc w:val="center"/>'),
          style("TableCell", "Table Cell", ppr=sp(20, 20), rpr=size(9.5)),
          style("Spacer", "Spacer", ppr=sp(0, 0), rpr=size(4)),
          style("Code", "Code", ppr=sp(0, 0) + '<w:ind w:left="567"/><w:contextualSpacing/>',
@@ -580,7 +583,7 @@ def zotero_custom_xml():
                     for n, c in enumerate(chunks))
     return ('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Properties '
             'xmlns="http://schemas.openxmlformats.org/officeDocument/2006/custom-properties" '
-            'xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docProps/VTypes">' + props + '</Properties>')
+            'xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes">' + props + '</Properties>')
 
 
 CONTENT_TYPES = ('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
