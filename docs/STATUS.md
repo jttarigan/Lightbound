@@ -195,13 +195,18 @@ _Last updated 2026-10-21 ≈ 21:15 WIB (session 16: references into Zotero; Word
   Calibration stats (seeds 1..200 per depth): open fraction p50 21.4 → 23.5 %, re-rolls ≈ 7 % of floors (rule 5 dark
   stretches, puzzle search, rule 6).
 
-## To-do (2026-10-16, in order)
+## To-do (refreshed 2026-10-21 21:40; order = dependency order)
 Tags: **[solo]** = this session, unattended; **[device: X, ~time]** = needs a machine; **[user]** = the human's hands or a decision.
 No phones or tablets are needed.
 
-1. **[user] Review M2** (`docs/img/floors/*.png`, DECISIONS #34). M2's [PC] check rides along with to-do 3. M3 (headless
+1. **[user] Review M2** (`docs/img/floors/*.png`, DECISIONS #34). M2's [PC] golden check rides along with to-do 4. M3 (headless
    simulation core) is next after M2 is accepted.
-2. **[device: Mac on AC, ≈ 70 min, unattended, Mac otherwise quiet]** extension series `results/m1_mac_ext` (idle + hot,
+2. **[user, then solo] The M5 spin-wait shift** (§12.2 item 5; `results/m1_mac_40w_check/`): (a) what else changed on the Mac
+   between 2026-09-24 and 10-17? (b) OK for a code test in which the bench thread sets `QOS_CLASS_USER_INTERACTIVE` (behind a
+   flag, off by default, R1-neutral)? Then **[solo]** the change + **[device: Mac AC, ≈ 8 min, Main slot]** retest with
+   `lc3.sh`. If the 09-24 levels come back, 3 can run; if not, **[user]** decides how the paper handles the shift
+   (re-measure the idle reference in the present state, or report both; §12.2 item 5 comment).
+3. **[device: Mac on AC, ≈ 70 min, unattended, Mac otherwise quiet]** **[device: Mac on AC, ≈ 70 min, unattended, Mac otherwise quiet]** extension series `results/m1_mac_ext` (idle + hot,
    12 payloads; command in `docs/M1_RESCOPE_PROPOSAL.md` §4): charger, lid open, Low Power Mode off, `caffeinate -is`; no
    other session may run GPU work, builds or heavy jobs meanwhile. Needs a slot from Main when the Mac is quiet (evening/night,
    not during another project's quiet-Mac run; Main queued it for 10-16 evening after RTBench, exact time from Main). M2 work
@@ -210,25 +215,28 @@ No phones or tablets are needed.
    Provenance: built 10-16 08:37 WIB, before Xcode auto-updated to 27.1 at 10:14 (Main's notice); `xcrun metal` is
    32023.921 before and after, the OS is unchanged, and the cache pins no SDK path. Builds after 10:14 use Apple clang 21.0.0
    (Xcode 27.1); a plain incremental build still works. Record both facts in the run log.
-3. **[user]** carry `~/Desktop/lightbound-main-2026-10-13.bundle` (rebuilt 10-16 at 364ffbf: decisions + M2) and
-   `docs/PC_MESSAGE_2026-10-13.md` to the PC and start the PC Claude on the message. (Bundle rebuilt again 10-17 for
-   the hold-file update below; the 10-16 copy is outdated.) **Since 10-17 20:3x WIB main is on GitHub (559c377)**, so the
-   PC can `git fetch origin main` instead; the bundle is the fallback. **The user halted the PC run until Mon 10-19**
-   (at the office).
-4. **[device: Windows PC, ≈ 3 h, unattended]** the same series on the 3060 Ti (`results\m1_3060_ext`), after the PC Claude
+4. **[user] PC checklist (Main, 10-21):** did `m1_3060_ext` run in the 10-20 PC session; is `C:\dev\GPU_HOLD.txt` gone; driver
+   still 566.36? Then, if it did not run, **[device: Windows PC, ≈ 3 h, unattended]** **[device: Windows PC, ≈ 3 h, unattended]** the same series on the 3060 Ti (`results\m1_3060_ext`), after the PC Claude
    fast-forwards and rebuilds. Nothing on the PC during the first ≈ 4 min. **The PC is shared with NeonSwarm training
    since 10-17** (Main): every PC step is wrapped in the hold file `C:\dev\GPU_HOLD.txt` (create → wait ≤ 10 min for no
    python in nvidia-smi → build/ctest → 10-min cooldown → measure → push → delete); the PC message's 10-17 update has the
    steps, and the run log records whether training ran that day.
-5. **[solo, ≈ 1 h]** after 2 and 4: fetch, report both with `micro_report.py` (`gpuload` column), compute the crossover per GPU
-   state with its run-to-run spread, compare with the H1′ predictions.
+5. **[solo, ≈ 1 h]** after 3 and 4: fetch, report both with `micro_report.py` (`gpuload` column), compute the crossover per GPU
+   state with its run-to-run spread, compare with the H1′ predictions, write §6.3 + Fig. 2, fill the §1/abstract placeholders.
    **Tool ready (10-21):** `python3 tools/analysis/crossover.py M5=results/m1_mac_ext 3060=results/m1_3060_ext --shared M5
    --modes all --out results/crossover_ext` (writes crossover.md with the H1′ verdicts; M1 preview in `results/m1_crossover/`).
-6. **4060 Ti step D, November** (the user's date). **[user]** installs it in the i7-12700F PC, same slot (protocol §2; if it goes
+6. **[user] Word manuscript check:** open `docs/paper/lightbound_jsc.docx` in Word, Zotero → Refresh (citations renumber, list
+   re-renders → the build counts as done); confirm the prefilled title page; choose the reference style (Springer basic prints no
+   DOI for conference papers and no arXiv id for preprints). Then **[solo]** polish: the cost-model formula as a Word equation,
+   the style/DOI fix, rebuild (`python3 docs/paper/build_docx.py`, `--sync` after any Zotero edit).
+7. **[user] Paper decisions:** AI-use declaration wording (Springer: in Methods), Zenodo DOI or not, extend the N grid beyond
+   100k for the ReBAR-off crossover (≈ 112k agents)?
+8. **4060 Ti step D, November** (the user's date). **4060 Ti step D, November** (the user's date). **[user]** installs it in the i7-12700F PC, same slot (protocol §2; if it goes
    into another PC, ask before planning). **[device: Windows PC, exclusive, ≈ 3 days unattended]** step D as written
    (`results\m1_4060`), then optionally `m1_4060_ext`. **[solo, ≈ 1 h]** merge and add P-4060 to the combined report.
-7. ~~Pushing~~ **done 10-17 evening**: SSH port 22 worked again (Main checked 20:29 WIB); pushed main baf605a..559c377 and
-   `mac/narrow-link` (new branch on origin).
+9. **[user] Push** the local commits (25 ahead of origin at 21:40).
+10. ~~Carry the bundle / PC message to the PC~~ superseded by 4 (main is on GitHub since 10-17; the bundle is the fallback).
+    ~~Pushing~~ done 10-17 evening (main baf605a..559c377 and `mac/narrow-link`).
 
 ## State
 
