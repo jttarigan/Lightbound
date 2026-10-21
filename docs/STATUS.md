@@ -28,7 +28,7 @@ _Last updated 2026-10-21 ≈ 13:00 WIB (session 15: solo stretch, then the launc
   stays). Next needs the user: what else changed on the Mac between 09-24 and 10-17? Optional code test (ask first): the
   bench thread sets QOS_CLASS_USER_INTERACTIVE (or logs per-thread counters) to see if P-core placement restores 09-24.
 - **Open asks for the user:** (1) ~~the 8-min Mac slot~~ done; new: what changed on the Mac 09-24 → 10-17, and OK for the QoS code test?; (2) did the 10-19 PC run happen; (3) M2 review; (4) push the
-  local commits (18 ahead of origin); (5) paper: AI-use wording, title-page data, Zenodo DOI; (6) new: the ReBAR-off
+  local commits (17 ahead of origin); (5) paper: AI-use wording, title-page data, Zenodo DOI; (6) new: the ReBAR-off
   crossover (≈ 112k agents) lies beyond the N grid 1k–100k: extend the grid later (M4/M8)? (7) new, only if the retest
   does not restore the 09-24 levels: how the paper handles the spin-wait shift (§12.2 item 5 comment).
 
