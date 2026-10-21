@@ -542,7 +542,8 @@ def styles_xml():
 def numbering_xml():
     lvl = lambda i, fmt, text, left: (f'<w:lvl w:ilvl="{i}"><w:start w:val="1"/><w:numFmt w:val="{fmt}"/>'
                                       f'<w:lvlText w:val="{text}"/><w:lvlJc w:val="left"/>'
-                                      f'<w:pPr><w:ind w:left="{left}" w:hanging="360"/></w:pPr></w:lvl>')
+                                      f'<w:pPr><w:tabs><w:tab w:val="num" w:pos="{left}"/></w:tabs>'
+                                      f'<w:ind w:left="{left}" w:hanging="360"/></w:pPr></w:lvl>')
     bullets = ('<w:abstractNum w:abstractNumId="0"><w:multiLevelType w:val="hybridMultilevel"/>'
                + lvl(0, "bullet", "•", 720) + lvl(1, "bullet", "–", 1440) + "</w:abstractNum>")
     decimal = ('<w:abstractNum w:abstractNumId="1"><w:multiLevelType w:val="hybridMultilevel"/>'
