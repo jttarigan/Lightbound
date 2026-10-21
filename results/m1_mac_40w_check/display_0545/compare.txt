@@ -1,0 +1,47 @@
+rt_us p50, median over runs
+                                         ref_0924 (Terminal, full wake?)  0232 dark wake, ultrawide on  0545 full wake, internal only awake  0545 full wake, all asleep (incl. run 1)
+path      submit  cpuwait payload_bytes                                                                                                                                              
+s1_copy   chain   block   4096                                     215.0                         212.0                                226.0                                     226.0
+                          1048576                                  352.0                         216.0                                229.0                                     228.0
+                  spin    4096                                     291.0                         398.0                                463.0                                     496.0
+                          1048576                                  352.0                         575.0                                573.0                                     577.0
+          perpass block   4096                                     223.0                         220.0                                228.0                                     232.0
+                          1048576                                  348.0                         208.0                                218.0                                     219.0
+                  spin    4096                                     220.0                         440.0                                474.0                                     502.0
+                          1048576                                  352.0                         563.0                                581.0                                     593.0
+s2_direct chain   block   4096                                     198.0                         199.0                                206.0                                     204.0
+                          1048576                                  306.0                         205.0                                217.0                                     222.0
+                  spin    4096                                     201.0                         384.0                                451.0                                     473.0
+                          1048576                                  304.0                         507.0                                507.0                                     512.0
+          perpass block   4096                                     201.0                         200.0                                209.0                                     209.0
+                          1048576                                  304.0                         198.0                                212.0                                     218.0
+                  spin    4096                                     203.0                         300.0                                457.0                                     469.0
+                          1048576                                  305.0                         508.0                                500.0                                     517.0
+
+spin delta vs ref_0924
+                                 ref_0924 (Terminal, full wake?)  0232 dark wake, ultrawide on  0545 full wake, internal only awake  0545 full wake, all asleep (incl. run 1)
+path      submit  payload_bytes                                                                                                                                              
+s1_copy   chain   4096                                       0.0                         107.0                                172.0                                     205.0
+                  1048576                                    0.0                         223.0                                221.0                                     225.0
+          perpass 4096                                       0.0                         220.0                                253.0                                     282.0
+                  1048576                                    0.0                         210.0                                228.0                                     240.0
+s2_direct chain   4096                                       0.0                         183.0                                250.0                                     272.0
+                  1048576                                    0.0                         203.0                                203.0                                     208.0
+          perpass 4096                                       0.0                          97.0                                254.0                                     266.0
+                  1048576                                    0.0                         203.0                                195.0                                     212.0
+
+legs, s1_copy chain, ref_0924 (Terminal, full wake?)
+                       rt_us  c2g_us  g2c_us  cpu_read_us  cpu_write_us  copy_g2c_us  copy_c2g_us
+cpuwait payload_bytes                                                                            
+block   4096           216.0   162.0    59.0          0.0           0.0          5.0          5.0
+        1048576        349.0   222.0    94.0         13.0          15.0         19.0         21.0
+spin    4096           292.0   241.0    52.0          0.0           0.0          5.0          5.0
+        1048576        352.0   238.0    85.0         14.0          15.0         19.0         21.0
+
+legs, s1_copy chain, 0545 full wake, internal only awake
+                       rt_us  c2g_us  g2c_us  cpu_read_us  cpu_write_us  copy_g2c_us  copy_c2g_us
+cpuwait payload_bytes                                                                            
+block   4096           229.0   165.0    66.0          0.0           0.0          1.0          2.0
+        1048576        229.0   124.0    75.0         16.0          17.0          4.0          9.0
+spin    4096           461.0   376.0    80.0          0.0           0.0          5.0          6.0
+        1048576        574.0   348.0   127.0         45.0          49.0         20.0         66.0

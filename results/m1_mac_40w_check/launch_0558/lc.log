@@ -1,0 +1,30 @@
+05:58:46 Terminal window id ; sys=CPU+Graphics+Audio+Network+/ps4; load 1.85
+05:58:49 run 1_S start: sys=CPU+Graphics+Audio+Network+/ps4; load 1.85
+05:58:52   bench 71330 46 5 UN
+ parents: zsh <- zsh
+05:59:23   exit 0
+05:59:26 run 2_T start: sys=CPU+Graphics+Audio+Network+/ps4; load 2.18
+05:59:29   bench  parents:  <- 
+06:00:40   exit timeout
+06:00:43 run 3_T start: sys=CPU+Graphics+Audio+Network+/ps4; load 2.06
+06:00:46   bench  parents:  <- 
+06:01:57   exit timeout
+06:02:00 run 4_S start: sys=CPU+Graphics+Audio+Network+/ps4; load 1.74
+06:02:03   bench 71934 31 5 SN
+ parents: zsh <- zsh
+06:02:33   exit 0
+06:02:36 run 5_S start: sys=CPU+Graphics+Audio+Network+/ps4; load 1.89
+06:02:39   bench 72016 46 5 UN
+ parents: zsh <- zsh
+06:03:10   exit 0
+06:03:13 run 6_T start: sys=CPU+Graphics+Audio+Network+/ps4; load 2.41
+06:03:17   bench  parents:  <- 
+06:04:28   exit timeout
+06:04:31 run 7_T start: sys=CPU+Graphics+Audio+Network+/ps4; load 2.15
+06:04:34   bench  parents:  <- 
+06:05:45   exit timeout
+06:05:48 run 8_S start: sys=CPU+Graphics+Audio+Network+/ps4; load 1.79
+06:05:51   bench 72488 31 5 SN
+ parents: zsh <- zsh
+06:06:21   exit 0
+06:06:23 end: window  exists? false; sys=CPU+Graphics+Audio+Network+/ps4

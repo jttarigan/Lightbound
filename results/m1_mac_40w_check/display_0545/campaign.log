@@ -1,0 +1,30 @@
+03:22:40 armed; waiting for 05:45
+05:33:00 v2 armed; waiting for 05:45
+05:45:00 gate: busy (load 1.37, gpu 13 %)
+05:45:15 gate passed; Wattage = 40W; internal:1710x1107@60Hz:asleep sys=CPU+Graphics+Audio+Network+/ps4
+05:45:33 disp_1_awake start: internal:1710x1107@60Hz:asleep sys=CPU+Graphics+Audio+Network+/ps4; load 1.43
+05:46:03   exit 0 ; after: internal:1710x1107@60Hz:asleep sys=CPU+Graphics+Audio+Network+/ps4
+05:46:18 disp_2_asleep start: internal:1710x1107@60Hz:asleep sys=CPU+Graphics+Audio+Network+/ps4; load 1.92
+05:46:49   exit 0 ; after: internal:1710x1107@60Hz:asleep sys=CPU+Graphics+Audio+Network+/ps4
+05:47:04 disp_3_asleep start: internal:1710x1107@60Hz:asleep sys=CPU+Graphics+Audio+Network+/ps4; load 1.98
+05:47:34   exit 0 ; after: internal:1710x1107@60Hz:asleep sys=CPU+Graphics+Audio+Network+/ps4
+05:47:51 disp_4_awake start: internal:1710x1107@60Hz:awake sys=CPU+Graphics+Audio+Network+/ps4; load 2.62
+05:48:24   exit 0 ; after: internal:1710x1107@60Hz:awake sys=CPU+Graphics+Audio+Network+/ps4
+05:48:41 disp_5_awake start: internal:1710x1107@60Hz:awake sys=CPU+Graphics+Audio+Network+/ps4; load 2.19
+05:49:13   exit 0 ; after: internal:1710x1107@60Hz:awake sys=CPU+Graphics+Audio+Network+/ps4
+05:49:28 disp_6_asleep start: internal:1710x1107@60Hz:asleep sys=CPU+Graphics+Audio+Network+/ps4; load 2.33
+05:50:00   exit 0 ; after: internal:1710x1107@60Hz:asleep sys=CPU+Graphics+Audio+Network+/ps4
+05:50:15 disp_7_asleep start: internal:1710x1107@60Hz:asleep sys=CPU+Graphics+Audio+Network+/ps4; load 2.08
+05:50:45   exit 0 ; after: internal:1710x1107@60Hz:asleep sys=CPU+Graphics+Audio+Network+/ps4
+05:51:03 disp_8_awake start: internal:1710x1107@60Hz:awake sys=CPU+Graphics+Audio+Network+/ps4; load 2.49
+05:51:35   exit 0 ; after: internal:1710x1107@60Hz:awake sys=CPU+Graphics+Audio+Network+/ps4
+05:51:52 disp_9_awake start: internal:1710x1107@60Hz:awake sys=CPU+Graphics+Audio+Network+/ps4; load 2.24
+05:52:24   exit 0 ; after: internal:1710x1107@60Hz:awake sys=CPU+Graphics+Audio+Network+/ps4
+05:52:40 disp_10_asleep start: internal:1710x1107@60Hz:asleep sys=CPU+Graphics+Audio+Network+/ps4; load 2.45
+05:53:10   exit 0 ; after: internal:1710x1107@60Hz:asleep sys=CPU+Graphics+Audio+Network+/ps4
+05:53:25 disp_11_asleep start: internal:1710x1107@60Hz:asleep sys=CPU+Graphics+Audio+Network+/ps4; load 3.31
+05:53:57   exit 0 ; after: internal:1710x1107@60Hz:asleep sys=CPU+Graphics+Audio+Network+/ps4
+05:54:14 disp_12_awake start: internal:1710x1107@60Hz:awake sys=CPU+Graphics+Audio+Network+/ps4; load 2.59
+05:54:47   exit 0 ; after: internal:1710x1107@60Hz:awake sys=CPU+Graphics+Audio+Network+/ps4
+05:54:48 pmset wake history:     8041 lines
+05:54:49 campaign end (display assertion released; displays back to normal idle sleep): internal:1710x1107@60Hz:awake sys=CPU+Graphics+Audio+Network+/ps4

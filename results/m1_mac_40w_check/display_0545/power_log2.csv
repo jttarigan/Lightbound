@@ -1,0 +1,11 @@
+time_wib,adapter_w,batt_pct,batt_ma,batt_c,load1,gpu_util,therm,displays,top3
+05:45:16,40,80,0,30.3,1.21,0,0,internal:1710x1107@60Hz:awake,3.6 Helper;3.2 (Renderer);2.3 syspolicyd;
+05:46:16,40,80,0,30.2,2.00,22,0,internal:1710x1107@60Hz:asleep,7.8 loginwindow;7.2 claude;3.6 Helper;
+05:47:16,40,80,0,30.3,2.69,59,0,internal:1710x1107@60Hz:asleep,283.9 corespotlightd;27.6 lightbound;1.4 CoreDeviceService;
+05:48:16,40,80,0,30.3,2.47,50,0,internal:1710x1107@60Hz:awake,45.8 lightbound;16.1 WindowServer;10.7 WallpaperAerialsExtension;
+05:49:16,40,80,0,30.3,2.70,52,0,internal:1710x1107@60Hz:asleep,2.9 fileproviderd;2.7 Helper;2.2 (Renderer);
+05:50:16,40,80,0,30.3,2.08,55,0,internal:1710x1107@60Hz:asleep,62.2 lightbound;1.6 Helper;1.2 (Renderer);
+05:51:16,40,80,0,30.3,2.68,38,0,internal:1710x1107@60Hz:awake,61.3 lightbound;14.6 WindowServer;4.5 WallpaperAerialsExtension;
+05:52:16,40,80,0,30.3,2.55,55,0,internal:1710x1107@60Hz:awake,45.2 lightbound;14.5 WindowServer;6.5 WallpaperAerialsExtension;
+05:53:16,40,80,0,30.3,3.63,65,0,internal:1710x1107@60Hz:asleep,2.8 Helper;2.5 (Renderer);1.1 claude;
+05:54:16,40,80,0,30.3,2.59,28,0,internal:1710x1107@60Hz:awake,29.9 lightbound;12.8 WindowServer;5.7 WallpaperAerialsExtension;
