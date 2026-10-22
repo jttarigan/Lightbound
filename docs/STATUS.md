@@ -1,6 +1,6 @@
 # Work status (resume here)
 
-_Last updated 2026-10-22 ≈ 20:10 WIB (session 18: the QoS/priority retest ran in Main's quiet-Mac slot; QoS and priority ruled out, the lead moves to the SoC clock)._
+_Last updated 2026-10-22 ≈ 21:55 WIB (session 18, closed: the QoS/priority retest ran in Main's quiet-Mac slot; QoS and priority ruled out, the lead moves to the SoC clock)._
 
 ## RESUME HERE (2026-10-22 ≈ 20:10, session 18: QoS/priority retest DONE — ruled out; new lead = the SoC clock on an idle Mac)
 - **Quiet-Mac slot (user's go 18:28 via Main; GO 19:48:00): `lc4_qos.sh` ran 19:48:00–19:52:10, 8/8 runs, exit 0**, data and
@@ -22,6 +22,9 @@ _Last updated 2026-10-22 ≈ 20:10 WIB (session 18: the QoS/priority retest ran 
   (5) paper decisions (to-do 7); (6) push (34 commits ahead after this session's commit).
 - Lab note sent to Main (lab-wide clue): an idle Mac clocks a lone busy thread low; other projects' single-thread CPU numbers on
   the Mac may depend on what else runs.
+- **Closed 21:5x WIB on the user's "save state, doing something else tonight" (via Main).** Nothing running, nothing pushed;
+  Main's quiet-Mac block ended 20:24; the root powermetrics check is parked for a later slot (Main holds it). Resume with the
+  to-do list below: to-do 2 (user's OK + decision), 6 (Word check), 1 (M2 review), 4 (PC checklist).
 
 ## RESUME HERE (2026-10-22 ≈ 10:55, session 17: solo hour; the spin-wait code test is built, the Word equation is done)
 - **Closed 15:32 WIB on the user's Mac shutdown (via Main).** Nothing running; nothing pushed. The `lc4_qos.sh` retest slot moves
