@@ -87,7 +87,8 @@ NS = ('xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" '
       'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" '
       'xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" '
       'xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" '
-      'xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"')
+      'xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture" '
+      'xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math"')
 
 # ------------------------------------------------------------------ Zotero
 
@@ -228,6 +229,97 @@ def para(style, text="", inner=None, extra_ppr=""):
     body = inner if inner is not None else runs(text)
     return f'<w:p><w:pPr><w:pStyle w:val="{style}"/>{extra_ppr}</w:pPr>{body}</w:p>'
 
+# ------------------------------------------------------------------ formulas (OMML)
+
+# A ```formula block becomes one Word equation paragraph (Office Math, m:oMathPara), one m:oMath per
+# line. Notation: x_sub or x_{sub} = subscript (two or more letters are set upright, as descriptive
+# subscripts are); {num} / {den} = fraction; ( ... ) = stretched delimiters; [text] = upright text;
+# everything else is a math run (Word italicises letters as variables).
+IDENT = re.compile(r"[A-Za-z][A-Za-z0-9]*")
+
+
+def m_run(text, upright=False):
+    pr = '<m:rPr><m:sty m:val="p"/></m:rPr>' if upright else ""
+    return f'<m:r>{pr}<m:t xml:space="preserve">{escape(text)}</m:t></m:r>'
+
+
+def omml(src):
+    """Converts one formula line to OMML children of m:oMath."""
+    out, text, i = [], "", 0
+
+    def flush():
+        nonlocal text
+        if text:
+            out.append(m_run(text))
+            text = ""
+
+    def group(close):          # src[i] is just past the opener; returns the OMML inside and moves i past `close`
+        nonlocal i
+        depth, start = 1, i
+        while i < len(src):
+            c = src[i]
+            if c in "{(":
+                depth += 1
+            elif c in "})":
+                depth -= 1
+                if depth == 0 and c == close:
+                    inner = src[start:i]
+                    i += 1
+                    return omml(inner)
+            i += 1
+        raise ValueError(f"unbalanced {close!r} in formula: {src}")
+
+    while i < len(src):
+        c = src[i]
+        if c == "{":
+            flush()
+            i += 1
+            num = group("}")
+            j = i
+            while j < len(src) and src[j] == " ":
+                j += 1
+            if j + 1 < len(src) and src[j] == "/" and src[j + 1:].lstrip().startswith("{"):
+                i = src.index("{", j) + 1
+                den = group("}")
+                out.append(f"<m:f><m:num>{num}</m:num><m:den>{den}</m:den></m:f>")
+            else:
+                out.append(num)
+            continue
+        if c == "(":
+            flush()
+            i += 1
+            out.append(f"<m:d><m:e>{group(')')}</m:e></m:d>")
+            continue
+        if c == "[":
+            flush()
+            j = src.index("]", i)
+            out.append(m_run(src[i:j + 1], upright=True))
+            i = j + 1
+            continue
+        m = IDENT.match(src, i)
+        if m and m.end() < len(src) and src[m.end()] == "_":
+            flush()
+            base, i = m.group(0), m.end() + 1
+            if i < len(src) and src[i] == "{":
+                j = src.index("}", i)
+                sub, i = src[i + 1:j], j + 1
+            else:
+                m2 = re.compile(r"[A-Za-z0-9]+").match(src, i)
+                sub, i = m2.group(0), m2.end()
+            sub_xml = m_run(sub, upright=len(sub) > 1)
+            out.append(f"<m:sSub><m:e>{m_run(base)}</m:e><m:sub>{sub_xml}</m:sub></m:sSub>")
+            continue
+        text += c
+        i += 1
+    flush()
+    return "".join(out)
+
+
+def formula_para(lines):
+    maths = "".join(f"<m:oMath>{omml(l.strip())}</m:oMath>" for l in lines if l.strip())
+    return ('<w:p><w:pPr><w:pStyle w:val="Normal"/><w:jc w:val="left"/></w:pPr>'
+            f'<m:oMathPara><m:oMathParaPr><m:jc m:val="left"/></m:oMathParaPr>{maths}</m:oMathPara></w:p>')
+
 # ------------------------------------------------------------------ blocks
 
 NUMS = []       # numbered-list instances (each restarts at 1); numId = 2 + index; bullets use numId 1
@@ -332,11 +424,17 @@ def blocks_xml(lines):
             i += 1
             continue
         if line.startswith("```"):
+            formula = line.strip() == "```formula"
             i += 1
+            block = []
             while i < len(lines) and not lines[i].startswith("```"):
-                out.append(para("Code", inner=run(lines[i].replace("\\*", "*"))))
+                block.append(lines[i])
                 i += 1
             i += 1
+            if formula:
+                out.append(formula_para(block))
+            else:
+                out.extend(para("Code", inner=run(l.replace("\\*", "*"))) for l in block)
             continue
         m = re.match(r"^!\[[^\]]*\]\(([^)]+)\)\s*$", line)
         if m:

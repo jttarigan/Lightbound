@@ -8,11 +8,13 @@
 
 The protocol fixes the model's form before any game run, per platform *p* and strategy *S*:
 
+```formula
+T_frame(N, K, S) ≈ a_gpu · N + b_gpu + a_cpu · N + b_cpu
++ K · (T_sync + {P_g2c(N) + P_c2g(N)} / {BW_eff(S)})
++ [S1] K · T_{copy setup}
 ```
-T_frame(N, K, S) ≈ a_gpu·N + b_gpu + a_cpu·N + b_cpu
-                   + K · ( T_sync + (P_g2c(N) + P_c2g(N)) / BW_eff(S) )
-                   + [S1] K · T_copy_setup
-```
+<!-- ```formula blocks become Word equations (OMML) in build_docx.py: x_sub / x_{sub} subscripts,
+     {num} / {den} fractions, ( ) stretched delimiters, [text] upright text. -->
 
 - **The first line** is the work that does not depend on K: GPU passes A and E, and CPU pass B. It grows linearly in
   the agent count N. Its coefficients come only from the game at K = 1.
