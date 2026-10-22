@@ -73,3 +73,15 @@ ext series was not started.
 - Next (needs the user): what else changed on the Mac between 09-24 and 10-17? Optional code-level test (a code change, so ask
   first): the bench thread sets QOS_CLASS_USER_INTERACTIVE, or logs per-thread counters, to see whether P-core placement
   restores the 09-24 spin levels.
+
+### 10-22: the code test is built (DECISIONS #36); the retest waits for the user's go
+- Probe in this session's process tree (nice 5): `pthread_set_qos_class_self_np(QOS_CLASS_USER_INTERACTIVE)` succeeds, but the
+  kernel caps a command-line process at priority 31 on every thread kind (main thread, `pthread_attr` QoS thread, `std::thread`);
+  lowering works (BACKGROUND → 4). `THREAD_PRECEDENCE_POLICY` works without root (+16 → 42 = task priority 26 (31 − nice 5) + 16;
+  63 cap). So a QoS request alone cannot test the P-core lead.
+- `lightbound --micro-qos=high` = the QoS request plus base priority 47 by precedence (what a user-interactive thread has in an
+  app). Smoke run 10-22: `# sysinfo.thread_priority: cur=47 base=47`. Every CSV header now records `sysinfo.thread_qos`,
+  `sysinfo.thread_priority` and `sysinfo.process_nice`, so a run always says what its thread ran as.
+- Retest driver `launch_0558/lc4_qos.sh`: D H H D D H H D (default / high), all launched from the session (the launch context is
+  ruled out), `build/lightbound` (the frozen ext binary predates the flag), rusage per run, the header's qos/priority lines logged.
+  Gates: full wake, AC ≥ 35 W. Needs the user's go and a Main slot (≈ 8 min). Compare against 09-24 with `ab_compare.py`.

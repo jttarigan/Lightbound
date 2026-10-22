@@ -1,8 +1,27 @@
 # Work status (resume here)
 
-_Last updated 2026-10-21 ≈ 21:45 WIB (session 16: references into Zotero; Word manuscript with live Zotero fields; §6 draft; to-do list refreshed)._
+_Last updated 2026-10-22 ≈ 10:55 WIB (session 17: solo hour; `--micro-qos` flag + thread priority in headers built; cost-model formula as a Word equation)._
 
-## RESUME HERE (2026-10-21 21:45, session 16: Zotero + Word manuscript; to-do list refreshed below)
+## RESUME HERE (2026-10-22 ≈ 10:55, session 17: solo hour; the spin-wait code test is built, the Word equation is done)
+- **Solo window 10:40–11:40 WIB (user away; Main's relay: no devices, no Mac measurements, no PC changes, no installs, no
+  push; local commits fine).** Nothing run on any device, no measurement; only two 20-iteration smoke runs of the microbench
+  on the Mac to check the CSV header. Word was not opened (it is one shared instance the user may be editing in, LAB.md 10-22;
+  `build_docx.py` writes the file directly and never drives Word).
+- **`--micro-qos=default|interactive|high` built (0ecb9d0, DECISIONS #36):** to-do 2's code test, off by default. Probe finding:
+  for a command-line process macOS caps `QOS_CLASS_USER_INTERACTIVE` at priority 31 on every thread kind (the class is even the
+  main thread's default), so a QoS request alone cannot test the P-core lead; `THREAD_PRECEDENCE_POLICY` works without root, so
+  `high` = the QoS request + base priority 47 (smoke run: header `sysinfo.thread_priority: cur=47 base=47`). Every CSV header now
+  records `sysinfo.thread_qos`, `sysinfo.thread_priority`, `sysinfo.process_nice` on both platforms; `# qos:` / `# qos.note:`
+  label a flagged run so it is never pooled with protocol runs. ctest 49/49. Retest driver
+  `results/m1_mac_40w_check/launch_0558/lc4_qos.sh` (D/H interleaved, 8 runs ≈ 8 min, session-launched, `build/lightbound`,
+  rusage per run, header lines logged; gates: full wake, AC ≥ 35 W) is ready and **waits for the user's go + a Main slot**.
+- **Paper (498b623):** the §9.1 cost-model formula is a Word equation (OMML; a ```formula block in `build_docx.py`: subscripts,
+  a fraction, stretched parentheses), `lightbound_jsc.docx` rebuilt, every part well-formed. Open ask (11) done; (8)–(10) remain.
+- **Open asks for the user:** (1) go for the 8-min `lc4_qos.sh` retest, and what else changed on the Mac 09-24 → 10-17;
+  (2) Word: Zotero → Refresh, title page, reference style, and whether the §9.1 equation renders; (3) PC checklist (to-do 4);
+  (4) M2 review; (5) paper decisions (to-do 7); (6) push (32 commits ahead of origin).
+
+## 2026-10-21 21:45 (session 16: Zotero + Word manuscript; to-do list refreshed below)
 - **Closed 22:4x WIB on the user's "call it off tonight, continue tomorrow" (via Main).** Nothing run on any device. Quiet-Mac
   blocks tonight (TopDownBoxy, VisServe) are other projects'; Lightbound resumes tomorrow with the to-do list below.
 - **Zotero (user's rule via Main, 17:5x; LAB.md "References: Zotero + Word"):** all 18 refs.bib entries added through
@@ -203,11 +222,15 @@ No phones or tablets are needed.
 
 1. **[user] Review M2** (`docs/img/floors/*.png`, DECISIONS #34). M2's [PC] golden check rides along with to-do 4. M3 (headless
    simulation core) is next after M2 is accepted.
-2. **[user, then solo] The M5 spin-wait shift** (§12.2 item 5; `results/m1_mac_40w_check/`): (a) what else changed on the Mac
-   between 2026-09-24 and 10-17? (b) OK for a code test in which the bench thread sets `QOS_CLASS_USER_INTERACTIVE` (behind a
-   flag, off by default, R1-neutral)? Then **[solo]** the change + **[device: Mac AC, ≈ 8 min, Main slot]** retest with
-   `lc3.sh`. If the 09-24 levels come back, 3 can run; if not, **[user]** decides how the paper handles the shift
-   (re-measure the idle reference in the present state, or report both; §12.2 item 5 comment).
+2. **[user, then device] The M5 spin-wait shift** (§12.2 item 5; `results/m1_mac_40w_check/`; DECISIONS #36). The code test is
+   built (10-22): `--micro-qos=high` raises the bench thread to base priority 47 (a plain QoS request is capped at 31 for a
+   command-line process, so `interactive` alone cannot test the P-core lead). Needs (a) the user's go for the
+   **[device: Mac on AC ≥ 35 W, ≈ 8 min, Main slot, full wake]** retest: `LC_SP=<scratchpad> LC_END='YYYY-mm-dd HH:MM:SS'
+   caffeinate -is results/m1_mac_40w_check/launch_0558/lc4_qos.sh` (default/high interleaved, 8 runs; compare with
+   `ab_compare.py` against 09-24); (b) still: what else changed on the Mac between 2026-09-24 and 10-17? If `high` brings the
+   09-24 levels back, **[user]** decides whether the protocol's Mac runs adopt it (docs/06 §2; both platforms re-measure)
+   before 3 runs; if not, **[user]** decides how the paper handles the shift (re-measure the idle reference in the present
+   state, or report both; §12.2 item 5 comment).
 3. **[device: Mac on AC, ≈ 70 min, unattended, Mac otherwise quiet]** extension series `results/m1_mac_ext` (idle + hot,
    12 payloads; command in `docs/M1_RESCOPE_PROPOSAL.md` §4): charger, lid open, Low Power Mode off, `caffeinate -is`; no
    other session may run GPU work, builds or heavy jobs meanwhile. Needs a slot from Main when the Mac is quiet (evening/night,
@@ -229,14 +252,15 @@ No phones or tablets are needed.
    --modes all --out results/crossover_ext` (writes crossover.md with the H1′ verdicts; M1 preview in `results/m1_crossover/`).
 6. **[user] Word manuscript check:** open `docs/paper/lightbound_jsc.docx` in Word, Zotero → Refresh (citations renumber, list
    re-renders → the build counts as done); confirm the prefilled title page; choose the reference style (Springer basic prints no
-   DOI for conference papers and no arXiv id for preprints). Then **[solo]** polish: the cost-model formula as a Word equation,
-   the style/DOI fix, rebuild (`python3 docs/paper/build_docx.py`, `--sync` after any Zotero edit).
+   DOI for conference papers and no arXiv id for preprints); check that the §9.1 equation renders (a Word equation since
+   10-22, three lines). Then **[solo]** polish: the style/DOI fix, rebuild (`python3 docs/paper/build_docx.py`, `--sync`
+   after any Zotero edit).
 7. **[user] Paper decisions:** AI-use declaration wording (Springer: in Methods), Zenodo DOI or not, extend the N grid beyond
    100k for the ReBAR-off crossover (≈ 112k agents)?
 8. **4060 Ti step D, November** (the user's date). **[user]** installs it in the i7-12700F PC, same slot (protocol §2; if it goes
    into another PC, ask before planning). **[device: Windows PC, exclusive, ≈ 3 days unattended]** step D as written
    (`results\m1_4060`), then optionally `m1_4060_ext`. **[solo, ≈ 1 h]** merge and add P-4060 to the combined report.
-9. **[user] Push** the local commits (25 ahead of origin at 21:40).
+9. **[user] Push** the local commits (32 ahead of origin after session 17, 10-22).
 10. ~~Carry the bundle / PC message to the PC~~ superseded by 4 (main is on GitHub since 10-17; the bundle is the fallback).
     ~~Pushing~~ done 10-17 evening (main baf605a..559c377 and `mac/narrow-link`).
 
