@@ -3,6 +3,9 @@
 _Last updated 2026-10-22 ≈ 10:55 WIB (session 17: solo hour; `--micro-qos` flag + thread priority in headers built; cost-model formula as a Word equation)._
 
 ## RESUME HERE (2026-10-22 ≈ 10:55, session 17: solo hour; the spin-wait code test is built, the Word equation is done)
+- **Closed 15:32 WIB on the user's Mac shutdown (via Main).** Nothing running; nothing pushed. The `lc4_qos.sh` retest slot moves
+  to the next session: it needs the user's go, a Main slot, the Mac on AC ≥ 35 W in full wake, and a fresh `cmake --build build`
+  if the tree changed (the flag is in `build/lightbound` as of 8d600ed). Resume with the to-do list below (2, 6 first).
 - **Solo window 10:40–11:40 WIB (user away; Main's relay: no devices, no Mac measurements, no PC changes, no installs, no
   push; local commits fine).** Nothing run on any device, no measurement; only two 20-iteration smoke runs of the microbench
   on the Mac to check the CSV header. Word was not opened (it is one shared instance the user may be editing in, LAB.md 10-22;
