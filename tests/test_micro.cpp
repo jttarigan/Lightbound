@@ -1,6 +1,7 @@
 #include "bench/MicroPattern.h"
 #include "bench/MicroResume.h"
 #include "bench/Microbench.h"
+#include "bench/SysInfo.h"
 #include "frame/MemoryPolicy.h"
 
 #include <doctest/doctest.h>
@@ -153,6 +154,32 @@ TEST_CASE("hot-GPU path names and load notes (DECISIONS #32)") {
     CHECK(scan.droppedRows == 1);
     CHECK(scan.kept.size() == 4 + 1 + 3);   // header, the kept cell's note and rows; nothing of the other cell
     CHECK(scan.kept[4] == cellLoadNote("empty_hot", "chain", "spin", 0, 10, 1.0));
+}
+
+TEST_CASE("bench-thread QoS diagnostics (DECISIONS #36)") {
+    CHECK(std::string(threadQosName(ThreadQos::Default)) == "default");
+    CHECK(std::string(threadQosName(ThreadQos::Interactive)) == "interactive");
+    CHECK(std::string(threadQosName(ThreadQos::High)) == "high");
+    CHECK_FALSE(threadQosClass().empty());
+    CHECK_FALSE(threadPriority().empty());
+    CHECK_FALSE(processNice().empty());
+    std::string note;
+    const bool applied = requestThreadQosInteractive(note);
+    CHECK_FALSE(note.empty());
+#if defined(__APPLE__)
+    CHECK(applied);
+    CHECK(threadQosClass() == "user-interactive");
+    CHECK(threadPriority().rfind("cur=", 0) == 0);
+    std::string prio;
+    CHECK(requestThreadPriority(47, prio));   // precedence policy needs no root
+    CHECK(threadPriority().find("base=47") != std::string::npos);
+    CHECK(requestThreadPriority(31, prio));   // and back, so later tests run as before
+#else
+    CHECK_FALSE(applied);
+    CHECK(threadQosClass() == "n/a");
+    std::string prio;
+    CHECK_FALSE(requestThreadPriority(47, prio));
+#endif
 }
 
 TEST_CASE("memory policy follows docs/05 §4.2") {

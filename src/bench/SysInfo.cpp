@@ -1,6 +1,7 @@
 #include "bench/SysInfo.h"
 
 #include <bit>
+#include <cerrno>
 #include <cstdio>
 #include <cstring>
 #include <ctime>
@@ -13,12 +14,21 @@
 #include <IOKit/ps/IOPowerSources.h>
 #include <objc/message.h>
 #include <objc/runtime.h>
+#include <libproc.h>
+#include <mach/mach.h>
+#include <mach/thread_policy.h>
+#include <pthread.h>
+#include <pthread/qos.h>
+#include <sys/proc_info.h>
+#include <sys/resource.h>
 #include <sys/sysctl.h>
+#include <unistd.h>
 #elif defined(_WIN32)
 #include <windows.h>
 #include <intrin.h>
 #include <powrprof.h>
 #else
+#include <sys/resource.h>
 #include <sys/utsname.h>
 #include <unistd.h>
 #endif
@@ -196,6 +206,118 @@ std::string thermalState() {
 #endif
 }
 
+#if defined(__APPLE__)
+namespace {
+const char* qosName(qos_class_t c) {
+    switch (c) {
+    case QOS_CLASS_USER_INTERACTIVE: return "user-interactive";
+    case QOS_CLASS_USER_INITIATED: return "user-initiated";
+    case QOS_CLASS_DEFAULT: return "default";
+    case QOS_CLASS_UTILITY: return "utility";
+    case QOS_CLASS_BACKGROUND: return "background";
+    case QOS_CLASS_UNSPECIFIED: return "unspecified";
+    }
+    return "?";
+}
+} // namespace
+#endif
+
+std::string threadQosClass() {
+#if defined(__APPLE__)
+    qos_class_t cls = QOS_CLASS_UNSPECIFIED;
+    int rel = 0;
+    if (pthread_get_qos_class_np(pthread_self(), &cls, &rel) != 0) return "unknown";
+    std::string s = qosName(cls);
+    if (rel != 0) s += " (" + std::to_string(rel) + ")";
+    return s;
+#else
+    return "n/a";
+#endif
+}
+
+std::string threadPriority() {
+#if defined(__APPLE__)
+    u64 tid = 0;
+    if (pthread_threadid_np(nullptr, &tid) != 0) return "unknown";
+    proc_threadinfo ti{};
+    const int n = proc_pidinfo(getpid(), PROC_PIDTHREADID64INFO, tid, &ti, static_cast<int>(sizeof(ti)));
+    if (n < static_cast<int>(sizeof(ti))) return "unknown";
+    return "cur=" + std::to_string(ti.pth_curpri) + " base=" + std::to_string(ti.pth_priority) +
+           " max=" + std::to_string(ti.pth_maxpriority);
+#else
+    return "n/a";
+#endif
+}
+
+std::string processNice() {
+#if defined(_WIN32)
+    return "n/a";
+#else
+    errno = 0;
+    const int nice = getpriority(PRIO_PROCESS, 0);
+    if (nice == -1 && errno != 0) return "unknown";
+    return std::to_string(nice);
+#endif
+}
+
+bool requestThreadQosInteractive(std::string& note) {
+#if defined(__APPLE__)
+    const std::string before = threadQosClass() + ", priority " + threadPriority();
+    const int rc = pthread_set_qos_class_self_np(QOS_CLASS_USER_INTERACTIVE, 0);
+    if (rc != 0) {
+        note = "pthread_set_qos_class_self_np failed (" + std::string(std::strerror(rc)) + "); thread stays " + before;
+        return false;
+    }
+    note = "QOS_CLASS_USER_INTERACTIVE requested; thread was " + before + ", now " + threadQosClass() +
+           ", priority " + threadPriority();
+    return true;
+#else
+    note = "no QoS classes on this OS (no-op); thread " + threadQosClass();
+    return false;
+#endif
+}
+
+#if defined(__APPLE__)
+namespace {
+int threadBasePriority() {
+    u64 tid = 0;
+    if (pthread_threadid_np(nullptr, &tid) != 0) return -1;
+    proc_threadinfo ti{};
+    const int n = proc_pidinfo(getpid(), PROC_PIDTHREADID64INFO, tid, &ti, static_cast<int>(sizeof(ti)));
+    return n < static_cast<int>(sizeof(ti)) ? -1 : ti.pth_priority;
+}
+} // namespace
+#endif
+
+bool requestThreadPriority(int target, std::string& note) {
+#if defined(__APPLE__)
+    const std::string before = threadPriority();
+    // The policy takes an importance relative to the task priority (31 minus nice), which the first
+    // read-back may not reflect yet; so set, read back and correct, up to three times.
+    int importance = 0;
+    int base = threadBasePriority();
+    for (int pass = 0; pass < 3 && base >= 0 && base != target; ++pass) {
+        importance += target - base;
+        thread_precedence_policy_data_t policy{importance};
+        const kern_return_t kr = thread_policy_set(mach_thread_self(), THREAD_PRECEDENCE_POLICY,
+                                                   reinterpret_cast<thread_policy_t>(&policy),
+                                                   THREAD_PRECEDENCE_POLICY_COUNT);
+        if (kr != KERN_SUCCESS) {
+            note = "thread_policy_set(THREAD_PRECEDENCE_POLICY) failed (kr=" + std::to_string(kr) + "); thread stays " + before;
+            return false;
+        }
+        base = threadBasePriority();
+    }
+    note = "base priority " + std::to_string(target) + " requested (THREAD_PRECEDENCE_POLICY importance " +
+           std::to_string(importance) + "); thread was " + before + ", now " + threadPriority();
+    return base == target;
+#else
+    (void)target;
+    note = "no thread precedence policy on this OS (no-op); thread " + threadPriority();
+    return false;
+#endif
+}
+
 std::string isoTimestampUtc() {
     const std::time_t t = std::time(nullptr);
     std::tm tm{};
@@ -250,6 +372,9 @@ KeyValues collectSysInfo(const gfx::GfxCaps& caps) {
     kv.add("cpu_logical", std::to_string(sysconf(_SC_NPROCESSORS_ONLN)));
     kv.add("ram", bytesToGiB(static_cast<u64>(sysconf(_SC_PHYS_PAGES)) * static_cast<u64>(sysconf(_SC_PAGE_SIZE))));
 #endif
+    kv.add("thread_qos", threadQosClass());
+    kv.add("thread_priority", threadPriority());
+    kv.add("process_nice", processNice());
     kv.add("thermal_state_start", thermalState());
     kv.add("backend", gfx::backendName(caps.backend));
     kv.add("gpu", caps.deviceName);

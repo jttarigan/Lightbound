@@ -13,6 +13,15 @@ namespace lb::bench {
 enum class GpuLoad : u8 { Idle, Hot, Both };
 const char* gpuLoadName(GpuLoad l);
 
+/// Scheduling requested for the bench thread (DECISIONS #36). Default = whatever the process started
+/// with; Interactive = QOS_CLASS_USER_INTERACTIVE (macOS caps it at priority 31 for a command-line
+/// process); High = that plus base priority 47 through THREAD_PRECEDENCE_POLICY, the priority a
+/// user-interactive thread has in an app. No-ops elsewhere. A diagnostic for the M5 spin-wait shift;
+/// never one of the protocol's conditions. The header records `qos`, `qos.note` and
+/// `sysinfo.thread_qos` / `thread_priority` so a CSV always says what the thread ran as.
+enum class ThreadQos : u8 { Default, Interactive, High };
+const char* threadQosName(ThreadQos q);
+
 struct MicrobenchConfig {
     u32 iterations = 2000;                 // measured iterations per cell
     u32 warmup = 200;                      // discarded iterations per cell
@@ -21,6 +30,7 @@ struct MicrobenchConfig {
     std::vector<std::string> paths;        // empty = every path this backend supports
     std::vector<u64> payloads;             // bytes (multiples of 16); P = 0 is the "empty" path
     GpuLoad gpuLoad = GpuLoad::Idle;
+    ThreadQos qos = ThreadQos::Default;
     std::string outPath;
     std::string commandLine;               // full CLI, for the CSV header
     std::string options;                   // normalized options, for the CSV header

@@ -129,6 +129,11 @@ int runMicrobench(const lb::app::Options& opt, int argc, char** argv) {
     case app::GpuLoad::Hot: cfg.gpuLoad = bench::GpuLoad::Hot; break;
     case app::GpuLoad::Both: cfg.gpuLoad = bench::GpuLoad::Both; break;
     }
+    switch (opt.microQos) {
+    case app::ThreadQos::Default: cfg.qos = bench::ThreadQos::Default; break;
+    case app::ThreadQos::Interactive: cfg.qos = bench::ThreadQos::Interactive; break;
+    case app::ThreadQos::High: cfg.qos = bench::ThreadQos::High; break;
+    }
     cfg.outPath = opt.out.empty() ? std::string("results/micro.csv") : opt.out;
     for (int i = 0; i < argc; ++i) cfg.commandLine += (i > 0 ? " " : "") + std::string(argv[i]);
     cfg.options = app::describeOptions(opt);

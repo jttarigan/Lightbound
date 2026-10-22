@@ -136,6 +136,23 @@ TEST_CASE("--micro-gpuload selects the hot-GPU cells (DECISIONS #32)") {
     CHECK(std::string(cliName(GpuLoad::Both)) == "both");
 }
 
+TEST_CASE("--micro-qos requests the bench thread's QoS class (DECISIONS #36)") {
+    Options o;
+    std::string err;
+    REQUIRE(parse({"--mode=microbench"}, o, err) == ParseStatus::Ok);
+    CHECK(o.microQos == ThreadQos::Default);
+    CHECK(describeOptions(o).find("micro-qos") == std::string::npos);  // default: header unchanged
+    REQUIRE(parse({"--mode=microbench", "--micro-qos=interactive"}, o, err) == ParseStatus::Ok);
+    CHECK(o.microQos == ThreadQos::Interactive);
+    CHECK(describeOptions(o).find("micro-qos=interactive") != std::string::npos);
+    REQUIRE(parse({"--micro-qos", "default"}, o, err) == ParseStatus::Ok);
+    CHECK(o.microQos == ThreadQos::Default);
+    REQUIRE(parse({"--micro-qos=high"}, o, err) == ParseStatus::Ok);
+    CHECK(o.microQos == ThreadQos::High);
+    CHECK(describeOptions(o).find("micro-qos=high") != std::string::npos);
+    CHECK(parse({"--micro-qos=realtime"}, o, err) == ParseStatus::Error);
+}
+
 TEST_CASE("describeOptions round-trips key fields") {
     Options o;
     std::string err;

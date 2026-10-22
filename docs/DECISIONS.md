@@ -362,3 +362,34 @@ Ambiguities resolved while building, per CLAUDE.md rule 4. Newest at the bottom.
       code ruled out (the 10-13 binary gives the same numbers). So "AC Power" is not enough: the adapter can change the
       measurement. **Revised rule:** a Mac run first passes a 2-min reference check against the 10-13 levels, and the adapter
       wattage is recorded. The ext run waits for a 35 W+ charger.
+
+## 2026-10-22 — M1 bench-thread scheduling flag (diagnostic for the M5 spin-wait shift)
+
+36. **`--micro-qos=default|interactive|high` asks for a scheduling class for the microbench thread; the default
+    changes nothing.** Since 10-17 the Mac's spin-wait cells run +100 to +280 µs slower than on 09-24, with the adapter,
+    the displays, dark wake, the launch context and nice ruled out (STATUS; paper §12.2 item 5), and the 10-21 retest
+    left P/E-core placement as the lead (68–75 % of the bench's CPU time on P-cores; the run with 90 % had the fastest
+    empty spin round trip). macOS places threads by QoS class and priority, so the test is: does a higher class or
+    priority restore the 09-24 levels? The cells run inline on the calling thread, which asks before the first
+    measurement (the bandwidth rows included).
+    - **What the OS allows (probe, 10-22, this session's process tree, nice 5):** `pthread_set_qos_class_self_np` succeeds
+      but **a command-line process is capped at priority 31** for USER_INTERACTIVE (and reads that class by default on its
+      main thread); the cap holds on the main thread, on a `pthread_attr` QoS thread and on a `std::thread`. Lowering works
+      (BACKGROUND → 4). `thread_policy_set(THREAD_PRECEDENCE_POLICY)` works without root: +16 → 42 (task priority 26 =
+      31 − nice 5), up to the 63 cap. So `interactive` = the QoS request as asked (recorded even when capped), and
+      `high` = that plus **base priority 47 by precedence** (what a user-interactive thread has in an app; the request
+      targets the absolute value, so nice does not change it; once the precedence policy is set the thread's requested
+      class reads `unspecified`, the two being exclusive, and the priority is what counts). The retest compares
+      `default` and `high`. Smoke-checked 10-22 10:3x: `high` → `thread_priority: cur=47 base=47` in the header.
+    - **Not a protocol condition.** Off by default; `describeOptions` and the CSV header show it only when set
+      (`# qos:`, `# qos.note:`), so such a run can never be pooled with the protocol's runs by mistake. R1 holds: the
+      measured algorithms and buffers are unchanged, and Windows/Linux report the request as a no-op. If `high` restores
+      the 09-24 levels, the human decides whether the protocol's Mac runs adopt it (then docs/06 §2 changes and both
+      platforms re-measure) or whether the paper reports the shift instead.
+    - **Every header now records what the thread ran as**, on both platforms: `sysinfo.thread_qos` (requested class),
+      `sysinfo.thread_priority` (macOS `proc_pidinfo` cur/base/max: 47 = user-interactive in an app, 31 = default,
+      26 = default at nice 5) and `sysinfo.process_nice`. CSVs before this entry lack the keys; `tools/rusage_wrap.py`'s
+      P-core share stays the record for them.
+    - **Retest driver:** `results/m1_mac_40w_check/launch_0558/lc4_qos.sh` (default/high interleaved, 8 runs ≈ 8 min,
+      all launched from the session since the launch context is ruled out, `build/lightbound` because the frozen ext
+      binary predates the flag). Waits for the user's go and a Main slot; gates on full wake and AC ≥ 35 W.

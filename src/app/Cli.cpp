@@ -78,6 +78,8 @@ constexpr EnumName<AudioMode> kAudioModes[] = {
 constexpr EnumName<Preset> kPresets[] = {
     {"none", Preset::None}, {"quick", Preset::Quick}, {"core", Preset::Core}, {"audit", Preset::Audit}};
 constexpr EnumName<GpuLoad> kGpuLoads[] = {{"idle", GpuLoad::Idle}, {"hot", GpuLoad::Hot}, {"both", GpuLoad::Both}};
+constexpr EnumName<ThreadQos> kThreadQos[] = {
+    {"default", ThreadQos::Default}, {"interactive", ThreadQos::Interactive}, {"high", ThreadQos::High}};
 
 struct FlagSpec { const char* name; bool takesValue; };
 constexpr FlagSpec kFlags[] = {
@@ -86,7 +88,7 @@ constexpr FlagSpec kFlags[] = {
     {"memvariant", true}, {"audit", true}, {"audio", true}, {"preset", true}, {"out", true},
     {"tag", true}, {"power", true},
     {"vsync", true}, {"validation", true}, {"width", true}, {"height", true}, {"exit-after", true},
-    {"log", true}, {"micro-paths", true}, {"micro-payloads", true}, {"micro-gpuload", true}, {"resume", false}, {"depth", true},
+    {"log", true}, {"micro-paths", true}, {"micro-payloads", true}, {"micro-gpuload", true}, {"micro-qos", true}, {"resume", false}, {"depth", true},
     {"help", false}, {"version", false},
 };
 
@@ -160,6 +162,7 @@ ParseStatus parseCommandLine(int argc, const char* const* argv, Options& out, st
         else if (name == "micro-paths") out.microPaths = value;
         else if (name == "micro-payloads") out.microPayloads = value;
         else if (name == "micro-gpuload") ok = parseEnum(value, kGpuLoads, out.microGpuLoad);
+        else if (name == "micro-qos") ok = parseEnum(value, kThreadQos, out.microQos);
         else if (name == "resume") out.resume = true;
         else if (name == "depth") { ok = parseU32(value, out.depth) && out.depth >= 1 && out.depth <= 5; out.depthExplicit = ok; }
         else if (name == "log") {
@@ -237,6 +240,12 @@ void printUsage(FILE* to) {
         "  --micro-gpuload=idle|hot|both microbench: GPU state during the CPU step (default idle =\n"
         "                                protocol §6; hot = a second queue keeps the GPU busy, cells\n"
         "                                are written as <path>_hot; both = idle cells, then hot)\n"
+        "  --micro-qos=default|interactive|high\n"
+        "                                microbench: scheduling of the bench thread (default = as the\n"
+        "                                process started; interactive = QOS_CLASS_USER_INTERACTIVE, which\n"
+        "                                macOS caps at priority 31 for a command-line process; high = that\n"
+        "                                plus base priority 47 via THREAD_PRECEDENCE_POLICY; no-ops\n"
+        "                                elsewhere; a diagnostic, DECISIONS #36)\n"
         "  --resume                      microbench: continue the interrupted run in --out (keeps the\n"
         "                                cells it completed, measures the missing ones)\n"
         "  --depth=1..5                  play / procgen-dump: floor depth (default 1); procgen-dump\n"
@@ -271,6 +280,7 @@ std::string describeOptions(const Options& o) {
     if (!o.microPaths.empty()) s += " micro-paths=" + o.microPaths;
     if (!o.microPayloads.empty()) s += " micro-payloads=" + o.microPayloads;
     if (o.microGpuLoad != GpuLoad::Idle) s += " micro-gpuload=" + std::string(cliName(o.microGpuLoad));
+    if (o.microQos != ThreadQos::Default) s += " micro-qos=" + std::string(cliName(o.microQos));
     if (o.depthExplicit) s += " depth=" + std::to_string(o.depth);
     return s;
 }
@@ -280,6 +290,15 @@ const char* cliName(GpuLoad v) {
     case GpuLoad::Idle: return "idle";
     case GpuLoad::Hot: return "hot";
     case GpuLoad::Both: return "both";
+    }
+    return "?";
+}
+
+const char* cliName(ThreadQos v) {
+    switch (v) {
+    case ThreadQos::Default: return "default";
+    case ThreadQos::Interactive: return "interactive";
+    case ThreadQos::High: return "high";
     }
     return "?";
 }

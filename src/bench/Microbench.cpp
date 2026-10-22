@@ -28,6 +28,8 @@ using namespace lb::gfx;
 
 namespace {
 
+constexpr int kHighThreadPriority = 47;  // --micro-qos=high: a user-interactive thread's base priority in an app
+
 constexpr u64 kWaitTimeoutNs = 5'000'000'000ull;
 constexpr u32 kRecalibrateEvery = 500;
 // The GPU timestamp clock and the host clock drift apart (≈ 32 ppm on the RTX 3060 Ti PC), so a
@@ -123,6 +125,19 @@ public:
             return 2;
         }
         if (!caps.gpuTimestamps) LB_LOG_WARN("GPU timestamps unavailable: rt/g2c/c2g will be NaN");
+        // Bench-thread QoS (DECISIONS #36): requested first, so every measurement, the bandwidth rows
+        // included, runs under the same class. The cells run on this thread (runCell is inline).
+        m_qosNote = "not requested; thread " + threadQosClass() + ", priority " + threadPriority();
+        if (m_cfg.qos != ThreadQos::Default) {
+            bool ok = requestThreadQosInteractive(m_qosNote);
+            if (m_cfg.qos == ThreadQos::High) {
+                std::string prio;
+                ok = requestThreadPriority(kHighThreadPriority, prio) && ok;
+                m_qosNote += "; " + prio;
+            }
+            if (ok) LB_LOG_INFO("bench thread scheduling: %s", m_qosNote.c_str());
+            else LB_LOG_WARN("--micro-qos=%s not (fully) applied: %s", threadQosName(m_cfg.qos), m_qosNote.c_str());
+        }
         if (!setup()) return 2;
 
         m_platform = platformId(caps);
@@ -627,6 +642,8 @@ private:
                                "(DECISIONS #20); bw_* rows: rt_us = GPU copy time");
         h.add("sysinfo.second_queue", m_g.caps().secondQueue ? m_g.caps().secondQueueInfo : "none");
         h.add("gpuload", gpuLoadName(m_cfg.gpuLoad));
+        h.add("qos", threadQosName(m_cfg.qos));
+        h.add("qos.note", m_qosNote);
         if (m_cfg.gpuLoad != GpuLoad::Idle) {
             // Hot-GPU cells (DECISIONS #32). load.steps / load.dispatch_us are calibrated per process.
             h.add("load.available", m_loadAvailable ? "yes" : "no");
@@ -767,6 +784,7 @@ private:
     TimestampPoolHandle m_ts;
     u64 m_value = 0;
     u64 m_failures = 0;
+    std::string m_qosNote;   // what the bench thread runs as (CSV header `qos.note`)
     std::FILE* m_csv = nullptr;
     ResumeScan m_resume;  // complete cells of the interrupted run (--resume); empty otherwise
     std::vector<Summary> m_summaries;
@@ -776,6 +794,15 @@ private:
 
 std::vector<u64> defaultMicroPayloads() {
     return {4ull << 10, 64ull << 10, 256ull << 10, 1ull << 20, 4ull << 20, 16ull << 20};
+}
+
+const char* threadQosName(ThreadQos q) {
+    switch (q) {
+    case ThreadQos::Default: return "default";
+    case ThreadQos::Interactive: return "interactive";
+    case ThreadQos::High: return "high";
+    }
+    return "?";
 }
 
 const char* gpuLoadName(GpuLoad l) {
