@@ -85,3 +85,38 @@ ext series was not started.
 - Retest driver `launch_0558/lc4_qos.sh`: D H H D D H H D (default / high), all launched from the session (the launch context is
   ruled out), `build/lightbound` (the frozen ext binary predates the flag), rusage per run, the header's qos/priority lines logged.
   Gates: full wake, AC ≥ 35 W. Needs the user's go and a Main slot (≈ 8 min). Compare against 09-24 with `ab_compare.py`.
+
+## QoS/priority retest (2026-10-22 19:48:00–19:52:10 WIB, `launch_1948/`, Main's quiet-Mac slot, user's go via Main): QoS and priority RULED OUT; the lead moves to the SoC clock
+
+- Driver `launch_0558/lc4_qos.sh` via `launch_1948/lc4_launch.sh` (epoch-timed start, environment log, own `caffeinate -is`):
+  `build/lightbound` at 6cef8eb clean, cells empty/s1_copy/s2_direct × 4K/1M, D H H D D H H D (D = `--micro-qos=default`,
+  H = `--micro-qos=high`), all launched from the session, 25–31 s each. Full wake before and after every run, 40 W through the
+  hub, 80 % at 0 mA throughout, internal panel only (no ultrawide), HID = internal keyboard/trackpad + USB mouse dongle
+  (Kanata S wireless) + Bluetooth headset; Mac rebooted at 18:26; the user had left; other agents idle (Main). Process nice 0.
+  The flag took effect: H headers read `thread_priority: cur=47 base=47`, `qos: high`; D headers `cur=31 base=31`.
+- **Result 1 (`compare.txt`, `lc4_compare.py`, median over 4 runs each): H = D.** H − D is within ±12 µs on 16 of 20 cells.
+  The 4 cells where D reads lower (empty chain spin −96, empty perpass spin −86, s1_copy perpass 4K −88, s2_direct perpass 4K
+  −127) are the cells that sped up late in the series, and the two late D runs (5, 8) happen to be the fastest: the interleaved
+  order shows a time trend, not a flag effect. P-core share did not move with the flag (H 0.55–0.65, D 0.56–0.69). So a
+  user-interactive QoS request plus base priority 47 does **not** restore the 09-24 spin levels: scheduling class and priority
+  are ruled out, and `--micro-qos=high` is not worth adopting (recommendation; DECISIONS #36 left the call to the user).
+- **Result 2: the spin cells track the effective clock, and a background load lifted it mid-series.** Exit rusage per run:
+  runs 1–3 (19:48:03–19:49:41) ran at 2.17–2.26 GHz process-wide (P-cores 2.6–2.8, E-cores 1.4–1.5), spin cells +170…+290 µs
+  vs 09-24, as in every check since 10-17. From run 4 (19:49:45) on: 2.8–3.2 GHz (P 3.3–3.9, E 1.8–2.9), CPU time per run
+  16.0–16.4 → 12.8–14.1 s, and the empty/4K spin cells fell to 09-24 levels or below (empty chain spin 101–130 µs in runs 6 and
+  8 vs ref 249; s2_direct chain 4K 210–214 in runs 7–8 vs 201; s2_direct perpass 4K 109–196 vs 203). Across the 8 runs
+  r(rt, GHz) = −0.81…−0.95 for the empty and 4K spin cells, r(rt, P-core share) only −0.52…+0.35: the clock explains the shift
+  better than the core placement did on 10-21. The 1 MiB spin cells stayed +180…+230 µs in every run but one (run 6 H: s1_copy
+  chain 1M 368 vs ref 352), so they carry a second component (the spin-mode 1 MiB read, 45 vs 14 µs on 09-24) that the clock
+  alone does not remove. Block cells: 4K +1…+13 µs, 1M −62…−127 µs vs 09-24, as since 10-20.
+  The 1-min load rose from 1.1–2.2 to 4.16 at 19:50:15 and stayed 3.4–3.9: Main's process log says macOS launched FPCKService
+  (iCloud Drive sync, ≈ 50 % CPU over 4 min) at 19:50:00, with Spotlight/photoanalysisd bursts, post-reboot housekeeping; no
+  agent ran anything. So **another process's load raised the SoC clock and the lone spinning bench thread profited.**
+- Reading (not proven): on an idle Mac the governor leaves a single spin-waiting thread at ≈ 2.2 GHz effective; on 09-24 the Mac
+  ran at thermal "fair", i.e. something else kept the clocks up then. That would make "what changed 09-24 → 10-17" the Mac's
+  background state rather than a setting. The process-wide counters cannot show the bench thread's own clock; `powermetrics`
+  (root) during a run would.
+- Next (user's call, STATUS to-do 2): (c) a 2-min root `powermetrics --samplers cpu_power` check during two runs (idle, then
+  with a companion load) to see the clock directly; then (a) report the shift and re-measure the idle reference in the present
+  state, or (b) make a defined CPU-side load part of the microbench condition (the game never runs a lone spinning thread;
+  docs/06 §2 changes and both platforms re-measure). Recommendation: (c) first, then (b) if it confirms.

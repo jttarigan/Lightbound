@@ -393,3 +393,10 @@ Ambiguities resolved while building, per CLAUDE.md rule 4. Newest at the bottom.
     - **Retest driver:** `results/m1_mac_40w_check/launch_0558/lc4_qos.sh` (default/high interleaved, 8 runs ≈ 8 min,
       all launched from the session since the launch context is ruled out, `build/lightbound` because the frozen ext
       binary predates the flag). Waits for the user's go and a Main slot; gates on full wake and AC ≥ 35 W.
+    - **Outcome (retest 2026-10-22 19:48 WIB, `results/m1_mac_40w_check/launch_1948/`): H = D.** Four `high` runs (header
+      `cur=47 base=47`) interleaved with four `default` runs differ by ≤ 12 µs on 16 of 20 cells, and the other 4 follow the run
+      order, not the flag; the P-core share did not move. **Scheduling class and priority are ruled out; `--micro-qos` stays a
+      diagnostic, off, and is not adopted by the protocol.** The same series showed the spin cells tracking the process's
+      effective clock (2.2 GHz in runs 1–3 → 2.8–3.2 GHz from run 4, when macOS's post-reboot iCloud/Spotlight housekeeping
+      loaded the Mac; r(rt, GHz) −0.81…−0.95 on the empty/4K spin cells), so the lead moves to the SoC's DVFS state on an idle
+      Mac (README of `m1_mac_40w_check`). What the protocol does about it is the human's call (STATUS to-do 2).

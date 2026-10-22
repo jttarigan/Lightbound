@@ -1,0 +1,43 @@
+[    0.000] INFO  main.cpp:185: lightbound 0.2.0-m2 | mode=microbench strategy=S2 k=1 delay=2 agents=20000 seed=1234 frames=2000 warmup=200 submit=chain cpuwait=spin threads=4 memvariant=default audit=off audio=on preset=none out=/private/tmp/claude-501/-Users-jostarigan-Project-Lightbound/00ac5adf-6adf-4649-93aa-0b2e40319811/scratchpad/lc4/lc_1_D.csv tag= power=off vsync=off validation=off micro-paths=empty,s1_copy,s2_direct micro-payloads=4K,1M
+[    0.014] INFO  MetalGfx.cpp:132: Metal device: Apple M5 (unified memory: yes, timestamps: stage-boundary, headless)
+[    0.061] INFO  Microbench.cpp:610: bw_d2h 1M: p50 23.3 us = 44.98 GB/s
+[    0.107] INFO  Microbench.cpp:610: bw_h2d 1M: p50 23.7 us = 44.31 GB/s
+[    0.107] INFO  Microbench.cpp:329: path empty             down=Shared up=Shared
+[    2.070] INFO  Microbench.cpp:551: empty             chain   spin      0  rt p50     488.6 us  p99     564.0  | g2c p50     78.1  c2g p50    409.2  | calib ±0.1 us
+[    3.084] INFO  Microbench.cpp:551: empty             chain   block     0  rt p50     208.4 us  p99     408.5  | g2c p50     53.7  c2g p50    155.2  | calib ±0.0 us
+[    4.742] INFO  Microbench.cpp:551: empty             perpass spin      0  rt p50     362.0 us  p99     562.0  | g2c p50     60.5  c2g p50    313.8  | calib ±0.0 us
+[    5.762] INFO  Microbench.cpp:551: empty             perpass block     0  rt p50     210.5 us  p99     381.7  | g2c p50     53.8  c2g p50    156.2  | calib ±0.0 us
+[    5.762] INFO  Microbench.cpp:329: path s1_copy           down=DeviceLocal up=DeviceLocal downStaging=Shared upStaging=Shared
+[    7.673] INFO  Microbench.cpp:551: s1_copy           chain   spin     4K  rt p50     496.4 us  p99     576.3  | g2c p50     94.3  c2g p50    399.9  | calib ±0.0 us
+[    9.901] INFO  Microbench.cpp:551: s1_copy           chain   spin     1M  rt p50     561.4 us  p99     685.3  | g2c p50    124.4  c2g p50    307.0  | calib ±0.1 us
+[   10.975] INFO  Microbench.cpp:551: s1_copy           chain   block    4K  rt p50     220.9 us  p99     319.9  | g2c p50     61.9  c2g p50    157.6  | calib ±0.0 us
+[   12.063] INFO  Microbench.cpp:551: s1_copy           chain   block    1M  rt p50     248.9 us  p99     471.5  | g2c p50     80.4  c2g p50    137.4  | calib ±0.0 us
+[   13.897] INFO  Microbench.cpp:551: s1_copy           perpass spin     4K  rt p50     507.0 us  p99     582.4  | g2c p50     90.6  c2g p50    410.7  | calib ±0.0 us
+[   16.419] INFO  Microbench.cpp:551: s1_copy           perpass spin     1M  rt p50     605.5 us  p99     697.2  | g2c p50    133.1  c2g p50    325.0  | calib ±0.1 us
+[   17.517] INFO  Microbench.cpp:551: s1_copy           perpass block    4K  rt p50     231.1 us  p99     406.0  | g2c p50     64.8  c2g p50    166.1  | calib ±0.1 us
+[   18.490] INFO  Microbench.cpp:551: s1_copy           perpass block    1M  rt p50     221.4 us  p99     274.3  | g2c p50     80.4  c2g p50    110.8  | calib ±0.0 us
+[   18.491] INFO  Microbench.cpp:329: path s2_direct         down=Shared up=Shared
+[   20.161] INFO  Microbench.cpp:551: s2_direct         chain   spin     4K  rt p50     452.4 us  p99     549.3  | g2c p50     68.7  c2g p50    377.1  | calib ±0.0 us
+[   22.557] INFO  Microbench.cpp:551: s2_direct         chain   spin     1M  rt p50     542.2 us  p99     624.3  | g2c p50    131.5  c2g p50    326.0  | calib ±0.1 us
+[   23.580] INFO  Microbench.cpp:551: s2_direct         chain   block    4K  rt p50     211.1 us  p99     406.1  | g2c p50     50.7  c2g p50    161.2  | calib ±0.0 us
+[   24.588] INFO  Microbench.cpp:551: s2_direct         chain   block    1M  rt p50     242.7 us  p99     267.7  | g2c p50     82.5  c2g p50    126.1  | calib ±0.0 us
+[   26.393] INFO  Microbench.cpp:551: s2_direct         perpass spin     4K  rt p50     489.5 us  p99     566.0  | g2c p50     77.3  c2g p50    409.4  | calib ±0.0 us
+[   28.783] INFO  Microbench.cpp:551: s2_direct         perpass spin     1M  rt p50     527.8 us  p99     606.6  | g2c p50    128.9  c2g p50    246.6  | calib ±0.1 us
+[   29.717] INFO  Microbench.cpp:551: s2_direct         perpass block    4K  rt p50     211.1 us  p99     238.2  | g2c p50     53.8  c2g p50    156.8  | calib ±0.0 us
+[   30.702] INFO  Microbench.cpp:551: s2_direct         perpass block    1M  rt p50     225.7 us  p99     263.6  | g2c p50     82.9  c2g p50    113.5  | calib ±0.0 us
+
+round-trip p50 / p99 (us), P-M5
+path              submit  wait                  0                4K                1M
+empty             chain   spin     488.6/   564.0                 -                 -
+empty             chain   block    208.4/   408.5                 -                 -
+empty             perpass spin     362.0/   562.0                 -                 -
+empty             perpass block    210.5/   381.7                 -                 -
+s1_copy           chain   spin                  -    496.4/   576.3    561.4/   685.3
+s1_copy           chain   block                 -    220.9/   319.9    248.9/   471.5
+s1_copy           perpass spin                  -    507.0/   582.4    605.5/   697.2
+s1_copy           perpass block                 -    231.1/   406.0    221.4/   274.3
+s2_direct         chain   spin                  -    452.4/   549.3    542.2/   624.3
+s2_direct         chain   block                 -    211.1/   406.1    242.7/   267.7
+s2_direct         perpass spin                  -    489.5/   566.0    527.8/   606.6
+s2_direct         perpass block                 -    211.1/   238.2    225.7/   263.6
+[   30.702] INFO  Microbench.cpp:195: microbench done: /private/tmp/claude-501/-Users-jostarigan-Project-Lightbound/00ac5adf-6adf-4649-93aa-0b2e40319811/scratchpad/lc4/lc_1_D.csv, 0 verification/R7 failures, 0 API errors, thermal state nominal

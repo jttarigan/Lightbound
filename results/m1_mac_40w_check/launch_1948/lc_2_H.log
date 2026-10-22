@@ -1,0 +1,44 @@
+[    0.000] INFO  main.cpp:185: lightbound 0.2.0-m2 | mode=microbench strategy=S2 k=1 delay=2 agents=20000 seed=1234 frames=2000 warmup=200 submit=chain cpuwait=spin threads=4 memvariant=default audit=off audio=on preset=none out=/private/tmp/claude-501/-Users-jostarigan-Project-Lightbound/00ac5adf-6adf-4649-93aa-0b2e40319811/scratchpad/lc4/lc_2_H.csv tag= power=off vsync=off validation=off micro-paths=empty,s1_copy,s2_direct micro-payloads=4K,1M micro-qos=high
+[    0.012] INFO  MetalGfx.cpp:132: Metal device: Apple M5 (unified memory: yes, timestamps: stage-boundary, headless)
+[    0.013] INFO  Microbench.cpp:138: bench thread scheduling: QOS_CLASS_USER_INTERACTIVE requested; thread was user-interactive, priority cur=31 base=31 max=63, now user-interactive, priority cur=31 base=31 max=63; base priority 47 requested (THREAD_PRECEDENCE_POLICY importance 16); thread was cur=31 base=31 max=63, now cur=47 base=47 max=63
+[    0.052] INFO  Microbench.cpp:610: bw_d2h 1M: p50 20.9 us = 50.13 GB/s
+[    0.089] INFO  Microbench.cpp:610: bw_h2d 1M: p50 20.5 us = 51.15 GB/s
+[    0.090] INFO  Microbench.cpp:329: path empty             down=Shared up=Shared
+[    2.063] INFO  Microbench.cpp:551: empty             chain   spin      0  rt p50     490.2 us  p99     565.1  | g2c p50     78.2  c2g p50    411.3  | calib ±0.0 us
+[    3.065] INFO  Microbench.cpp:551: empty             chain   block     0  rt p50     207.8 us  p99     410.8  | g2c p50     53.5  c2g p50    154.5  | calib ±0.0 us
+[    4.775] INFO  Microbench.cpp:551: empty             perpass spin      0  rt p50     475.8 us  p99     561.8  | g2c p50     75.3  c2g p50    397.6  | calib ±0.0 us
+[    5.824] INFO  Microbench.cpp:551: empty             perpass block     0  rt p50     211.1 us  p99     288.8  | g2c p50     53.1  c2g p50    157.8  | calib ±0.0 us
+[    5.824] INFO  Microbench.cpp:329: path s1_copy           down=DeviceLocal up=DeviceLocal downStaging=Shared upStaging=Shared
+[    7.731] INFO  Microbench.cpp:551: s1_copy           chain   spin     4K  rt p50     492.7 us  p99     567.8  | g2c p50     93.2  c2g p50    398.4  | calib ±0.0 us
+[   10.149] INFO  Microbench.cpp:551: s1_copy           chain   spin     1M  rt p50     585.0 us  p99     687.1  | g2c p50    126.7  c2g p50    329.8  | calib ±0.1 us
+[   11.292] INFO  Microbench.cpp:551: s1_copy           chain   block    4K  rt p50     226.7 us  p99     472.6  | g2c p50     64.2  c2g p50    163.0  | calib ±0.0 us
+[   12.272] INFO  Microbench.cpp:551: s1_copy           chain   block    1M  rt p50     243.0 us  p99     274.5  | g2c p50     79.4  c2g p50    131.8  | calib ±0.0 us
+[   14.119] INFO  Microbench.cpp:551: s1_copy           perpass spin     4K  rt p50     509.9 us  p99     574.8  | g2c p50     92.9  c2g p50    414.2  | calib ±0.0 us
+[   16.601] INFO  Microbench.cpp:551: s1_copy           perpass spin     1M  rt p50     599.6 us  p99     673.4  | g2c p50    131.4  c2g p50    318.7  | calib ±0.1 us
+[   17.700] INFO  Microbench.cpp:551: s1_copy           perpass block    4K  rt p50     231.2 us  p99     504.8  | g2c p50     64.4  c2g p50    167.0  | calib ±0.0 us
+[   18.675] INFO  Microbench.cpp:551: s1_copy           perpass block    1M  rt p50     222.3 us  p99     271.4  | g2c p50     80.2  c2g p50    111.4  | calib ±0.0 us
+[   18.675] INFO  Microbench.cpp:329: path s2_direct         down=Shared up=Shared
+[   20.452] INFO  Microbench.cpp:551: s2_direct         chain   spin     4K  rt p50     468.0 us  p99     562.6  | g2c p50     73.8  c2g p50    392.8  | calib ±0.0 us
+[   22.748] INFO  Microbench.cpp:551: s2_direct         chain   spin     1M  rt p50     523.9 us  p99     613.3  | g2c p50    117.8  c2g p50    255.6  | calib ±0.1 us
+[   23.744] INFO  Microbench.cpp:551: s2_direct         chain   block    4K  rt p50     206.5 us  p99     402.0  | g2c p50     52.4  c2g p50    155.9  | calib ±0.0 us
+[   24.768] INFO  Microbench.cpp:551: s2_direct         chain   block    1M  rt p50     244.1 us  p99     266.1  | g2c p50     82.0  c2g p50    128.8  | calib ±0.0 us
+[   26.583] INFO  Microbench.cpp:551: s2_direct         perpass spin     4K  rt p50     483.0 us  p99     558.3  | g2c p50     76.7  c2g p50    404.7  | calib ±0.0 us
+[   28.963] INFO  Microbench.cpp:551: s2_direct         perpass spin     1M  rt p50     529.0 us  p99     613.1  | g2c p50    127.3  c2g p50    257.2  | calib ±0.1 us
+[   29.981] INFO  Microbench.cpp:551: s2_direct         perpass block    4K  rt p50     211.0 us  p99     397.3  | g2c p50     52.7  c2g p50    158.3  | calib ±0.0 us
+[   30.963] INFO  Microbench.cpp:551: s2_direct         perpass block    1M  rt p50     224.0 us  p99     261.3  | g2c p50     82.0  c2g p50    114.3  | calib ±0.0 us
+
+round-trip p50 / p99 (us), P-M5
+path              submit  wait                  0                4K                1M
+empty             chain   spin     490.2/   565.1                 -                 -
+empty             chain   block    207.8/   410.8                 -                 -
+empty             perpass spin     475.8/   561.8                 -                 -
+empty             perpass block    211.1/   288.8                 -                 -
+s1_copy           chain   spin                  -    492.7/   567.8    585.0/   687.1
+s1_copy           chain   block                 -    226.7/   472.6    243.0/   274.5
+s1_copy           perpass spin                  -    509.9/   574.8    599.6/   673.4
+s1_copy           perpass block                 -    231.2/   504.8    222.3/   271.4
+s2_direct         chain   spin                  -    468.0/   562.6    523.9/   613.3
+s2_direct         chain   block                 -    206.5/   402.0    244.1/   266.1
+s2_direct         perpass spin                  -    483.0/   558.3    529.0/   613.1
+s2_direct         perpass block                 -    211.0/   397.3    224.0/   261.3
+[   30.963] INFO  Microbench.cpp:195: microbench done: /private/tmp/claude-501/-Users-jostarigan-Project-Lightbound/00ac5adf-6adf-4649-93aa-0b2e40319811/scratchpad/lc4/lc_2_H.csv, 0 verification/R7 failures, 0 API errors, thermal state nominal

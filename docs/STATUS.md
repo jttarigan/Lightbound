@@ -1,6 +1,27 @@
 # Work status (resume here)
 
-_Last updated 2026-10-22 ≈ 10:55 WIB (session 17: solo hour; `--micro-qos` flag + thread priority in headers built; cost-model formula as a Word equation)._
+_Last updated 2026-10-22 ≈ 20:10 WIB (session 18: the QoS/priority retest ran in Main's quiet-Mac slot; QoS and priority ruled out, the lead moves to the SoC clock)._
+
+## RESUME HERE (2026-10-22 ≈ 20:10, session 18: QoS/priority retest DONE — ruled out; new lead = the SoC clock on an idle Mac)
+- **Quiet-Mac slot (user's go 18:28 via Main; GO 19:48:00): `lc4_qos.sh` ran 19:48:00–19:52:10, 8/8 runs, exit 0**, data and
+  write-up in `results/m1_mac_40w_check/launch_1948/` (CSVs gzipped, `compare.txt`, `env.log`), README section "QoS/priority
+  retest", DECISIONS #36 outcome. Mac: 40 W, 80 % at 0 mA, full wake, internal panel only, Mac rebooted 18:26, agents idle.
+- **Result 1: `--micro-qos=high` (user-interactive + base priority 47, confirmed in the headers) = `default`.** H − D ≤ 12 µs on
+  16 of 20 cells; the other 4 follow the run order. P-core share unchanged (0.55–0.69). **Scheduling class/priority ruled out**;
+  the flag stays a diagnostic, nothing to adopt (to-do 2's "if high brings 09-24 back" branch is closed).
+- **Result 2 (new lead): the spin cells track the process's effective clock.** Runs 1–3 at 2.2 GHz: spin +170…+290 µs vs 09-24.
+  From run 4 (19:49:45) 2.8–3.2 GHz: the empty/4K spin cells back at or below 09-24 (empty chain spin 101–130 vs 249), the 1 MiB
+  spin cells still +180…+230 (one exception). r(rt, GHz) −0.81…−0.95 on the empty/4K spin cells vs r(rt, P-core share)
+  −0.52…+0.35. The clock rose when macOS's post-reboot iCloud sync (FPCKService, ≈ 50 % CPU) + Spotlight started at 19:50:00
+  (Main's process log): **a background load raises the SoC clock and the lone spinning bench thread profits.** Reading: on an
+  idle Mac the governor leaves a single spin-waiting thread at ≈ 2.2 GHz; on 09-24 the Mac was at thermal "fair" (busier).
+  Not proven: the bench thread's own clock is not measured (`powermetrics` needs root).
+- **Open asks for the user:** (1) to-do 2: OK for a 2-min root `powermetrics` check (two runs: idle, then with a companion load)
+  and then the protocol decision (report the shift / re-measure the reference, or a defined CPU-side load as a bench condition);
+  (2) Word: Zotero → Refresh, title page, reference style, §9.1 equation; (3) PC checklist (to-do 4); (4) M2 review;
+  (5) paper decisions (to-do 7); (6) push (34 commits ahead after this session's commit).
+- Lab note sent to Main (lab-wide clue): an idle Mac clocks a lone busy thread low; other projects' single-thread CPU numbers on
+  the Mac may depend on what else runs.
 
 ## RESUME HERE (2026-10-22 ≈ 10:55, session 17: solo hour; the spin-wait code test is built, the Word equation is done)
 - **Closed 15:32 WIB on the user's Mac shutdown (via Main).** Nothing running; nothing pushed. The `lc4_qos.sh` retest slot moves
@@ -219,21 +240,22 @@ _Last updated 2026-10-22 ≈ 10:55 WIB (session 17: solo hour; `--micro-qos` fla
   Calibration stats (seeds 1..200 per depth): open fraction p50 21.4 → 23.5 %, re-rolls ≈ 7 % of floors (rule 5 dark
   stretches, puzzle search, rule 6).
 
-## To-do (refreshed 2026-10-21 21:40; order = dependency order)
+## To-do (refreshed 2026-10-22 20:10; order = dependency order)
 Tags: **[solo]** = this session, unattended; **[device: X, ~time]** = needs a machine; **[user]** = the human's hands or a decision.
 No phones or tablets are needed.
 
 1. **[user] Review M2** (`docs/img/floors/*.png`, DECISIONS #34). M2's [PC] golden check rides along with to-do 4. M3 (headless
    simulation core) is next after M2 is accepted.
-2. **[user, then device] The M5 spin-wait shift** (§12.2 item 5; `results/m1_mac_40w_check/`; DECISIONS #36). The code test is
-   built (10-22): `--micro-qos=high` raises the bench thread to base priority 47 (a plain QoS request is capped at 31 for a
-   command-line process, so `interactive` alone cannot test the P-core lead). Needs (a) the user's go for the
-   **[device: Mac on AC ≥ 35 W, ≈ 8 min, Main slot, full wake]** retest: `LC_SP=<scratchpad> LC_END='YYYY-mm-dd HH:MM:SS'
-   caffeinate -is results/m1_mac_40w_check/launch_0558/lc4_qos.sh` (default/high interleaved, 8 runs; compare with
-   `ab_compare.py` against 09-24); (b) still: what else changed on the Mac between 2026-09-24 and 10-17? If `high` brings the
-   09-24 levels back, **[user]** decides whether the protocol's Mac runs adopt it (docs/06 §2; both platforms re-measure)
-   before 3 runs; if not, **[user]** decides how the paper handles the shift (re-measure the idle reference in the present
-   state, or report both; §12.2 item 5 comment).
+2. **[user] The M5 spin-wait shift** (§12.2 item 5; `results/m1_mac_40w_check/`; DECISIONS #36). **Retest done 10-22 19:48**
+   (`launch_1948/`): `--micro-qos=high` = default, so scheduling class/priority are ruled out (after the adapter, displays, dark
+   wake, launch context, nice). New lead: the SoC clock — the spin cells went back to 09-24 levels when a background load
+   (macOS iCloud sync) lifted the process clock from 2.2 to 3.1 GHz; the 1 MiB spin cells kept a second component. Needs
+   **[user]**: (c) OK for a 2-min root `powermetrics --samplers cpu_power` check during two runs (idle, then with a companion load;
+   the user runs the sudo line or pastes it into a Terminal, Main slot), then the protocol decision: (a) report the shift and
+   re-measure the idle reference in the present state (docs/06 §2 unchanged, the paper says the idle spin cells are
+   governor-dependent), or (b) make a defined CPU-side load part of the microbench condition (the game never runs a lone spinning
+   thread; docs/06 §2 changes and both platforms re-measure). Recommendation: (c) first, then (b) if it confirms. Still open:
+   what else changed on the Mac 09-24 → 10-17 (the thermal "fair" on 09-24 suggests the Mac was busier then).
 3. **[device: Mac on AC, ≈ 70 min, unattended, Mac otherwise quiet]** extension series `results/m1_mac_ext` (idle + hot,
    12 payloads; command in `docs/M1_RESCOPE_PROPOSAL.md` §4): charger, lid open, Low Power Mode off, `caffeinate -is`; no
    other session may run GPU work, builds or heavy jobs meanwhile. Needs a slot from Main when the Mac is quiet (evening/night,
@@ -263,7 +285,7 @@ No phones or tablets are needed.
 8. **4060 Ti step D, November** (the user's date). **[user]** installs it in the i7-12700F PC, same slot (protocol §2; if it goes
    into another PC, ask before planning). **[device: Windows PC, exclusive, ≈ 3 days unattended]** step D as written
    (`results\m1_4060`), then optionally `m1_4060_ext`. **[solo, ≈ 1 h]** merge and add P-4060 to the combined report.
-9. **[user] Push** the local commits (32 ahead of origin after session 17, 10-22).
+9. **[user] Push** the local commits (34 ahead of origin after session 18, 10-22 evening).
 10. ~~Carry the bundle / PC message to the PC~~ superseded by 4 (main is on GitHub since 10-17; the bundle is the fallback).
     ~~Pushing~~ done 10-17 evening (main baf605a..559c377 and `mac/narrow-link`).
 
