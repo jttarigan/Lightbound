@@ -1,6 +1,30 @@
 # Work status (resume here)
 
-_Last updated 2026-10-22 ≈ 21:55 WIB (session 18, closed: the QoS/priority retest ran in Main's quiet-Mac slot; QoS and priority ruled out, the lead moves to the SoC clock)._
+_Last updated 2026-10-23 ≈ 12:15 WIB (session 19: paper pass on the user's "focus on paper writing" via Main; no device, no measurement, nothing pushed)._
+
+## RESUME HERE (2026-10-23 ≈ 12:15, session 19: paper pass — text, references, Declarations; no device, no measurement)
+- **Context:** Main relayed the user's instruction (11:55 WIB): work on the paper steps that need no hands and no device; Mac timing
+  runs, PC changes, pushes and Word scripting stay forbidden without Main's GO. Four local commits, nothing pushed (39 ahead).
+- **Done:** (1) `4700b24` §12.2 item 5 and §1 contribution 5 rewritten with the 10-22 QoS/priority retest: scheduling class and
+  priority ruled out; the spin-wait shift tracks the processor clock on an idle Mac (runs at 2.2 GHz +170…+290 µs, runs at
+  2.8–3.2 GHz back at the 09-24 levels for the empty cells; r(rt, GHz) −0.81…−0.95 on five of six empty/4K spin cells, the 1 MiB
+  spin cells keep a second component); the two protocol responses (a/b) are stated as open; "idle cuts both ways" lesson; §12.3
+  thermal note; OUTLINE row 12. (2) `59d1c7f` **`docs/paper/declarations.md`** (funding, competing interests, ethics n/a, data and
+  code availability with the tracked `results/` folders, contributions, a *proposed* AI-use wording) now feeds the Declarations
+  block of `build_docx.py`; the methods TODO of 10-17 closed (bandwidth is in Table 4). (3) `d6ebfa5` reference check: all 18
+  DOIs/URLs resolve (the three ACM DOIs answer 403 to scripts = ACM's bot block, not a bad DOI); **Huebner25 is published**
+  (IPDPSW 2025, IEEE, pp. 45–54, doi 10.1109/ipdpsw66978.2025.00013): Zotero item B5Q9E3C9 patched in place through the web API
+  (preprint → conferencePaper, same key, collection unchanged, arXiv id kept in Extra), refs.bib and related_work.md updated,
+  `build_docx.py --sync` rebuilt the .docx; Feng25, Cassagne25 and Maczan26 have no published version on Crossref (10-23) and
+  already carry arXiv DOIs (10.48550/…); "shared physical memory" wording in Table 2 and §4.7. Checks that passed: every §x.y
+  cross-reference has a heading; Table 1–7 and Fig. 1 appear in order; no draft cites the lab's unpublished paper 1 (LAB.md rule
+  of 10-23: only published work with a DOI). All 11 XML parts of the .docx parse after each rebuild.
+- **Found for the user:** the repository has **no LICENSE file**, so the code-availability statement cannot name a licence yet;
+  Springer basic prints no DOI for the IPDPSW entry either (same question as user ask 10, reference style).
+- **Main told:** (11:5x) the paper step and the one gating action = the spin-wait protocol decision (a/b; the 2-min powermetrics
+  check is a confirmation); (12:0x) "NEEDS DATA": m1_mac_ext (Mac, ≈ 70 min), m1_3060_ext (PC, ≈ 3 h), M3–M8 for §8/§10/§11.
+- **Open asks for the user:** the to-do list below (2 protocol decision; 6 Word check, now including the Declarations block;
+  7 paper decisions, now with the licence choice and the AI-use wording; 1 M2 review; 4 PC checklist; 9 push).
 
 ## RESUME HERE (2026-10-22 ≈ 20:10, session 18: QoS/priority retest DONE — ruled out; new lead = the SoC clock on an idle Mac)
 - **Quiet-Mac slot (user's go 18:28 via Main; GO 19:48:00): `lc4_qos.sh` ran 19:48:00–19:52:10, 8/8 runs, exit 0**, data and
@@ -243,7 +267,7 @@ _Last updated 2026-10-22 ≈ 21:55 WIB (session 18, closed: the QoS/priority ret
   Calibration stats (seeds 1..200 per depth): open fraction p50 21.4 → 23.5 %, re-rolls ≈ 7 % of floors (rule 5 dark
   stretches, puzzle search, rule 6).
 
-## To-do (refreshed 2026-10-22 20:10; order = dependency order)
+## To-do (refreshed 2026-10-23 12:15; order = dependency order)
 Tags: **[solo]** = this session, unattended; **[device: X, ~time]** = needs a machine; **[user]** = the human's hands or a decision.
 No phones or tablets are needed.
 
@@ -281,14 +305,15 @@ No phones or tablets are needed.
 6. **[user] Word manuscript check:** open `docs/paper/lightbound_jsc.docx` in Word, Zotero → Refresh (citations renumber, list
    re-renders → the build counts as done); confirm the prefilled title page; choose the reference style (Springer basic prints no
    DOI for conference papers and no arXiv id for preprints); check that the §9.1 equation renders (a Word equation since
-   10-22, three lines). Then **[solo]** polish: the style/DOI fix, rebuild (`python3 docs/paper/build_docx.py`, `--sync`
+   10-22, three lines); read the new Declarations block (10-23, bracketed items are yours). Then **[solo]** polish: the style/DOI fix, rebuild (`python3 docs/paper/build_docx.py`, `--sync`
    after any Zotero edit).
-7. **[user] Paper decisions:** AI-use declaration wording (Springer: in Methods), Zenodo DOI or not, extend the N grid beyond
-   100k for the ReBAR-off crossover (≈ 112k agents)?
+7. **[user] Paper decisions:** AI-use declaration wording (Springer: in Methods; a proposal is in `docs/paper/declarations.md`),
+   **a licence for the repository** (none yet; code availability needs it), funding statement, Zenodo DOI or not, extend the N grid
+   beyond 100k for the ReBAR-off crossover (≈ 112k agents)?
 8. **4060 Ti step D, November** (the user's date). **[user]** installs it in the i7-12700F PC, same slot (protocol §2; if it goes
    into another PC, ask before planning). **[device: Windows PC, exclusive, ≈ 3 days unattended]** step D as written
    (`results\m1_4060`), then optionally `m1_4060_ext`. **[solo, ≈ 1 h]** merge and add P-4060 to the combined report.
-9. **[user] Push** the local commits (34 ahead of origin after session 18, 10-22 evening).
+9. **[user] Push** the local commits (39 ahead of origin after session 19's paper pass, 10-23 midday).
 10. ~~Carry the bundle / PC message to the PC~~ superseded by 4 (main is on GitHub since 10-17; the bundle is the fallback).
     ~~Pushing~~ done 10-17 evening (main baf605a..559c377 and `mac/narrow-link`).
 
