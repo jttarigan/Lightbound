@@ -94,7 +94,7 @@ series are kept apart from the protocol series and never pooled with them.
 
 ## 4.7 Platforms (cross-reference to §3)
 
-- **P-M5:** MacBook Air 15" (Mac17,4), Apple M5 (4P + 6E CPU cores, 10 GPU cores), 24 GiB unified memory,
+- **P-M5:** MacBook Air 15" (Mac17,4), Apple M5 (4P + 6E CPU cores, 10 GPU cores), 24 GiB of memory shared by the CPU and GPU (Apple's "unified memory"),
   macOS 26.6.2, on AC power, Low Power Mode off, fanless chassis.
 - **P-3060:** Intel Core i7-12700F, 32 GB, RTX 3060 Ti 8 GB, driver 566.36, Windows 11, power plan Ultimate
   Performance, GPU "Prefer maximum performance". The slot runs at **PCIe gen3 x16** (measured under load in every

@@ -12,7 +12,7 @@
 |---|---|---|
 | system | MacBook Air 15" (Mac17,4), fanless | desktop, MSI MS-B9241 board |
 | CPU | Apple M5, 4 performance + 6 efficiency cores | Intel Core i7-12700F, 12 cores / 20 threads |
-| GPU | Apple M5, 10 cores, unified memory | NVIDIA RTX 3060 Ti, 8 GB |
+| GPU | Apple M5, 10 cores, shared physical memory | NVIDIA RTX 3060 Ti, 8 GB |
 | memory | 24 GiB unified | 32 GB system |
 | link | none (shared memory) | PCIe **gen3** x16, measured under load in every run |
 | OS / driver | macOS 26.6.2 (25G83) | Windows 11 (10.0.26200), driver 566.36 |

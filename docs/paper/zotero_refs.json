@@ -1,7 +1,7 @@
 {
  "zotero_user": 5591478,
  "style": "springer-basic-brackets",
- "synced": "2026-10-21 13:56 UTC",
+ "synced": "2026-10-23 05:05 UTC",
  "keys": {
   "Beischl26": "9RHUAUDT",
   "Feng25": "MFGDN9HN",
@@ -23,6 +23,115 @@
   "Yu20": "ZXCPKCWA"
  },
  "items": {
+  "B5Q9E3C9": {
+   "id": "B5Q9E3C9",
+   "type": "paper-conference",
+   "container-title": "2025 IEEE International Parallel and Distributed Processing Symposium Workshops (IPDPSW)",
+   "DOI": "10.1109/ipdpsw66978.2025.00013",
+   "note": "Citation Key: Huebner25\narXiv: 2502.05317",
+   "page": "45-54",
+   "publisher": "IEEE",
+   "title": "Apple vs. Oranges: Evaluating the Apple Silicon M-Series SoCs for HPC Performance and Efficiency",
+   "URL": "https://doi.org/10.1109/ipdpsw66978.2025.00013",
+   "author": [
+    {
+     "family": "Hübner",
+     "given": "Paul"
+    },
+    {
+     "family": "Hu",
+     "given": "Andong"
+    },
+    {
+     "family": "Peng",
+     "given": "Ivy"
+    },
+    {
+     "family": "Markidis",
+     "given": "Stefano"
+    }
+   ],
+   "issued": {
+    "date-parts": [
+     [
+      2025,
+      6,
+      3
+     ]
+    ]
+   }
+  },
+  "63M2D7IM": {
+   "id": "63M2D7IM",
+   "type": "article-journal",
+   "container-title": "Future Generation Computer Systems",
+   "DOI": "10.1016/j.future.2025.108331",
+   "ISSN": "0167-739X",
+   "note": "Citation Key: Velicka26",
+   "page": "108331",
+   "title": "An in-depth study of GPU frequency-scaling latency and its optimization on modern architectures",
+   "URL": "https://doi.org/10.1016/j.future.2025.108331",
+   "volume": "179",
+   "author": [
+    {
+     "family": "Velicka",
+     "given": "Daniel"
+    },
+    {
+     "family": "Vysocky",
+     "given": "Ondrej"
+    },
+    {
+     "family": "Yasal",
+     "given": "Osman"
+    },
+    {
+     "family": "Riha",
+     "given": "Lubomir"
+    }
+   ],
+   "issued": {
+    "date-parts": [
+     [
+      2026,
+      6
+     ]
+    ]
+   }
+  },
+  "JH7NE5WJ": {
+   "id": "JH7NE5WJ",
+   "type": "paper-conference",
+   "container-title": "2025 IEEE International Parallel and Distributed Processing Symposium Workshops (IPDPSW)",
+   "DOI": "10.1109/ipdpsw66978.2025.00133",
+   "note": "Citation Key: Velicka25",
+   "page": "830-839",
+   "publisher": "IEEE",
+   "title": "Methodology for GPU Frequency Switching Latency Measurement",
+   "URL": "https://doi.org/10.1109/ipdpsw66978.2025.00133",
+   "author": [
+    {
+     "family": "Velicka",
+     "given": "Daniel"
+    },
+    {
+     "family": "Vysocky",
+     "given": "Ondrej"
+    },
+    {
+     "family": "Riha",
+     "given": "Lubomir"
+    }
+   ],
+   "issued": {
+    "date-parts": [
+     [
+      2025,
+      6
+     ]
+    ]
+   }
+  },
   "ZXCPKCWA": {
    "id": "ZXCPKCWA",
    "type": "article-journal",
@@ -169,44 +278,6 @@
     ]
    }
   },
-  "63M2D7IM": {
-   "id": "63M2D7IM",
-   "type": "article-journal",
-   "container-title": "Future Generation Computer Systems",
-   "DOI": "10.1016/j.future.2025.108331",
-   "ISSN": "0167-739X",
-   "note": "Citation Key: Velicka26",
-   "page": "108331",
-   "title": "An in-depth study of GPU frequency-scaling latency and its optimization on modern architectures",
-   "URL": "https://doi.org/10.1016/j.future.2025.108331",
-   "volume": "179",
-   "author": [
-    {
-     "family": "Velicka",
-     "given": "Daniel"
-    },
-    {
-     "family": "Vysocky",
-     "given": "Ondrej"
-    },
-    {
-     "family": "Yasal",
-     "given": "Osman"
-    },
-    {
-     "family": "Riha",
-     "given": "Lubomir"
-    }
-   ],
-   "issued": {
-    "date-parts": [
-     [
-      2026,
-      6
-     ]
-    ]
-   }
-  },
   "HHZZZEFU": {
    "id": "HHZZZEFU",
    "type": "article-journal",
@@ -233,39 +304,6 @@
      [
       2023,
       2
-     ]
-    ]
-   }
-  },
-  "JH7NE5WJ": {
-   "id": "JH7NE5WJ",
-   "type": "paper-conference",
-   "container-title": "2025 IEEE International Parallel and Distributed Processing Symposium Workshops (IPDPSW)",
-   "DOI": "10.1109/ipdpsw66978.2025.00133",
-   "note": "Citation Key: Velicka25",
-   "page": "830-839",
-   "publisher": "IEEE",
-   "title": "Methodology for GPU Frequency Switching Latency Measurement",
-   "URL": "https://doi.org/10.1109/ipdpsw66978.2025.00133",
-   "author": [
-    {
-     "family": "Velicka",
-     "given": "Daniel"
-    },
-    {
-     "family": "Vysocky",
-     "given": "Ondrej"
-    },
-    {
-     "family": "Riha",
-     "given": "Lubomir"
-    }
-   ],
-   "issued": {
-    "date-parts": [
-     [
-      2025,
-      6
      ]
     ]
    }
@@ -607,41 +645,6 @@
     ]
    }
   },
-  "B5Q9E3C9": {
-   "id": "B5Q9E3C9",
-   "type": "article",
-   "DOI": "10.48550/arXiv.2502.05317",
-   "note": "Citation Key: Huebner25",
-   "number": "arXiv:2502.05317",
-   "publisher": "arXiv",
-   "title": "Apple vs. Oranges: Evaluating the Apple Silicon M-Series SoCs for HPC Performance and Efficiency",
-   "URL": "https://arxiv.org/abs/2502.05317",
-   "author": [
-    {
-     "family": "Hübner",
-     "given": "Paul"
-    },
-    {
-     "family": "Hu",
-     "given": "Andong"
-    },
-    {
-     "family": "Peng",
-     "given": "Ivy"
-    },
-    {
-     "family": "Markidis",
-     "given": "Stefano"
-    }
-   ],
-   "issued": {
-    "date-parts": [
-     [
-      2025
-     ]
-    ]
-   }
-  },
   "MFGDN9HN": {
    "id": "MFGDN9HN",
    "type": "article",
@@ -723,7 +726,7 @@
  "bib": {
   "9RHUAUDT": "Beischl A, Morozov M, Jungmair M, et al (2026) Evaluating Apple Silicon for Data Processing. In: Proceedings of the 22nd International Workshop on Data Management on New Hardware. ACM, pp 1&#x2013;10",
   "MFGDN9HN": "Feng D, Xu Z, Wang R, Lin FX (2025) Profiling Apple Silicon Performance for ML Training",
-  "B5Q9E3C9": "H&#xFC;bner P, Hu A, Peng I, Markidis S (2025) Apple vs. Oranges: Evaluating the Apple Silicon M-Series SoCs for HPC Performance and Efficiency",
+  "B5Q9E3C9": "H&#xFC;bner P, Hu A, Peng I, Markidis S (2025) Apple vs. Oranges: Evaluating the Apple Silicon M-Series SoCs for HPC Performance and Efficiency. In: 2025 IEEE International Parallel and Distributed Processing Symposium Workshops (IPDPSW). IEEE, pp 45&#x2013;54",
   "Z6B26CZ6": "Wahlgren J, Schieffer G, Shi R, et al (2025) Dissecting CPU-GPU Unified Physical Memory on AMD MI300A APUs. In: 2025 IEEE International Symposium on Workload Characterization (IISWC). IEEE, pp 368&#x2013;380",
   "XFCXEPHQ": "Spafford KL, Meredith JS, Lee S, et al (2012) The tradeoffs of fused memory hierarchies in heterogeneous computing architectures. In: Proceedings of the 9th conference on Computing Frontiers. ACM, pp 103&#x2013;112",
   "SUVUGF4V": "Gera P, Kim H, Kim H, et al (2018) Performance Characterisation and Simulation of Intel&#x2019;s Integrated GPU Architecture. In: 2018 IEEE International Symposium on Performance Analysis of Systems and Software (ISPASS). IEEE, pp 139&#x2013;148",
