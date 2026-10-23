@@ -8,3 +8,6 @@ __pycache__/
 .DS_Store
 .cache/
 compile_commands.json
+
+# Zotero refresh test copies (tools/zotero_refresh_test.sh from NPUBenchSwarm)
+.refreshtest/

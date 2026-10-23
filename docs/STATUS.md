@@ -1,6 +1,6 @@
 # Work status (resume here)
 
-_Last updated 2026-10-23 ≈ 12:15 WIB (session 19: paper pass on the user's "focus on paper writing" via Main; no device, no measurement, nothing pushed)._
+_Last updated 2026-10-23 ≈ 12:40 WIB (session 19: paper pass + the Zotero Refresh test passed in Word on Main's turn; no device, no measurement, nothing pushed)._
 
 ## RESUME HERE (2026-10-23 ≈ 12:15, session 19: paper pass — text, references, Declarations; no device, no measurement)
 - **Context:** Main relayed the user's instruction (11:55 WIB): work on the paper steps that need no hands and no device; Mac timing
@@ -19,6 +19,13 @@ _Last updated 2026-10-23 ≈ 12:15 WIB (session 19: paper pass on the user's "fo
   already carry arXiv DOIs (10.48550/…); "shared physical memory" wording in Table 2 and §4.7. Checks that passed: every §x.y
   cross-reference has a heading; Table 1–7 and Fig. 1 appear in order; no draft cites the lab's unpublished paper 1 (LAB.md rule
   of 10-23: only published work with a DOI). All 11 XML parts of the .docx parse after each rebuild.
+- **12:3x Zotero Refresh test PASSED (Main's Word turn):** `~/Project/NPUBenchSwarm/tools/zotero_refresh_test.sh docs/paper/lightbound_jsc.docx`
+  (copy in `docs/paper/.refreshtest/`, gitignored; opened and closed by name, Word empty afterwards): exit 0, Refresh done in ≈ 8 s, no
+  dialog, 21/21 ZOTERO_ITEM and 1/1 ZOTERO_BIBL fields kept, 354/354 paragraphs, no citation text changed. The only differences
+  are Zotero's rendering of the bibliography: "1. " for the build's "1."+tab, and **LTWA journal abbreviations** (J Supercomput,
+  Future Gener Comput Syst, Simul Model Pract Theory), which the journal requires. **The Word build counts as done** (user ask 8
+  closed); the user still looks at the title page, the reference style (no DOI on conference papers), the §9.1 equation and the
+  Declarations block. Word rule from Main (12:2x): Word is scripted only on Main's turn, one pane at a time.
 - **Found for the user:** the repository has **no LICENSE file**, so the code-availability statement cannot name a licence yet;
   Springer basic prints no DOI for the IPDPSW entry either (same question as user ask 10, reference style).
 - **Main told:** (11:5x) the paper step and the one gating action = the spin-wait protocol decision (a/b; the 2-min powermetrics
@@ -302,8 +309,8 @@ No phones or tablets are needed.
    state with its run-to-run spread, compare with the H1′ predictions, write §6.3 + Fig. 2, fill the §1/abstract placeholders.
    **Tool ready (10-21):** `python3 tools/analysis/crossover.py M5=results/m1_mac_ext 3060=results/m1_3060_ext --shared M5
    --modes all --out results/crossover_ext` (writes crossover.md with the H1′ verdicts; M1 preview in `results/m1_crossover/`).
-6. **[user] Word manuscript check:** open `docs/paper/lightbound_jsc.docx` in Word, Zotero → Refresh (citations renumber, list
-   re-renders → the build counts as done); confirm the prefilled title page; choose the reference style (Springer basic prints no
+6. **[user] Word manuscript check:** ~~Zotero → Refresh~~ **passed 10-23 12:3x** (refresh test on a copy, exit 0, fields kept, LTWA
+   abbreviations applied by Zotero; rerun it after every rebuild, on Main's Word turn only); the user confirms the prefilled title page; choose the reference style (Springer basic prints no
    DOI for conference papers and no arXiv id for preprints); check that the §9.1 equation renders (a Word equation since
    10-22, three lines); read the new Declarations block (10-23, bracketed items are yours). Then **[solo]** polish: the style/DOI fix, rebuild (`python3 docs/paper/build_docx.py`, `--sync`
    after any Zotero edit).
