@@ -95,7 +95,7 @@ staleness of frame-delayed readback (H4).
 | 9 | Cost model (§7) | **formulation drafted:** `cost_model.md` (payload per agent, estimation, falsifiers) | microbench ext + K = 1 game runs |
 | 10 | Decision staleness (H4) | — | M3 oracle, M8 audit runs |
 | 11 | Energy (H6, secondary) | — | M8 |
-| 12 | Threats to validity | **draft:** `threats_to_validity.md` (platform/API, measurement hygiene with the 10-17/10-20 evidence, run-to-run, interpretation; §12.2 revised 10-21: adapter ruled out, spin-wait shift open) | launch-context retest; game-side threats with M3–M8 |
+| 12 | Threats to validity | **draft:** `threats_to_validity.md` (platform/API, measurement hygiene with the 10-17/10-20 evidence, run-to-run, interpretation; §12.2 revised 10-23: adapter, display, wake, launch context and scheduling ruled out, the spin-wait shift tracks the processor clock on an idle Mac) | per-thread clock trace (root powermetrics) + the protocol decision; game-side threats with M3–M8 |
 | 13 | Conclusion | — | everything |
 
 **Draft order:** §4 (method), then §3 and §5 (facts already final), then §2 after a literature search, then §6
