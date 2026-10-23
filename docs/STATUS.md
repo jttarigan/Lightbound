@@ -25,7 +25,9 @@ _Last updated 2026-10-23 ≈ 12:40 WIB (session 19: paper pass + the Zotero Refr
   are Zotero's rendering of the bibliography: "1. " for the build's "1."+tab, and **LTWA journal abbreviations** (J Supercomput,
   Future Gener Comput Syst, Simul Model Pract Theory), which the journal requires. **The Word build counts as done** (user ask 8
   closed); the user still looks at the title page, the reference style (no DOI on conference papers), the §9.1 equation and the
-  Declarations block. Word rule from Main (12:2x): Word is scripted only on Main's turn, one pane at a time.
+  Declarations block. Word rule from Main (12:2x): Word is scripted only on Main's turn, one pane at a time. Main's follow-up (NPUBench finding, 12:5x):
+  Refresh restyles the list to Word's "Bibliography" style and invents a bare one if the docx lacks it; checked: `build_docx.py` ships
+  that style (10 pt, 0.25" hanging indent) and the refreshed copy kept it on every reference paragraph, so no rebuild or re-test.
 - **Found for the user:** the repository has **no LICENSE file**, so the code-availability statement cannot name a licence yet;
   Springer basic prints no DOI for the IPDPSW entry either (same question as user ask 10, reference style).
 - **Main told:** (11:5x) the paper step and the one gating action = the spin-wait protocol decision (a/b; the 2-min powermetrics
