@@ -1,6 +1,6 @@
 # Work status (resume here)
 
-_Last updated 2026-10-23 ≈ 12:40 WIB (session 19: paper pass + the Zotero Refresh test passed in Word on Main's turn; no device, no measurement, nothing pushed)._
+_Last updated 2026-10-23 ≈ 16:25 WIB (session 19, closed: paper pass + Zotero Refresh test passed; the user turned the Mac off for the day)._
 
 ## RESUME HERE (2026-10-23 ≈ 12:15, session 19: paper pass — text, references, Declarations; no device, no measurement)
 - **Context:** Main relayed the user's instruction (11:55 WIB): work on the paper steps that need no hands and no device; Mac timing
@@ -32,6 +32,11 @@ _Last updated 2026-10-23 ≈ 12:40 WIB (session 19: paper pass + the Zotero Refr
   Springer basic prints no DOI for the IPDPSW entry either (same question as user ask 10, reference style).
 - **Main told:** (11:5x) the paper step and the one gating action = the spin-wait protocol decision (a/b; the 2-min powermetrics
   check is a confirmation); (12:0x) "NEEDS DATA": m1_mac_ext (Mac, ≈ 70 min), m1_3060_ext (PC, ≈ 3 h), M3–M8 for §8/§10/§11.
+- **Closed ≈ 16:25 WIB on the user's "I'm off now; the Mac is being turned off" (via Main).** Nothing running, no device or app
+  touched all day, Word empty, nothing pushed (main 42 ahead after this commit). Device bookings by EchoHunt and ParticleParty
+  (iPhone 12, Mac camera) did not involve Lightbound. **Resume tomorrow with to-do 2** (the user's spin-wait protocol decision a/b +
+  OK for the 2-min root powermetrics check in a Main quiet slot); then 7 (licence, AI-use wording), 6 (title page, ref style,
+  Declarations look), 1 (M2 review), 4 (PC checklist), 9 (push). The Mac rebooted: start any quiet block ≥ 30 min after boot (LAB.md).
 - **Open asks for the user:** the to-do list below (2 protocol decision; 6 Word check, now including the Declarations block;
   7 paper decisions, now with the licence choice and the AI-use wording; 1 M2 review; 4 PC checklist; 9 push).
 
@@ -322,7 +327,7 @@ No phones or tablets are needed.
 8. **4060 Ti step D, November** (the user's date). **[user]** installs it in the i7-12700F PC, same slot (protocol §2; if it goes
    into another PC, ask before planning). **[device: Windows PC, exclusive, ≈ 3 days unattended]** step D as written
    (`results\m1_4060`), then optionally `m1_4060_ext`. **[solo, ≈ 1 h]** merge and add P-4060 to the combined report.
-9. **[user] Push** the local commits (39 ahead of origin after session 19's paper pass, 10-23 midday).
+9. **[user] Push** the local commits (42 ahead of origin after session 19, closed 10-23 ≈ 16:25).
 10. ~~Carry the bundle / PC message to the PC~~ superseded by 4 (main is on GitHub since 10-17; the bundle is the fallback).
     ~~Pushing~~ done 10-17 evening (main baf605a..559c377 and `mac/narrow-link`).
 
