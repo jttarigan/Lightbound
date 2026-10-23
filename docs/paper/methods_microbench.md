@@ -102,5 +102,6 @@ series are kept apart from the protocol series and never pooled with them.
   ReBAR off is a separate series.
 - **P-4060:** RTX 4060 Ti, same PC and slot, gen3 x8 expected (pending, November).
 
-<!-- TODO before submission: state the 3060 Ti's measured raw bandwidth here or in §5; Mac thermal state was
-     "fair" through the AC series; mention that the Mac is fanless (thermal threat, §12). -->
+<!-- TODO of 10-17 closed 10-23: the 3060 Ti's raw copy bandwidth is in Table 4 (§5: 12.4 / 13.3 GB/s against the M5's
+     55.4 / 57.9), the fanless chassis is stated above and in Table 2, and the "fair" thermal state of the accepted Mac
+     series is in §12.3. -->

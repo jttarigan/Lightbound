@@ -69,7 +69,7 @@ SECTIONS = [
     (12, "Threats to validity", "threats_to_validity.md", "subsections"),
     (13, "Conclusion", None, "[Written last.]"),
 ]
-DECLARATIONS = [
+DECLARATIONS = [          # fallback only; the draft is declarations.md (10-23)
     ("Funding", "[None / to state.]"),
     ("Competing interests", "[The author declares no competing interests. / to state]"),
     ("Data and code availability", "The benchmark, the simulation, the analysis scripts and the measured "
@@ -539,6 +539,14 @@ def abstract_block():
     return out
 
 
+def declarations():
+    """(heading, text) per H2 block of declarations.md; the DECLARATIONS list when the draft is missing."""
+    if not os.path.exists(os.path.join(HERE, "declarations.md")):
+        return DECLARATIONS
+    _, blocks = load_draft("declarations.md")
+    return [(fix_text(title), " ".join(" ".join(lines).split())) for title, lines in blocks]
+
+
 def body_xml():
     xml = [para("Title", TITLE), para("Author", AUTHOR), para("Affiliation", AFFILIATION),
            para("Affiliation", CONTACT)]
@@ -564,7 +572,7 @@ def body_xml():
                     raise SystemExit(f"{fname}: no H2 block {t!r}; has {list(titles)}")
                 xml += blocks_xml(titles[t])
     xml.append(para("Heading1", "Declarations", extra_ppr="<w:keepNext/>"))
-    for head, text in DECLARATIONS:
+    for head, text in declarations():
         xml.append(para("Normal", inner=run(head + ". ", bold=True) + runs(text)))
     xml.append(para("Heading1", "References", extra_ppr="<w:keepNext/>"))
     xml += zotero_bibliography()

@@ -57,7 +57,8 @@ checked 2026-10-18; Springer Nature policy pages for AI and preprints, same day)
 - **Title page:** title, author names, affiliations and addresses, corresponding author's e-mail, telephone (fax).
 - **Declarations before the references:** funding; competing interests; **data availability (required for original
   research)**; code availability; author contributions (entered in the submission system). Ethics/consent: not
-  applicable (no human or animal participants).
+  applicable (no human or animal participants). Drafted in `declarations.md` (10-23). **The repository has no LICENSE file** (checked 10-23): code
+  availability needs one before submission (user's choice).
 - **Figures:** Helvetica or Arial lettering at 8–12 pt print size, lines ≥ 0.3 pt, vector (EPS/PDF) for line art,
   RGB, legible in black and white, captions "**Fig. 1** …" in the text, not in the file. Width 84 mm (one column) or
   174 mm (full), max height 234 mm (the page also lists 119 mm for small-format journals; which one applies is to be
@@ -97,6 +98,7 @@ staleness of frame-delayed readback (H4).
 | 11 | Energy (H6, secondary) | — | M8 |
 | 12 | Threats to validity | **draft:** `threats_to_validity.md` (platform/API, measurement hygiene with the 10-17/10-20 evidence, run-to-run, interpretation; §12.2 revised 10-23: adapter, display, wake, launch context and scheduling ruled out, the spin-wait shift tracks the processor clock on an idle Mac) | per-thread clock trace (root powermetrics) + the protocol decision; game-side threats with M3–M8 |
 | 13 | Conclusion | — | everything |
+| — | Declarations | **draft 1:** `declarations.md` (10-23; funding, competing interests, ethics n/a, data + code availability, contributions, AI-use proposal) | the user's wording for AI use and funding; licence file for the repository (none yet); Zenodo DOI or not |
 
 **Draft order:** §4 (method), then §3 and §5 (facts already final), then §2 after a literature search, then §6
 once both extension series are in.
