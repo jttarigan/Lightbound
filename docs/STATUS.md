@@ -1,11 +1,11 @@
 # Lightbound status (resume here)
 
-_Saved 2026-10-24 ≈ 01:00 WIB (session 20: resume check, then this lean rewrite on Main's relay). Sessions 1–19, M1 findings
+_Saved 2026-10-25 ≈ 08:55 WIB (session 21: powermetrics clock check run 07:08 in Main's slot, analysed). Sessions 1–19, M1 findings
 1–8, PC results and old run instructions: `docs/archive/STATE-history-2026-10.md` (read only when needed)._
 
 ## Resume point
-- **Next: to-do 2** (user: spin-wait protocol decision a/b + OK for the 2-min root powermetrics check), then 7, 6, 1, 4, 9.
-- Running: nothing. Devices: none in use. Word: not touched; scripted only on Main's turn. Push: main 43 ahead of origin.
+- **Next: to-do 2** (user: spin-wait protocol decision a / b / b′; the clock check is done), then 7, 6, 1, 4, 9.
+- Running: nothing. Devices: none in use. Word: not touched; scripted only on Main's turn. Push: main 44 ahead of origin.
 - Mac rebooted 10-23: start a quiet block ≥ 30 min after boot (LAB.md).
 
 ## Current state
@@ -13,10 +13,12 @@ _Saved 2026-10-24 ≈ 01:00 WIB (session 20: resume check, then this lean rewrit
   re-scoped 10-16 to H1′ = payload/N crossover (DECISIONS #33). 4060 Ti missing (November, accepted deviation). M2
   (procedural floors) built 10-16: awaits user review + [PC] MSVC golden check (DECISIONS #34). M3 after M2 is accepted.
 - **M5 spin-wait shift** (paper §12.2 item 5, DECISIONS #36): Mac spin cells +170…+290 µs vs the 09-24 reference; block-wait
-  cells fine. Ruled out: charger, displays, dark wake, launch context, nice, QoS/priority. Lead: SoC clock. A lone spinning
-  thread runs ≈ 2.2 GHz on an idle Mac; at 2.8–3.2 GHz (background load) the empty/4K spin cells return to 09-24 levels
-  (r(rt, GHz) −0.81…−0.95); the 1 MiB spin cells keep a second component (spin-mode 1 MiB read 45 vs 14 µs). Data
-  `results/m1_mac_40w_check/` (`launch_1253/`, `launch_1948/`). Blocks m1_mac_ext (to-do 3).
+  cells fine. Ruled out: charger, displays, dark wake, launch context, nice, QoS/priority. **Cause confirmed 10-25 (root
+  powermetrics, `pm_1025_0708/`): the SoC clock.** Bench alone: the spinning thread hops across the 4 S-cores at ≈ 2.7 GHz,
+  spin cells +65…+268 µs. With 2× `yes` as companion load: S-cluster 4.3–4.5 GHz, spin cells +4…+34 µs (1 MiB included;
+  4K perpass/s2_direct +80…+88), but block cells get slower (4K +85…+96 µs). GPU at 338 MHz in both. 09-24 matches neither
+  state whole (block 4K ≈ idle, spin and block 1M ≈ loaded): it ran under uncontrolled load. Data
+  `results/m1_mac_40w_check/` (README last section). Blocks m1_mac_ext (to-do 3).
 - **Paper** (The Journal of Supercomputing): drafts in `docs/paper/` → `build_docx.py` → `lightbound_jsc.docx`; 21 live
   ZOTERO_ITEM + 1 ZOTERO_BIBL field, Zotero collection `Lightbound` (GMGWF6JT, 18 refs, `zotero_map.json`). Refresh test
   passed 10-23 12:3x (NPUBenchSwarm `tools/zotero_refresh_test.sh`; rerun after each rebuild, Main's Word turn). Drafted:
@@ -27,16 +29,16 @@ _Saved 2026-10-24 ≈ 01:00 WIB (session 20: resume check, then this lean rewrit
 
 ## To-do (dependency order; [user] = the user's hands or decision, [device] = machine time, [solo] = this session)
 1. **[user] Review M2:** `docs/img/floors/*.png`, DECISIONS #34. The [PC] golden check rides with 4. Then M3.
-2. **[user] Spin-wait shift:** (c) OK for a 2-min root `powermetrics --samplers cpu_power` capture over two runs (idle, then
-   with a companion load; the user types a sudo waiter line per LAB.md; Main slot). Then decide: (a) report the shift and
-   re-measure the idle reference as the Mac is now (docs/06 §2 unchanged), or (b) a defined CPU-side load becomes part of
-   the microbench condition (docs/06 §2 changes; both platforms re-measure). Recommendation: (c), then (b) if it confirms.
-   Still open: what else changed on the Mac 09-24 → 10-17 (09-24 ran at thermal "fair", i.e. busier).
+2. **[user] Spin-wait shift, decide** (clock check done 10-25): (a) idle only: re-measure the idle reference as the Mac is
+   now, report the shift (docs/06 §2 unchanged); (b) loaded only: a defined companion load (2 busy threads) becomes the
+   microbench condition (docs/06 §2 changes; both platforms re-measure); (b′) both as named conditions, report the load
+   sensitivity as a finding (ext series ≈ 2× time on Mac and PC). Recommendation: (b′), since the load moves Mac spin and
+   block cells in opposite directions and the game never runs a lone thread. Then DECISIONS #37 + docs/06 §2.
 3. **[device: Mac on AC, ≈ 70 min, quiet, Main slot; after 2]** `results/m1_mac_ext` (idle + hot, 12 payloads; command in
    `docs/M1_RESCOPE_PROPOSAL.md` §4) with `--exe build/frozen_ext_2d5c1ba/lightbound` (+ its `shaders/`; Metal Release,
    commit 2d5c1ba). Pre-checks per LAB.md (AC ≥ 35 W, ≈ 0 mA, full wake, load/top logged), one `caffeinate -is` for the
    whole series. Log: frozen binary built 10-16 08:37 WIB, before Xcode 27.1; `xcrun metal` 32023.921 before and after.
-4. **[user] PC checklist:** did m1_3060_ext run on 10-20; is `C:\dev\GPU_HOLD.txt` gone; driver still 566.36? If it did not
+4. **[user] PC checklist** (RTBench has the PC Mon 10-26 for M7; it was asked to check `results\m1_3060_ext` and GPU_HOLD.txt): did m1_3060_ext run on 10-20; is `C:\dev\GPU_HOLD.txt` gone; driver still 566.36? If it did not
    run: **[device: PC, ≈ 3 h]** `results\m1_3060_ext` after the PC Claude fast-forwards and rebuilds, wrapped in the hold
    file (create → wait ≤ 10 min for no python in nvidia-smi → build/ctest → 10-min cooldown → measure → push → delete);
    nothing on the PC in the first ≈ 4 min; plus the M2 MSVC golden check (never regenerate goldens there).
@@ -51,7 +53,7 @@ _Saved 2026-10-24 ≈ 01:00 WIB (session 20: resume check, then this lean rewrit
    statement, Zenodo DOI or not, extend the N grid past 100k (ReBAR-off crossover ≈ 112k agents).
 8. **4060 Ti step D, November:** [user] installs it in the i7-12700F PC, same slot (ask before planning another PC);
    [device: PC, ≈ 3 days] `results\m1_4060`, optional `m1_4060_ext`; [solo] add P-4060 to the combined report.
-9. **[user] Push:** main is 43 commits ahead of origin.
+9. **[user] Push:** main is 44 commits ahead of origin.
 
 ## Rules carried forward
 - Never pool `results/m1_3060_run1_disturbed`; ReBAR off gets its own report; `*_ext` dirs stay apart from protocol series.

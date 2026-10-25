@@ -1,0 +1,14 @@
+07:08:21 start: sys=CPU+Graphics+Audio+Network+/ps4; ac=40W mA=0 80% AC; load 1.59; binary 44c6bfb
+07:08:21 trigger at 1792886901587
+07:08:24 powermetrics running
+07:08:27 run 1_I start 1792886907701: sys=CPU+Graphics+Audio+Network+/ps4; ac=40W mA=0 80% AC; load 1.46
+07:08:56 run 1_I end 1792886936520: exit 0
+07:09:01 run 2_L start 1792886941578: sys=CPU+Graphics+Audio+Network+/ps4; ac=40W mA=0 80% AC; load 1.90
+07:09:29 run 2_L end 1792886969896: exit 0
+07:09:33 run 3_I start 1792886972961: sys=CPU+Graphics+Audio+Network+/ps4; ac=40W mA=0 80% AC; load 2.95
+07:10:01 run 3_I end 1792887001598: exit 0
+07:10:06 run 4_L start 1792887006648: sys=CPU+Graphics+Audio+Network+/ps4; ac=40W mA=0 80% AC; load 2.67
+07:10:35 run 4_L end 1792887035260: exit 0
+07:10:35 runs finished; waiting for powermetrics to end
+07:11:30 plist copied ( 19602894 bytes, mtime 1792887089)
+07:11:30 done; ac=40W mA=0 80% AC

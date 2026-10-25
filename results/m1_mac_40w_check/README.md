@@ -120,3 +120,22 @@ ext series was not started.
   with a companion load) to see the clock directly; then (a) report the shift and re-measure the idle reference in the present
   state, or (b) make a defined CPU-side load part of the microbench condition (the game never runs a lone spinning thread;
   docs/06 §2 changes and both platforms re-measure). Recommendation: (c) first, then (b) if it confirms.
+
+## Clock check with root powermetrics (2026-10-25 07:08:21–07:11:30 WIB, `pm_1025_0708/`, Main's quiet-Mac slot, user's go and sudo waiter): the SoC clock is CONFIRMED as the spin-wait shift
+
+- Driver `pm_check.sh` (one `caffeinate -is`): Main's shared root waiter (`labpm_go`) ran `powermetrics --samplers
+  cpu_power,gpu_power -i 250 -n 720` (3 min); `build/lightbound` at 6cef8eb code (HEAD 44c6bfb, src clean), cells
+  empty/s1_copy/s2_direct × 4K/1M, runs I L I L (≈ 29 s each; I = bench alone, L = bench + 2× `yes >/dev/null`), exit rusage
+  per run. Full wake before every run, 40 W through the hub, 80 % at 0 mA throughout, load 1.5–2.9, internal panel. Analysis
+  `pm_compare.py pm_1025_0708` → `compare.txt` (samples inside each run window, 2 s trimmed per end; M5 clusters = E (6) + S (4)).
+- **Clock:** I runs: S-cluster 2.67–2.74 GHz, the busiest S-core 2.67–2.72 GHz (p10 1.9) at only ≈ 0.3 active: the spinning
+  thread hops across the 4 S-cores (S-cluster total ≈ 0.8 cores busy), P-share 96–99 %, rusage 2.77–2.79 GHz. L runs: S-cluster
+  4.26 GHz, busiest S-core 4.46 GHz (≈ 0.69 active, S total ≈ 2.4), rusage 4.13–4.14 GHz. GPU: lowest DVFS state 338 MHz and
+  never idle in all four runs (idle ratio 0; 0.98 before, 0.84 after), so the GPU clock does not separate I from L.
+- **rt p50 vs 09-24 (I / L):** spin cells +65…+268 / +4…+34 µs, except the 4K perpass/s2_direct spin cells in L at +80…+88. The
+  1 MiB spin cells return to 09-24 under L too (+4…+20; on 10-22 at 2.8–3.2 GHz they had not). Block cells: I matches 09-24 at
+  4K (±4) and beats it at 1M (−98…−144), as since 10-20; **L makes block cells slower** (4K +85…+96, 1M +6…+18, empty +15…+17).
+- Reading: a lone spin-waiting thread on an otherwise idle Mac gets ≈ 2.7 GHz; with two busy companion threads the S-cluster
+  runs ≈ 4.3–4.5 GHz and the spin cells return to the 09-24 levels. Neither state reproduces 09-24 whole (09-24 block 4K ≈ I,
+  block 1M and spin ≈ L), consistent with 09-24 having run under some uncontrolled background load (thermal "fair"). The
+  microbench result thus depends on the CPU-side load, which docs/06 §2 does not fix. Decision (a)/(b) → STATUS to-do 2.
