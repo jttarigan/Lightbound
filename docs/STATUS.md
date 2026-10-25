@@ -1,12 +1,13 @@
 # Lightbound status (resume here)
 
-_Saved 2026-10-25 ≈ 08:55 WIB (session 21: powermetrics clock check run 07:08 in Main's slot, analysed). Sessions 1–19, M1 findings
+_Saved 2026-10-26 ≈ 04:10 WIB (session 21 closed: user's Mac shutdown via Main; clock check run 10-25 07:08, analysed, 5fd28c7). Sessions 1–19, M1 findings
 1–8, PC results and old run instructions: `docs/archive/STATE-history-2026-10.md` (read only when needed)._
 
 ## Resume point
 - **Next: to-do 2** (user: spin-wait protocol decision a / b / b′; the clock check is done), then 7, 6, 1, 4, 9.
-- Running: nothing. Devices: none in use. Word: not touched; scripted only on Main's turn. Push: main 44 ahead of origin.
-- Mac rebooted 10-23: start a quiet block ≥ 30 min after boot (LAB.md).
+- Running: nothing. Devices: none in use. Word: not touched; scripted only on Main's turn. Push: main 45 ahead of origin.
+- Mac shut down 10-26 ≈ 04:10: start a quiet block ≥ 30 min after boot (LAB.md). RTBench had the PC Mon 10-26 (M7): ask Main
+  what it saw of `results\m1_3060_ext` / GPU_HOLD.txt.
 
 ## Current state
 - **Milestones.** M0 accepted (Mac + PC). M1 measured (Mac AC 09-24; 3060 Ti ReBAR on/off, merged 10-13): NO-GO on H1,
@@ -53,7 +54,7 @@ _Saved 2026-10-25 ≈ 08:55 WIB (session 21: powermetrics clock check run 07:08 
    statement, Zenodo DOI or not, extend the N grid past 100k (ReBAR-off crossover ≈ 112k agents).
 8. **4060 Ti step D, November:** [user] installs it in the i7-12700F PC, same slot (ask before planning another PC);
    [device: PC, ≈ 3 days] `results\m1_4060`, optional `m1_4060_ext`; [solo] add P-4060 to the combined report.
-9. **[user] Push:** main is 44 commits ahead of origin.
+9. **[user] Push:** main is 45 commits ahead of origin.
 
 ## Rules carried forward
 - Never pool `results/m1_3060_run1_disturbed`; ReBAR off gets its own report; `*_ext` dirs stay apart from protocol series.
