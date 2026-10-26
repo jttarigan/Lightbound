@@ -134,6 +134,7 @@ int runMicrobench(const lb::app::Options& opt, int argc, char** argv) {
     case app::ThreadQos::Interactive: cfg.qos = bench::ThreadQos::Interactive; break;
     case app::ThreadQos::High: cfg.qos = bench::ThreadQos::High; break;
     }
+    cfg.cpuLoad = opt.microCpuLoad;
     cfg.outPath = opt.out.empty() ? std::string("results/micro.csv") : opt.out;
     for (int i = 0; i < argc; ++i) cfg.commandLine += (i > 0 ? " " : "") + std::string(argv[i]);
     cfg.options = app::describeOptions(opt);

@@ -34,3 +34,9 @@ add_test(NAME microbench_smoke_hot
           --micro-payloads=4K --micro-gpuload=both --validation=on --log=warn
           --out=${CMAKE_BINARY_DIR}/test_micro_smoke_hot.csv)
 set_tests_properties(microbench_smoke_hot PROPERTIES LABELS gpu TIMEOUT 300)
+
+# CPU companion load (DECISIONS #36): one path with two busy threads beside the bench thread.
+add_test(NAME microbench_smoke_cpuload
+  COMMAND lightbound --mode=microbench --frames=30 --warmup=5 --micro-paths=empty --micro-cpuload=2
+          --validation=on --log=warn --out=${CMAKE_BINARY_DIR}/test_micro_smoke_cpuload.csv)
+set_tests_properties(microbench_smoke_cpuload PROPERTIES LABELS gpu TIMEOUT 300)

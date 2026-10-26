@@ -57,6 +57,7 @@ struct Options {
     ThreadQos microQos = ThreadQos::Default;  // microbench: bench-thread scheduling request (macOS: interactive =
                                               // QOS_CLASS_USER_INTERACTIVE, high = that + base priority 47 through
                                               // THREAD_PRECEDENCE_POLICY; a no-op elsewhere; diagnostic)
+    u32 microCpuLoad = 0;       // microbench: busy companion threads beside the bench thread (0 = protocol §6 as written)
     u32 depth = 1;              // play / procgen-dump: floor depth 1..5 (GDD §7)
     bool depthExplicit = false;
     u8 logLevel = 1;            // 0 trace, 1 info, 2 warn, 3 error

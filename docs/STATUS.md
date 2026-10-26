@@ -4,8 +4,10 @@ _Saved 2026-10-26 ≈ 04:10 WIB (session 21 closed: user's Mac shutdown via Main
 1–8, PC results and old run instructions: `docs/archive/STATE-history-2026-10.md` (read only when needed)._
 
 ## Resume point
-- **Next: to-do 2** (user: spin-wait protocol decision a / b / b′; the clock check is done), then 7, 6, 1, 4, 9.
-- Running: nothing. Devices: none in use. Word: not touched; scripted only on Main's turn. Push: main 45 ahead of origin.
+- **Next: to-do 2** (user: spin-wait decision a / b / b′, draft + tooling ready in `docs/CPULOAD_PROPOSAL.md`), then 7, 6, 1, 4, 9.
+  10-26 (user away, agent-only day per Main): paper §12.2/§1 updated; `--micro-cpuload=N`, `run_microbench.py --cond`,
+  `tools/m1_mac_ext.sh` built and tested (ctest 52/52); docx rebuilt, Refresh test owed (Main's Word turn).
+- Running: nothing. Devices: none in use. Word: not touched; scripted only on Main's turn. Push: main 47 ahead of origin.
 - Mac shut down 10-26 ≈ 04:10: start a quiet block ≥ 30 min after boot (LAB.md). RTBench had the PC Mon 10-26 (M7): ask Main
   what it saw of `results\m1_3060_ext` / GPU_HOLD.txt.
 
@@ -35,9 +37,10 @@ _Saved 2026-10-26 ≈ 04:10 WIB (session 21 closed: user's Mac shutdown via Main
    microbench condition (docs/06 §2 changes; both platforms re-measure); (b′) both as named conditions, report the load
    sensitivity as a finding (ext series ≈ 2× time on Mac and PC). Recommendation: (b′), since the load moves Mac spin and
    block cells in opposite directions and the game never runs a lone thread. Then DECISIONS #37 + docs/06 §2.
-3. **[device: Mac on AC, ≈ 70 min, quiet, Main slot; after 2]** `results/m1_mac_ext` (idle + hot, 12 payloads; command in
-   `docs/M1_RESCOPE_PROPOSAL.md` §4) with `--exe build/frozen_ext_2d5c1ba/lightbound` (+ its `shaders/`; Metal Release,
-   commit 2d5c1ba). Pre-checks per LAB.md (AC ≥ 35 W, ≈ 0 mA, full wake, load/top logged), one `caffeinate -is` for the
+3. **[device: Mac on AC, ≈ 70 min (a/b) or 140 min (b′), quiet, Main slot; after 2]** `caffeinate -is tools/m1_mac_ext.sh
+   <a|b|b2> <frozen dir>` → `results/m1_mac_ext/<idle|load2>/`. (a) may use `build/frozen_ext_2d5c1ba/`; b/b′ need a new
+   frozen copy of a build with `--micro-cpuload` (copy `build/lightbound` + `shaders/` at a clean commit, log its sha256),
+   and first a ≈ 3-min check that `--micro-cpuload=2` lifts the clock like 2× `yes` (root waiter, `pm_check.sh` pattern). Pre-checks per LAB.md (AC ≥ 35 W, ≈ 0 mA, full wake, load/top logged), one `caffeinate -is` for the
    whole series. Log: frozen binary built 10-16 08:37 WIB, before Xcode 27.1; `xcrun metal` 32023.921 before and after.
 4. **[user] PC checklist** (RTBench has the PC Mon 10-26 for M7; it was asked to check `results\m1_3060_ext` and GPU_HOLD.txt): did m1_3060_ext run on 10-20; is `C:\dev\GPU_HOLD.txt` gone; driver still 566.36? If it did not
    run: **[device: PC, ≈ 3 h]** `results\m1_3060_ext` after the PC Claude fast-forwards and rebuilds, wrapped in the hold
@@ -54,7 +57,7 @@ _Saved 2026-10-26 ≈ 04:10 WIB (session 21 closed: user's Mac shutdown via Main
    statement, Zenodo DOI or not, extend the N grid past 100k (ReBAR-off crossover ≈ 112k agents).
 8. **4060 Ti step D, November:** [user] installs it in the i7-12700F PC, same slot (ask before planning another PC);
    [device: PC, ≈ 3 days] `results\m1_4060`, optional `m1_4060_ext`; [solo] add P-4060 to the combined report.
-9. **[user] Push:** main is 45 commits ahead of origin.
+9. **[user] Push:** main is 47 commits ahead of origin.
 
 ## Rules carried forward
 - Never pool `results/m1_3060_run1_disturbed`; ReBAR off gets its own report; `*_ext` dirs stay apart from protocol series.

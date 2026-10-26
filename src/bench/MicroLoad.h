@@ -6,6 +6,7 @@
 // backends only provide Gfx::loadDispatch / loadWait.
 #include "gfx/Gfx.h"
 
+#include <array>
 #include <atomic>
 #include <thread>
 
@@ -55,6 +56,40 @@ private:
     std::atomic<bool> m_stop{false};
     std::atomic<bool> m_failed{false};
     std::atomic<u64> m_dispatches{0};
+    u64 m_startNs = 0, m_endNs = 0;
+};
+
+/// CPU companion load for the microbench (--micro-cpuload=N, the M5 spin-wait shift, DECISIONS #36):
+/// N threads each run a dependent integer multiply-add chain (no memory traffic) from start() until
+/// stop(), so the bench thread shares the SoC with a defined load instead of whatever else runs.
+/// Plain std::thread, the same on every platform (R1). The iteration rate per thread is reported as
+/// a rough clock proxy for the loaded cores.
+constexpr u32 kMaxCpuLoadThreads = 16;
+
+class CpuLoad {
+public:
+    explicit CpuLoad(u32 threads) : m_count(threads < kMaxCpuLoadThreads ? threads : kMaxCpuLoadThreads) {}
+    ~CpuLoad() { stop(); }
+    CpuLoad(const CpuLoad&) = delete;
+    CpuLoad& operator=(const CpuLoad&) = delete;
+
+    void start();
+    /// Joins every load thread.
+    void stop();
+    u32 threads() const { return m_count; }
+    /// Mean chain iterations per µs and thread from start() to stop(); valid after stop().
+    f64 itersPerUs() const;
+    f64 activeUs() const { return static_cast<f64>(m_endNs - m_startNs) * 1e-3; }
+
+private:
+    void run(u32 index);
+
+    u32 m_count;
+    std::array<std::thread, kMaxCpuLoadThreads> m_threads;
+    std::array<u64, kMaxCpuLoadThreads> m_iters{};
+    std::array<u64, kMaxCpuLoadThreads> m_sink{};   // chain results, kept so the loop is not optimized away
+    std::atomic<bool> m_stop{false};
+    bool m_running = false;
     u64 m_startNs = 0, m_endNs = 0;
 };
 

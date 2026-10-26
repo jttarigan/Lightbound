@@ -1,3 +1,4 @@
+#include "bench/MicroLoad.h"
 #include "bench/MicroPattern.h"
 #include "bench/MicroResume.h"
 #include "bench/Microbench.h"
@@ -6,8 +7,10 @@
 
 #include <doctest/doctest.h>
 
+#include <chrono>
 #include <cstring>
 #include <string>
+#include <thread>
 #include <vector>
 
 using namespace lb;
@@ -214,4 +217,21 @@ TEST_CASE("memory policy follows docs/05 §4.2") {
     CHECK(m.upStaging == gfx::MemoryClass::HostVisibleCoherent);
     vk.memoryClassSupported[static_cast<u32>(gfx::MemoryClass::DeviceLocalHostVisible)] = false;
     CHECK_FALSE(frame::pathMemory(frame::TransferPath::S2Rebar, vk, m)); // never substituted
+}
+
+TEST_CASE("CPU companion load: threads run the chain until stop()") {
+    CpuLoad none(0);
+    none.start();
+    none.stop();
+    CHECK(none.itersPerUs() == 0.0);
+
+    CpuLoad load(2);
+    CHECK(load.threads() == 2);
+    load.start();
+    std::this_thread::sleep_for(std::chrono::milliseconds(30));
+    load.stop();
+    CHECK(load.activeUs() >= 25'000.0);
+    CHECK(load.itersPerUs() > 1.0);   // ≈ 4 cycles per step: hundreds per µs on any current core
+    load.stop();                      // a second stop is a no-op
+    CHECK(CpuLoad(99).threads() == kMaxCpuLoadThreads);
 }

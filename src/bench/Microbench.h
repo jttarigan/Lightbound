@@ -31,6 +31,7 @@ struct MicrobenchConfig {
     std::vector<u64> payloads;             // bytes (multiples of 16); P = 0 is the "empty" path
     GpuLoad gpuLoad = GpuLoad::Idle;
     ThreadQos qos = ThreadQos::Default;
+    u32 cpuLoad = 0;                       // CPU companion load: busy threads beside the bench thread (DECISIONS #36)
     std::string outPath;
     std::string commandLine;               // full CLI, for the CSV header
     std::string options;                   // normalized options, for the CSV header

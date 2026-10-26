@@ -139,6 +139,10 @@ public:
             else LB_LOG_WARN("--micro-qos=%s not (fully) applied: %s", threadQosName(m_cfg.qos), m_qosNote.c_str());
         }
         if (!setup()) return 2;
+        // CPU companion load (DECISIONS #36): started before the bandwidth rows and kept until the
+        // last cell, like the QoS request, so every measurement of the process runs beside it.
+        CpuLoad cpuLoad(m_cfg.cpuLoad);
+        cpuLoad.start();
 
         m_platform = platformId(caps);
         const KeyValues sys = collectSysInfo(caps);
@@ -183,6 +187,11 @@ public:
             destroyPathBuffers(pb);
         }
 
+        cpuLoad.stop();
+        if (cpuLoad.threads() > 0) {
+            std::fprintf(m_csv, "# cpuload_end: %u threads, %.1f chain iterations/us per thread over %.1f s\n",
+                         cpuLoad.threads(), cpuLoad.itersPerUs(), cpuLoad.activeUs() * 1e-6);
+        }
         std::fprintf(m_csv, "# thermal_state_end: %s\n", thermalState().c_str());
         std::fprintf(m_csv, "# failures: %llu\n", static_cast<unsigned long long>(m_failures));
         std::fclose(m_csv);
@@ -644,6 +653,12 @@ private:
         h.add("gpuload", gpuLoadName(m_cfg.gpuLoad));
         h.add("qos", threadQosName(m_cfg.qos));
         h.add("qos.note", m_qosNote);
+        h.add("cpuload", std::to_string(std::min(m_cfg.cpuLoad, kMaxCpuLoadThreads)));
+        if (m_cfg.cpuLoad > 0) {
+            h.add("cpuload.note", "busy threads in this process, dependent 64-bit integer multiply-add chain (no "
+                                  "memory traffic), from before the bw_* rows to after the last cell; "
+                                  "'# cpuload_end:' gives the chain rate");
+        }
         if (m_cfg.gpuLoad != GpuLoad::Idle) {
             // Hot-GPU cells (DECISIONS #32). load.steps / load.dispatch_us are calibrated per process.
             h.add("load.available", m_loadAvailable ? "yes" : "no");

@@ -88,7 +88,7 @@ constexpr FlagSpec kFlags[] = {
     {"memvariant", true}, {"audit", true}, {"audio", true}, {"preset", true}, {"out", true},
     {"tag", true}, {"power", true},
     {"vsync", true}, {"validation", true}, {"width", true}, {"height", true}, {"exit-after", true},
-    {"log", true}, {"micro-paths", true}, {"micro-payloads", true}, {"micro-gpuload", true}, {"micro-qos", true}, {"resume", false}, {"depth", true},
+    {"log", true}, {"micro-paths", true}, {"micro-payloads", true}, {"micro-gpuload", true}, {"micro-qos", true}, {"micro-cpuload", true}, {"resume", false}, {"depth", true},
     {"help", false}, {"version", false},
 };
 
@@ -163,6 +163,7 @@ ParseStatus parseCommandLine(int argc, const char* const* argv, Options& out, st
         else if (name == "micro-payloads") out.microPayloads = value;
         else if (name == "micro-gpuload") ok = parseEnum(value, kGpuLoads, out.microGpuLoad);
         else if (name == "micro-qos") ok = parseEnum(value, kThreadQos, out.microQos);
+        else if (name == "micro-cpuload") ok = parseU32(value, out.microCpuLoad) && out.microCpuLoad <= 16;
         else if (name == "resume") out.resume = true;
         else if (name == "depth") { ok = parseU32(value, out.depth) && out.depth >= 1 && out.depth <= 5; out.depthExplicit = ok; }
         else if (name == "log") {
@@ -246,6 +247,9 @@ void printUsage(FILE* to) {
         "                                macOS caps at priority 31 for a command-line process; high = that\n"
         "                                plus base priority 47 via THREAD_PRECEDENCE_POLICY; no-ops\n"
         "                                elsewhere; a diagnostic, DECISIONS #36)\n"
+        "  --micro-cpuload=N             microbench: N busy companion threads (0..16) run beside the\n"
+        "                                bench thread for the whole process (default 0 = protocol §6;\n"
+        "                                the M5 spin-wait shift, DECISIONS #36)\n"
         "  --resume                      microbench: continue the interrupted run in --out (keeps the\n"
         "                                cells it completed, measures the missing ones)\n"
         "  --depth=1..5                  play / procgen-dump: floor depth (default 1); procgen-dump\n"
@@ -281,6 +285,7 @@ std::string describeOptions(const Options& o) {
     if (!o.microPayloads.empty()) s += " micro-payloads=" + o.microPayloads;
     if (o.microGpuLoad != GpuLoad::Idle) s += " micro-gpuload=" + std::string(cliName(o.microGpuLoad));
     if (o.microQos != ThreadQos::Default) s += " micro-qos=" + std::string(cliName(o.microQos));
+    if (o.microCpuLoad != 0) s += " micro-cpuload=" + std::to_string(o.microCpuLoad);
     if (o.depthExplicit) s += " depth=" + std::to_string(o.depth);
     return s;
 }

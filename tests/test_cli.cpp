@@ -153,6 +153,21 @@ TEST_CASE("--micro-qos requests the bench thread's QoS class (DECISIONS #36)") {
     CHECK(parse({"--micro-qos=realtime"}, o, err) == ParseStatus::Error);
 }
 
+TEST_CASE("--micro-cpuload sets the CPU companion load (DECISIONS #36)") {
+    Options o;
+    std::string err;
+    REQUIRE(parse({"--mode=microbench"}, o, err) == ParseStatus::Ok);
+    CHECK(o.microCpuLoad == 0);
+    CHECK(describeOptions(o).find("micro-cpuload") == std::string::npos);  // default: header unchanged
+    Options l;
+    REQUIRE(parse({"--mode=microbench", "--micro-cpuload=2"}, l, err) == ParseStatus::Ok);
+    CHECK(l.microCpuLoad == 2);
+    CHECK(describeOptions(l).find("micro-cpuload=2") != std::string::npos);
+    Options bad;
+    CHECK(parse({"--micro-cpuload=17"}, bad, err) == ParseStatus::Error);
+    CHECK(parse({"--micro-cpuload=two"}, bad, err) == ParseStatus::Error);
+}
+
 TEST_CASE("describeOptions round-trips key fields") {
     Options o;
     std::string err;

@@ -99,4 +99,40 @@ void BackgroundLoad::run() {
     m_endNs = nowNs();
 }
 
+void CpuLoad::start() {
+    if (m_running) return;
+    m_stop.store(false, std::memory_order_relaxed);
+    m_iters.fill(0);
+    m_startNs = nowNs();
+    m_endNs = m_startNs;
+    for (u32 i = 0; i < m_count; ++i) m_threads[i] = std::thread(&CpuLoad::run, this, i);
+    m_running = true;
+}
+
+void CpuLoad::stop() {
+    if (!m_running) return;
+    m_stop.store(true, std::memory_order_relaxed);
+    for (u32 i = 0; i < m_count; ++i) m_threads[i].join();
+    m_endNs = nowNs();
+    m_running = false;
+}
+
+f64 CpuLoad::itersPerUs() const {
+    if (m_count == 0 || m_endNs <= m_startNs) return 0.0;
+    u64 total = 0;
+    for (u32 i = 0; i < m_count; ++i) total += m_iters[i];
+    return static_cast<f64>(total) / m_count / activeUs();
+}
+
+void CpuLoad::run(u32 index) {
+    constexpr u32 kBlock = 4096;   // chain steps between two looks at the stop flag
+    u64 x = 0x853c49e6748fea9bull + index, n = 0;
+    while (!m_stop.load(std::memory_order_relaxed)) {
+        for (u32 j = 0; j < kBlock; ++j) x = x * 6364136223846793005ull + 1442695040888963407ull;
+        n += kBlock;
+    }
+    m_sink[index] = x;
+    m_iters[index] = n;
+}
+
 } // namespace lb::bench
