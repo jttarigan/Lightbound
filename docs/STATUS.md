@@ -68,7 +68,7 @@ _Saved 2026-10-26 ≈ 04:10 WIB (session 21 closed: user's Mac shutdown via Main
   "[Huebner25, Beischl26] look at HPC kernels and databases"; removed "Feng et al. [Feng25] already point to kernel launch
   time as a factor in the gap with NVIDIA"; the launch-overhead bullet (Maczan26 24–36 / 32–71 µs per dispatch, 450 of 497
   µs sync; Cassagne25 ≈ 5–40 µs host-to-kernel start) now cites only Beischl26's Metal encode + dispatch cost, CPU→GPU only.
-- Refresh test owed on the rebuilt docx (Main's Word turn).
+- Refresh re-test passed 10-26 (exit 0, 19/19 fields + 1 BIBL, original unchanged).
 
 ## Rules carried forward
 - Never pool `results/m1_3060_run1_disturbed`; ReBAR off gets its own report; `*_ext` dirs stay apart from protocol series.
