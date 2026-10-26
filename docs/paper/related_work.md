@@ -11,7 +11,6 @@
 | key | reference | checked | relevance |
 |---|---|---|---|
 | Beischl26 | A. Beischl, M. Morozov, M. Jungmair, L. Haussmann, T. Neumann. *Evaluating Apple Silicon for Data Processing.* DaMoN '26 (22nd Int. Workshop on Data Management on New Hardware), ACM. doi:10.1145/3789237.3809127 | full PDF text (authors' copy, db.in.tum.de) | **closest**: Apple Silicon unified memory, Metal synchronization costs |
-| Feng25 | D. Feng, Z. Xu, R. Wang, F. X. Lin. *Profiling Apple Silicon Performance for ML Training.* arXiv:2501.14925, 2025 | arXiv abstract | Apple Silicon vs NVIDIA; names kernel launch time as one cause of the gap |
 | Huebner25 | P. Hübner, A. Hu, I. Peng, S. Markidis. *Apple vs. Oranges: Evaluating the Apple Silicon M-Series SoCs for HPC Performance and Efficiency.* IPDPSW 2025 (IEEE), pp. 45–54, doi 10.1109/ipdpsw66978.2025.00013 (preprint arXiv:2502.05317) | arXiv abstract; published version via Crossref (10-23) | M1–M4 bandwidth and FP32 throughput with Metal; energy |
 | Wahlgren25 | J. Wahlgren, G. Schieffer, R. Shi, E. A. León, R. Pearce, M. Gokhale, I. Peng. *Dissecting CPU-GPU Unified Physical Memory on AMD MI300A APUs.* IISWC 2025, pp. 368–380, doi 10.1109/IISWC66894.2025.00038 (arXiv:2508.12743) | arXiv abstract | unified physical memory characterization (latency, bandwidth, coherence), HPC side |
 | Spafford12 | K. Spafford, J. S. Meredith, S. Lee, D. Li, P. C. Roth, J. S. Vetter. *The Tradeoffs of Fused Memory Hierarchies in Heterogeneous Computing Architectures.* ACM Computing Frontiers (CF '12), pp. 103–112, doi 10.1145/2212908.2212924 | search snippets + hgpu/OSTI/DBLP listings (OSTI page refused the connection) | the classic fused (APU) vs discrete comparison |
@@ -19,8 +18,6 @@
 | GomezLuna17 | J. Gómez-Luna, I. El Hajj, L.-W. Chang, V. García-Flores, S. Garcia de Gonzalo, T. B. Jablin, A. J. Peña, W.-m. Hwu. *Chai: Collaborative Heterogeneous Applications for Integrated-architectures.* ISPASS 2017, pp. 43–54, doi 10.1109/ISPASS.2017.7975269 | hgpu.org abstract | fine-grained CPU–GPU collaboration patterns on integrated architectures |
 | Sun16 | Y. Sun, X. Gong, A. K. Ziabari, L. Yu, X. Li, S. Mukherjee, C. McCardwell, A. Villegas, D. Kaeli. *Hetero-Mark, a Benchmark Suite for CPU-GPU Collaborative Computing.* IISWC 2016, pp. 1–10, doi 10.1109/IISWC.2016.7581262 | hgpu.org abstract | collaboration patterns; reports communication and transfer latency |
 | Lumpp21 | F. Lumpp, H. D. Patel, N. Bombieri. *A Framework for Optimizing CPU-iGPU Communication on Embedded Platforms.* DAC 2021 (San Francisco, 5–9 Dec 2021), IEEE Xplore 9586304, pp. 685–690, doi 10.1109/DAC18074.2021.9586304 (Crossref, 10-18: three authors, H. D. Patel was missing here) | IEEE Xplore record + Univ. Verona repository abstract (venue confirmed 10-17) | copy vs unified memory vs zero-copy on embedded iGPUs, with a performance model and micro-benchmarks |
-| Maczan26 | J. Maczan. *Measuring and Reducing WebGPU Dispatch Overhead for LLM Inference.* arXiv:2608.08730 (v2, Aug 2026); accepted at the 4th UK AI Conference 2026 (PMLR) | arXiv abstract + HTML full text §1, §4.1, §5.1 | per-dispatch cost 24–36 µs on Vulkan and 32–71 µs on Metal (sequential method, sync excluded); a single timed op is dominated by sync (450 of 497 µs) |
-| Cassagne25 | A. Cassagne, N. Amiot, M. Bouyer. *Dalek: An Unconventional and Energy-Aware Heterogeneous Cluster.* arXiv:2508.10481, 2025 | arXiv abstract + HTML full text §V-E | OpenCL launch latency (host call → kernel start): ≈ 5 µs RTX 4090 and Radeon 890M, 35–40 µs Intel iGPUs, ≈ 90 µs Arc 770 over Oculink |
 | Velicka25 | D. Velicka, O. Vysocky, L. Riha. *Methodology for GPU Frequency Switching Latency Measurement.* IPDPS Workshops 2025, pp. 830–839, doi 10.1109/IPDPSW66978.2025.00133 (Crossref, 10-17); preprint arXiv:2502.20075 | arXiv abstract | DVFS switching latency on GH200, A100, RTX Quadro 6000 (as the abstract names it); differs widely between GPUs |
 | Skrzypczak23 | J. Skrzypczak, P. Czarnul. *Efficient parallel implementation of crowd simulation using a hybrid CPU+GPU high performance computing system.* Simulation Modelling Practice and Theory 123 (2023) 102691. doi:10.1016/j.simpat.2022.102691 | search snippets + university repository listing (repository host unreachable 10-17) | workload side: OpenMP+CUDA crowd simulation with CPU–GPU load balancing, 10k–1M agents |
 | Velicka26 | D. Velicka, O. Vysocky, O. Yasal, L. Riha. *An in-depth study of GPU frequency-scaling latency and its optimization on modern architectures.* Future Generation Computer Systems 179 (2026), article 108331, doi 10.1016/j.future.2025.108331 (verified on Crossref 10-17; the search result's DOI was one digit short) | search result abstract (repository page rate-limited) | journal version of Velicka25: switching vs transition latency, LATEST tool, GH200 / A100 / RTX Quadro 6000; dataset on Zenodo (2025-09-29) |
@@ -28,6 +25,12 @@
 | Knap19 | M. Knap, P. Czarnul. *Performance evaluation of Unified Memory with prefetching and oversubscription for selected parallel CUDA applications on NVIDIA Pascal and Volta GPUs.* J. Supercomputing 75 (2019) 7625–7645, doi 10.1007/s11227-019-02966-8 | Crossref metadata + search snippet | **CUDA unified memory** (page migration on a discrete GPU), not shared physical memory: the terminology contrast in §1; target journal |
 | Jarzabek17 | Ł. Jarząbek, P. Czarnul. *Performance evaluation of unified memory and dynamic parallelism for selected parallel CUDA applications.* J. Supercomputing 73 (2017) 5378–5401, doi 10.1007/s11227-017-2091-x | Crossref metadata + search snippet | CUDA UM usually slower than explicit copies; same contrast; target journal (first name Łukasz, Crossref 10-18) |
 | Yu20 | Q. Yu, B. Childers, L. Huang, C. Qian, Z. Wang. *A quantitative evaluation of unified memory in GPUs.* J. Supercomputing 76 (2020) 2958–2985, doi 10.1007/s11227-019-03079-y | Crossref metadata + search snippet | where CUDA UM overhead comes from (OS involvement, many transfer requests); target journal |
+
+<!-- Removed 2026-10-26 (LAB.md: arXiv-only preprints are unpublished; Main applied the rule, the user may overrule;
+     revert the commit "Paper: drop arXiv-only refs" to restore). Rows as they were:
+     | Feng25 | D. Feng, Z. Xu, R. Wang, F. X. Lin. *Profiling Apple Silicon Performance for ML Training.* arXiv:2501.14925, 2025 | arXiv abstract | Apple Silicon vs NVIDIA; names kernel launch time as one cause of the gap |
+     | Maczan26 | J. Maczan. *Measuring and Reducing WebGPU Dispatch Overhead for LLM Inference.* arXiv:2608.08730 (v2, Aug 2026); accepted at the 4th UK AI Conference 2026 (PMLR) | arXiv abstract + HTML full text §1, §4.1, §5.1 | per-dispatch cost 24–36 µs on Vulkan and 32–71 µs on Metal (sequential method, sync excluded); a single timed op is dominated by sync (450 of 497 µs) |
+     | Cassagne25 | A. Cassagne, N. Amiot, M. Bouyer. *Dalek: An Unconventional and Energy-Aware Heterogeneous Cluster.* arXiv:2508.10481, 2025 | arXiv abstract + HTML full text §V-E | OpenCL launch latency (host call → kernel start): ≈ 5 µs RTX 4090 and Radeon 890M, 35–40 µs Intel iGPUs, ≈ 90 µs Arc 770 over Oculink | -->
 
 ## What they establish, and the gap we fill
 
@@ -46,15 +49,14 @@
   that dependence directly in payload size and GPU state, on one benchmark that runs unchanged on both platforms.
 - **Collaboration benchmarks** [GomezLuna17, Sun16] define the fine-grained CPU–GPU patterns, but they target integrated architectures through OpenCL, CUDA or C++ AMP, and Gera et al. [Gera18] characterize Intel's integrated GPU with microbenchmarks that include CPU–GPU cache sharing. Neither compares a unified-memory SoC with a discrete GPU
   on one shader source with identical buffer layouts.
-- **Apple Silicon studies** [Feng25, Huebner25, Beischl26] look at ML training, HPC kernels and databases.
-  - Feng et al. [Feng25] already point to kernel launch time as a factor in the gap with NVIDIA.
+- **Apple Silicon studies** [Huebner25, Beischl26] look at HPC kernels and databases.
   - None measures repeated round trips within a real-time frame budget, or the GPU power-state effect we see in
     the CPU→GPU hand-off (§5, §6).
 
-- **Launch and dispatch overhead are known to be tens of µs, but measured one way.** Maczan [Maczan26] separates the marginal cost of a dispatch (24–36 µs Vulkan, 32–71 µs Metal) from the synchronization that a naive single-op
-  timing folds in (450 of 497 µs). Cassagne et al. [Cassagne25] report host-to-kernel-start latency from ≈ 5 µs (RTX 4090) to
-  35–40 µs (Intel iGPUs). Both measure the CPU→GPU direction only. Our round trip is exactly the part they exclude:
-  the full hand-off in both directions, repeated within a frame, which is what a game pays for each K.
+- **Launch overhead is known to be tens of µs, but measured one way.** On Apple Silicon, a Metal kernel costs tens of
+  µs to encode and dispatch before it starts [Beischl26]. Such figures cover the CPU→GPU direction only. Our round trip
+  adds what they leave out: the full hand-off in both directions, repeated within a frame, which is what a game pays
+  for each K.
 - **GPU power-state transitions are slow and vendor-specific.** Velicka et al. [Velicka25, Velicka26] measure DVFS switching latency on data-centre NVIDIA GPUs and find that it differs widely between GPUs. We found no study of idle-state exit latency, on Apple or NVIDIA. So Sects. 5 and 6 can only say
   the multimodal M5 hand-off is "consistent with" a power-state effect, and the hot-GPU cells test that reading
   directly.
@@ -69,7 +71,7 @@
 | topic | result |
 |---|---|
 | GPU idle-state exit latency | **none found** (only DVFS switching, Velicka25, and forum reports). Keep "consistent with". |
-| semaphore / `MTLSharedEvent` latency, launch overhead | Maczan26, Cassagne25 (above). No study of timeline-semaphore or `MTLSharedEvent` signal-to-wake latency found. |
+| semaphore / `MTLSharedEvent` latency, launch overhead | Beischl26 (Metal launch, above); two arXiv-only sources dropped 10-26 (LAB.md). No study of timeline-semaphore or `MTLSharedEvent` signal-to-wake latency found. |
 | frame-delayed readback and staleness (H4) | **no academic source found**; only engine docs (Unity `AsyncGPUReadback`: "adds a few frames of latency"). §10 can state the gap. |
 | crowd/swarm with CPU decisions | Skrzypczak23 (HPC). Real-time game swarms: still open. |
 | ReBAR / BAR-mapped CPU writes | **no academic source found**; vendor explainers (Intel) and press only. For §5's ReBAR result, say "we are not aware of a published measurement". |

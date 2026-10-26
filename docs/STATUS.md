@@ -8,7 +8,7 @@ _Saved 2026-10-26 ≈ 04:10 WIB (session 21 closed: user's Mac shutdown via Main
   10-26 (user away, agent-only day per Main): paper §12.2/§1 updated; `--micro-cpuload=N`, `run_microbench.py --cond`,
   `tools/m1_mac_ext.sh` built and tested (Metal + MoltenVK ctest 52/52); docx rebuilt, Refresh test passed 10-26 ≈ 09:4x
   (exit 0, original md5 unchanged).
-- Running: nothing. Devices: none in use. Word: not touched; scripted only on Main's turn. Push: main 47 ahead of origin.
+- Running: nothing. Devices: none in use. Word: not touched; scripted only on Main's turn. Push: main 49 ahead of origin.
 - Mac shut down 10-26 ≈ 04:10: start a quiet block ≥ 30 min after boot (LAB.md). RTBench had the PC Mon 10-26 (M7): ask Main
   what it saw of `results\m1_3060_ext` / GPU_HOLD.txt.
 
@@ -24,7 +24,7 @@ _Saved 2026-10-26 ≈ 04:10 WIB (session 21 closed: user's Mac shutdown via Main
   state whole (block 4K ≈ idle, spin and block 1M ≈ loaded): it ran under uncontrolled load. Data
   `results/m1_mac_40w_check/` (README last section). Blocks m1_mac_ext (to-do 3).
 - **Paper** (The Journal of Supercomputing): drafts in `docs/paper/` → `build_docx.py` → `lightbound_jsc.docx`; 21 live
-  ZOTERO_ITEM + 1 ZOTERO_BIBL field, Zotero collection `Lightbound` (GMGWF6JT, 18 refs, `zotero_map.json`). Refresh test
+  ZOTERO_ITEM + 1 ZOTERO_BIBL field (19 + 1 since 10-26), Zotero collection `Lightbound` (GMGWF6JT, 18 items, 15 cited, `zotero_map.json`). Refresh test
   passed 10-23 12:3x (NPUBenchSwarm `tools/zotero_refresh_test.sh`; rerun after each rebuild, Main's Word turn). Drafted:
   §1–§5, §6.1–6.2, §9 (Word equation), §12, Declarations (`declarations.md`). Placeholders: §6.3, §8, §10, §11, §13 (need
   m1_mac_ext, m1_3060_ext, M3–M8). The repo has no LICENSE file.
@@ -54,13 +54,21 @@ _Saved 2026-10-26 ≈ 04:10 WIB (session 21 closed: user's Mac shutdown via Main
    (Springer basic prints no DOI for conference papers, incl. IPDPSW, and no arXiv id); the §9.1 equation renders; the
    Declarations block (bracketed items). Then **[solo]** style fix, `python3 docs/paper/build_docx.py` (`--sync` after any
    Zotero edit), refresh test on Main's Word turn.
-7. **[user] Paper decisions:** refs 13–15 (Feng25, Maczan26, Cassagne25) are arXiv preprints with arXiv DOIs only, no
-   published version (Crossref 10-23): LAB.md says unpublished manuscripts stay out of reference lists; keep (Springer
-   allows preprints) or drop and rephrase §2? AI-use wording (proposal in `docs/paper/declarations.md`), a repository licence, funding
+7. **[user] Paper decisions:** AI-use wording (proposal in `docs/paper/declarations.md`), a repository licence, funding
    statement, Zenodo DOI or not, extend the N grid past 100k (ReBAR-off crossover ≈ 112k agents).
 8. **4060 Ti step D, November:** [user] installs it in the i7-12700F PC, same slot (ask before planning another PC);
    [device: PC, ≈ 3 days] `results\m1_4060`, optional `m1_4060_ext`; [solo] add P-4060 to the combined report.
-9. **[user] Push:** main is 47 commits ahead of origin.
+9. **[user] Push:** main is 49 commits ahead of origin.
+
+## Dropped references (10-26, Main applied LAB.md: arXiv-only = unpublished; the user may overrule → revert the commit "Paper: drop arXiv-only refs")
+- Feng25 (10.48550/arXiv.2501.14925), Maczan26 (10.48550/arXiv.2608.08730; accepted at the 4th UK AI Conference 2026, PMLR
+  volume not out on 10-26: may return once published, PMLR counts), Cassagne25 (10.48550/arXiv.2508.10481). Still in Zotero
+  (the build leaves uncited items out) and refs.bib; table rows kept in a comment in `related_work.md`.
+- §2 changes: "Apple Silicon studies [Feng25, Huebner25, Beischl26] look at ML training, HPC kernels and databases" →
+  "[Huebner25, Beischl26] look at HPC kernels and databases"; removed "Feng et al. [Feng25] already point to kernel launch
+  time as a factor in the gap with NVIDIA"; the launch-overhead bullet (Maczan26 24–36 / 32–71 µs per dispatch, 450 of 497
+  µs sync; Cassagne25 ≈ 5–40 µs host-to-kernel start) now cites only Beischl26's Metal encode + dispatch cost, CPU→GPU only.
+- Refresh test owed on the rebuilt docx (Main's Word turn).
 
 ## Rules carried forward
 - Never pool `results/m1_3060_run1_disturbed`; ReBAR off gets its own report; `*_ext` dirs stay apart from protocol series.
