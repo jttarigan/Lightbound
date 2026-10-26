@@ -6,7 +6,8 @@ _Saved 2026-10-26 ≈ 04:10 WIB (session 21 closed: user's Mac shutdown via Main
 ## Resume point
 - **Next: to-do 2** (user: spin-wait decision a / b / b′, draft + tooling ready in `docs/CPULOAD_PROPOSAL.md`), then 7, 6, 1, 4, 9.
   10-26 (user away, agent-only day per Main): paper §12.2/§1 updated; `--micro-cpuload=N`, `run_microbench.py --cond`,
-  `tools/m1_mac_ext.sh` built and tested (ctest 52/52); docx rebuilt, Refresh test owed (Main's Word turn).
+  `tools/m1_mac_ext.sh` built and tested (Metal + MoltenVK ctest 52/52); docx rebuilt, Refresh test passed 10-26 ≈ 09:4x
+  (exit 0, original md5 unchanged).
 - Running: nothing. Devices: none in use. Word: not touched; scripted only on Main's turn. Push: main 47 ahead of origin.
 - Mac shut down 10-26 ≈ 04:10: start a quiet block ≥ 30 min after boot (LAB.md). RTBench had the PC Mon 10-26 (M7): ask Main
   what it saw of `results\m1_3060_ext` / GPU_HOLD.txt.
@@ -53,7 +54,9 @@ _Saved 2026-10-26 ≈ 04:10 WIB (session 21 closed: user's Mac shutdown via Main
    (Springer basic prints no DOI for conference papers, incl. IPDPSW, and no arXiv id); the §9.1 equation renders; the
    Declarations block (bracketed items). Then **[solo]** style fix, `python3 docs/paper/build_docx.py` (`--sync` after any
    Zotero edit), refresh test on Main's Word turn.
-7. **[user] Paper decisions:** AI-use wording (proposal in `docs/paper/declarations.md`), a repository licence, funding
+7. **[user] Paper decisions:** refs 13–15 (Feng25, Maczan26, Cassagne25) are arXiv preprints with arXiv DOIs only, no
+   published version (Crossref 10-23): LAB.md says unpublished manuscripts stay out of reference lists; keep (Springer
+   allows preprints) or drop and rephrase §2? AI-use wording (proposal in `docs/paper/declarations.md`), a repository licence, funding
    statement, Zenodo DOI or not, extend the N grid past 100k (ReBAR-off crossover ≈ 112k agents).
 8. **4060 Ti step D, November:** [user] installs it in the i7-12700F PC, same slot (ask before planning another PC);
    [device: PC, ≈ 3 days] `results\m1_4060`, optional `m1_4060_ext`; [solo] add P-4060 to the combined report.
