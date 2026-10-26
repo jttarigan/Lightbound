@@ -74,27 +74,38 @@ from our own runs:
    against 201), and the `s1_copy` 4 KiB cells closed only part of the gap. Across the eight runs the spin round trips
    correlate with the clock (r = −0.81 to −0.95 for five of the six empty and 4 KiB cells, −0.58 for the sixth) and
    only weakly with the share of CPU time spent on performance cores (−0.52 to +0.16 for the same cells), which an
-   earlier series had suggested as the cause. The 1 MiB spin cells stayed +180–230 µs in all but one run, so they
-   carry a second component, the slow 1 MiB read in spin mode, that the clock alone does not remove.
-   Our reading, not yet confirmed by a per-thread clock trace (root-level power sampling during a run is planned): on
-   an otherwise idle M5 the governor leaves a lone spin-waiting thread at about 2.2 GHz, and another process's load
-   raises the clock that the benchmark thread then shares. The accepted series ran with the chassis at thermal state
-   "fair", that is with the machine busier than during any of our checks, which would make "what changed" the machine's
-   background activity rather than a setting. Consequences: the M5's idle spin-wait numbers (§5) are governor-dependent,
-   and a quiet machine is not the fastest machine for them. §5's verdict does not depend on it: in the present state
-   the M5's block-wait cells are still slower than the 3060 Ti's best path (`s2_direct` 1 MiB, chained, p50 205–222 vs
-   145–161 µs; on the PC, block and spin wait differ by ≤ 6 µs). The interpolated crossover does depend on it: it rests
-   on the M5's 1 MiB level and would move to smaller payloads if the present block-wait level held. Two responses are
-   open: re-measure the idle reference in the present state and report the spin-wait cells as clock-dependent, or make
-   a defined CPU-side companion load part of the microbenchmark condition, which is closer to the game, whose
-   simulation thread never spins alone. No M5 extension series is measured before that decision.
+   earlier series had suggested as the cause. The 1 MiB spin cells stayed +180–230 µs in all but one run of that series.
+   A per-thread view came from root-level power sampling (`powermetrics`, CPU and GPU samplers, 250 ms) over four
+   alternating runs on 2026-10-25: two with the benchmark alone and two beside a defined companion load of two busy
+   threads. Alone, the spin-waiting thread migrated across the four performance cores, each about 30 % active, with
+   the cluster at 2.7 GHz; the spin cells were again +65–268 µs slower than the accepted series. Beside the load, the
+   cluster ran at 4.3–4.5 GHz and the spin cells returned to within 34 µs of the accepted series, the 1 MiB cells
+   included (+4–20 µs), except three 4 KiB cells at +80–88 µs. So the 1 MiB component seen at 2.8–3.2 GHz is also a
+   clock effect, at a higher clock. The GPU sat in its lowest performance state (338 MHz) in all four runs, so it does
+   not separate the two conditions. The load had the opposite effect on block-wait cells: +85–96 µs at 4 KiB and
+   +6–18 µs at 1 MiB, where they had matched or beaten the accepted series alone. The process-level counters are a
+   weaker guide than the sampled cluster clock: they read 2.8 GHz for the slow solo runs of 2026-10-25, about the
+   process clock at which the 2026-10-22 runs had already recovered.
+   Our reading: on an otherwise idle M5 the governor leaves a lone spin-waiting thread at a low clock, and another
+   process's load raises the clock that the benchmark thread then shares. Neither condition reproduces the accepted
+   series as a whole (its 4 KiB block-wait cells match the solo runs, its spin-wait and 1 MiB block-wait cells the
+   loaded ones), consistent with its having run under an uncontrolled background load: the chassis was at thermal
+   state "fair", busier than during any of our checks. Consequences: the M5's spin- and block-wait numbers (§5) depend
+   on the CPU-side load, in opposite directions, and a quiet machine is not the fastest machine for spin waits.
+   §5's verdict does not depend on it: in the present state the M5's block-wait cells are still slower than the
+   3060 Ti's best path (`s2_direct` 1 MiB, chained, p50 205–222 vs 145–161 µs; on the PC, block and spin wait differ
+   by ≤ 6 µs). The interpolated crossover does depend on it: it rests on the M5's 1 MiB level and would move to smaller
+   payloads if the solo block-wait level held. Three responses are open: re-measure the reference with the machine
+   idle and report the load dependence, make the defined companion load part of the microbenchmark condition (closer
+   to the game, whose simulation thread never spins alone), or measure both as named conditions. No M5 extension
+   series is measured before that decision.
    <!-- results/m1_mac_40w_check/display_0545/compare.txt (spin and block deltas, legs), ab_compare.txt (binary A/B),
         launch_0558/ (nice 5 runs; Terminal arm failed), launch_1253/ (2026-10-21 retest: launch context ruled out;
         ru_*.json = exit rusage per run), launch_1948/compare.txt + README section "QoS/priority retest" (2026-10-22:
         H − D per cell, GHz per run from exit rusage, r(rt, GHz) and r(rt, P-core share) per spin cell; the load/FPCKService
-        timing is Main's process log quoted in the README), DECISIONS #36. Block deltas: 4K +1…+13, 1M −62…−127 (10-22) and
-        within 11 / −84…−140 (10-20). OPEN (user, STATUS to-do 2): the root powermetrics check, then (a) re-measure the idle
-        reference or (b) a defined CPU-side load as a bench condition. PC block vs spin: results/m1_report*/summary.csv
+        timing is Main's process log quoted in the README), pm_1025_0708/compare.txt + README section "Clock check with root
+        powermetrics" (2026-10-25: cluster GHz per run window, rt p50 I/L vs 09-24; pm_compare.py), DECISIONS #36. Block deltas: 4K +1…+13, 1M −62…−127 (10-22) and
+        within 11 / −84…−140 (10-20). OPEN (user, STATUS to-do 2): (a) idle reference, (b) defined companion load, or (b′) both. PC block vs spin: results/m1_report*/summary.csv
         (chain, idle). -->
 
 In each case the first minute of cells showed the problem against the accepted levels, and the attempt was

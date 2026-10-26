@@ -72,9 +72,9 @@ when the GPU is busy, as it is inside a real time step**. We answer it in three 
 5. A practical account of measurement hygiene for microsecond-scale GPU latency on a laptop-class SoC. Background
    GPU clients, CPU contention and an undetected dark wake cost us runs, and a shift of 100–280 µs in spin-wait
    round trips survived every power, display, wake, launch and scheduling condition we tried, until the processor
-   clock explained most of it: on an otherwise idle laptop a lone spin-waiting thread runs slower than the same thread
-   beside a background load (§12). *(evidence in hand; a per-thread clock trace and the protocol's response are open,
-   2026-10-23)*
+   clock explained it: on an otherwise idle laptop a lone spin-waiting thread runs at 2.7 GHz, beside a two-thread
+   background load at 4.3–4.5 GHz, and the load speeds spin waits but slows block waits (§12). *(evidence in hand,
+   clock trace 2026-10-25; the protocol's response is open)*
 
 **Scope and what we do not claim.**
 - We compare two **platforms** (hardware, OS, driver and API together), not memory architectures in isolation (§12).
