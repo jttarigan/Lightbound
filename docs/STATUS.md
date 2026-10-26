@@ -1,14 +1,14 @@
 # Lightbound status (resume here)
 
-_Saved 2026-10-26 ≈ 04:10 WIB (session 21 closed: user's Mac shutdown via Main; clock check run 10-25 07:08, analysed, 5fd28c7). Sessions 1–19, M1 findings
+_Saved 2026-10-26 (session 21 paused: user stopping, "continue later", via Main; 10-26 agent-only work done; arXiv-only refs dropped 934b305, Refresh re-test passed). Sessions 1–19, M1 findings
 1–8, PC results and old run instructions: `docs/archive/STATE-history-2026-10.md` (read only when needed)._
 
 ## Resume point
 - **Next: to-do 2** (user: spin-wait decision a / b / b′, draft + tooling ready in `docs/CPULOAD_PROPOSAL.md`), then 7, 6, 1, 4, 9.
   10-26 (user away, agent-only day per Main): paper §12.2/§1 updated; `--micro-cpuload=N`, `run_microbench.py --cond`,
   `tools/m1_mac_ext.sh` built and tested (Metal + MoltenVK ctest 52/52); docx rebuilt, Refresh test passed 10-26 ≈ 09:4x
-  (exit 0, original md5 unchanged).
-- Running: nothing. Devices: none in use. Word: not touched; scripted only on Main's turn. Push: main 49 ahead of origin.
+  (exit 0, original md5 unchanged); arXiv-only refs dropped (934b305, revertable), re-test 19/19 passed.
+- Running: nothing. Devices: none in use. Word: 0 windows; scripted only on Main's turn. Push: main 51 ahead of origin.
 - Mac shut down 10-26 ≈ 04:10: start a quiet block ≥ 30 min after boot (LAB.md). RTBench had the PC Mon 10-26 (M7): ask Main
   what it saw of `results\m1_3060_ext` / GPU_HOLD.txt.
 
@@ -58,7 +58,7 @@ _Saved 2026-10-26 ≈ 04:10 WIB (session 21 closed: user's Mac shutdown via Main
    statement, Zenodo DOI or not, extend the N grid past 100k (ReBAR-off crossover ≈ 112k agents).
 8. **4060 Ti step D, November:** [user] installs it in the i7-12700F PC, same slot (ask before planning another PC);
    [device: PC, ≈ 3 days] `results\m1_4060`, optional `m1_4060_ext`; [solo] add P-4060 to the combined report.
-9. **[user] Push:** main is 49 commits ahead of origin.
+9. **[user] Push:** main is 51 commits ahead of origin.
 
 ## Dropped references (10-26, Main applied LAB.md: arXiv-only = unpublished; the user may overrule → revert the commit "Paper: drop arXiv-only refs")
 - Feng25 (10.48550/arXiv.2501.14925), Maczan26 (10.48550/arXiv.2608.08730; accepted at the 4th UK AI Conference 2026, PMLR
