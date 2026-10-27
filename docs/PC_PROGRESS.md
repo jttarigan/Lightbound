@@ -366,7 +366,7 @@ not exist before: it did not run on 10-20).
 
 | Item | Result |
 |---|---|
-| Hold file `C:\dev\GPU_HOLD.txt` | created 14:25:59 WIB (`Lightbound rebuild + M2 golden (no m1_3060_ext: DECISIONS #37 open)`); deleted after this push (time below) |
+| Hold file `C:\dev\GPU_HOLD.txt` | created 14:25:59 WIB (`Lightbound rebuild + M2 golden (no m1_3060_ext: DECISIONS #37 open)`); deleted 14:28:44 WIB |
 | GPU users at start | `nvidia-smi --query-compute-apps`: no python / training / RTBench process (only desktop apps); no python process at all; GPU util 2 % |
 | RTBench / NeonSwarm that day | none running at 14:25; whether RTBench's M7 slot ran earlier today is not visible from here |
 | Driver | 566.36 (unchanged) |
