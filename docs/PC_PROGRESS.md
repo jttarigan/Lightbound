@@ -357,3 +357,27 @@ change, an extra path/payload, or a ReBAR-off `s2_rebar` cross-check). In that c
 "If the PC has to be switched off" above, **rebuild first if `src/` changed** (the `--resume`
 header check refuses a different `git_commit`), use a **new output directory** for a new series
 (never add runs to `results\m1_3060`, its three runs are final), and keep the 4-minute rule.
+
+## PC task 2026-10-27 (`docs/PC_TASK_2026-10-27.md`) — steps 1–4 done, series not run
+
+Session 2026-10-27, user's "go" ≈ 14:25 WIB. **DECISIONS #37 (spin-wait a / b′) is not on `main`
+(e4525b1)**, so per the task only steps 1–4 ran; `results\m1_3060_ext` was not started (and did
+not exist before: it did not run on 10-20).
+
+| Item | Result |
+|---|---|
+| Hold file `C:\dev\GPU_HOLD.txt` | created 14:25:59 WIB (`Lightbound rebuild + M2 golden (no m1_3060_ext: DECISIONS #37 open)`); deleted after this push (time below) |
+| GPU users at start | `nvidia-smi --query-compute-apps`: no python / training / RTBench process (only desktop apps); no python process at all; GPU util 2 % |
+| RTBench / NeonSwarm that day | none running at 14:25; whether RTBench's M7 slot ran earlier today is not visible from here |
+| Driver | 566.36 (unchanged) |
+| ReBAR | on — smoke header `sysinfo.rebar: on`, `bar_heap_mb: 8024`; `nvidia-smi` BAR1 total 8192 MiB |
+| PCIe link | gen3 x16 (max gen3 x16) |
+| Power plan | Ultimate Performance (`601bada7-…`) |
+| NVIDIA "Prefer maximum performance" | not checkable from the shell (set by the human 10-02, no driver change since) |
+| Windows Update | paused, re-paused 2026-10-22 07:48 UTC, expires **2026-11-05 07:48 UTC** |
+| Update | `git merge --ff-only origin/main`: fast-forward c593742 → e4525b1 (35 files in src/tests/cmake/shaders) |
+| Build | Release, MSVC (VS Build Tools 2022), `/W4 /WX`: **clean, 0 warnings**, no source fixes |
+| ctest | **52/52 PASS** (53.0 s), incl. `procgen golden hashes` (0.61 s) **pass with MSVC — goldens untouched**, `procgen performance` < 150 ms pass (0.47 s test time), `microbench_smoke` 17.5 s, `_hot` 1.1 s, `_cpuload` 0.8 s (header `# cpuload: 2`), binary `git_commit: e4525b1213b9` |
+
+Next: when DECISIONS #37 is on `main`, run steps 1 and 5–7 of the task (fetch first; rebuild only
+if `src/` changed after e4525b1). Hold file → 10-min cooldown → series → checks → push → delete.
