@@ -381,3 +381,32 @@ not exist before: it did not run on 10-20).
 
 Next: when DECISIONS #37 is on `main`, run steps 1 and 5–7 of the task (fetch first; rebuild only
 if `src/` changed after e4525b1). Hold file → 10-min cooldown → series → checks → push → delete.
+
+## `results\m1_3060_ext` — variant b′ (idle + load2), 2026-10-28
+
+**Variant:** the user said "the choice is b" in this PC session (2026-10-28 ≈ 08:50 WIB); DECISIONS #37
+was **not on `main`** (still e4525b1). The PC task offers only a / b′, so b′ ran (its `load2\` half
+is the loaded-only condition of b). Mac: please record #37 and say if b′ was not what the user meant.
+
+| Item | Value |
+|---|---|
+| Hold file | created 2026-10-28 08:54:43 WIB; deleted after this push (time below) |
+| GPU users before | none (no python / training / RTBench in `--query-compute-apps`); RTBench's own note `PC_SENDBACK_20261027.md` says it ran nothing on the GPU on 10-27 (M7 was done 10-22); NeonSwarm not running |
+| Environment | driver 566.36, ReBAR on (`bar_heap_mb` 8024), gen3 x16, Ultimate Performance, WU paused to 11-05; binary e4525b1 (built 10-27, unchanged) |
+| Apps | the user closed Codex/ChatGPT, Teams, OneDrive, MSI Center UI before the start; **Voicemod was still running** (in the start check) |
+| Cooldown / start | 10 min (detached launcher `Start-Sleep 600`); series start 09:04:45, nvidia-smi re-check in `start_check.txt` (desktop apps only) |
+| Command | PC_TASK_2026-10-27 §5 (b′) verbatim, no `--resume` needed (no interruption) |
+| End | 14:38:43 WIB (5 h 34 min); runs ≈ 54–56 min each, alternating idle / load2 |
+| Failures | all 6 logs: `0 verification/R7 failures, 0 API errors`, 0 WARN lines |
+| `cpuload_end` (load2) | 2 threads, chain 2264.9 / 2257.4 / 2272.4 iterations/µs per thread (runs 1–3) |
+| `cell_load` duty | **not ≈ 1**: idle min 0.54, median 0.72; load2 min 0.55, median 0.73 (444 cells each; above the 0.5 warning level, no warnings). `micro_burn` dispatches 178–201 µs. The second queue idles ≈ 25–45 % of each hot cell on the 3060 Ti |
+| Run-to-run | **FAIL in both** (any cell ≥ 10 %). idle: 4 cells ≥ 10 % (hot 2, idle 2); worst 62.5 % `s1_copy_hot perpass/spin 4M`; idle-GPU worst 13.1 % `s2_direct perpass/block 2M`, primary 6.2 %. load2: hot 5, idle 4 cells; worst 26.2 % `s2_hostcached_hot chain/block 16M`; idle-GPU worst 12.6 % `s2_hostcached chain/block 3M`, primary 10.6 % |
+
+Run-to-run detail: in every flagged cell one run is slow and the other two agree (e.g. `s1_copy_hot
+perpass/spin 4M` p50 2167 / 1334 / 1333 µs; `s2_direct perpass/block 2M` 367 / 415 / 367), and the
+slow run differs between cells (idle: runs 1, 2, 3; load2: runs 2, 3), so it is not one disturbed
+run. Not re-run (`*_ext` gets no extra runs without the Mac's call). The protocol series
+`results\m1_3060` (0 cells ≥ 10 %) is untouched.
+
+Files: `results\m1_3060_ext\{idle,load2}\` — `micro_P-3060_rebar-on_run{1,2,3}.csv.gz` + `.log`,
+`report\`; `run_microbench.out`, `start_check.txt` (`.err` empty).

@@ -1,0 +1,13 @@
+2026-10-28 09:04:45 series start; compute-apps:
+2020, [Insufficient Permissions]
+9664, C:\Windows\System32\ShellHost.exe
+9900, C:\Windows\SystemApps\MicrosoftWindows.Client.CBS_cw5n1h2txyewy\CrossDeviceResume.exe
+9600, C:\Windows\explorer.exe
+11756, C:\Windows\System32\NahimicSvc64.exe
+2792, C:\Program Files\WindowsApps\Microsoft.WindowsTerminal_1.24.12741.0_x64__8wekyb3d8bbwe\WindowsTerminal.exe
+15856, C:\Windows\System32\ApplicationFrameHost.exe
+16284, C:\Program Files\WindowsApps\A-Volute.Nahimic_1.10.15.0_x64__w2gh52qy24etm\Nahimic3.exe
+13484, C:\Users\josta\AppData\Local\VoicemodV3\app\last\Voicemod.exe
+3604, C:\Windows\ImmersiveControlPanel\SystemSettings.exe
+5808, C:\Windows\SystemApps\ShellExperienceHost_cw5n1h2txyewy\ShellExperienceHost.exe
+17448, C:\Program Files\WindowsApps\Microsoft.YourPhone_1.26082.121.0_x64__8wekyb3d8bbwe\PhoneExperienceHost.exe
