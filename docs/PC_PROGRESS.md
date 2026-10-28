@@ -390,7 +390,7 @@ is the loaded-only condition of b). Mac: please record #37 and say if b′ was n
 
 | Item | Value |
 |---|---|
-| Hold file | created 2026-10-28 08:54:43 WIB; deleted after this push (time below) |
+| Hold file | created 2026-10-28 08:54:43 WIB, deleted 14:40:55 WIB |
 | GPU users before | none (no python / training / RTBench in `--query-compute-apps`); RTBench's own note `PC_SENDBACK_20261027.md` says it ran nothing on the GPU on 10-27 (M7 was done 10-22); NeonSwarm not running |
 | Environment | driver 566.36, ReBAR on (`bar_heap_mb` 8024), gen3 x16, Ultimate Performance, WU paused to 11-05; binary e4525b1 (built 10-27, unchanged) |
 | Apps | the user closed Codex/ChatGPT, Teams, OneDrive, MSI Center UI before the start; **Voicemod was still running** (in the start check) |
