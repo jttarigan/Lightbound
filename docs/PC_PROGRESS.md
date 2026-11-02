@@ -410,3 +410,12 @@ run. Not re-run (`*_ext` gets no extra runs without the Mac's call). The protoco
 
 Files: `results\m1_3060_ext\{idle,load2}\` — `micro_P-3060_rebar-on_run{1,2,3}.csv.gz` + `.log`,
 `report\`; `run_microbench.out`, `start_check.txt` (`.err` empty).
+
+**State on 2026-11-02 (session paused, user switching the PC off):** the 10-27 PC task is complete
+(steps 1–7, `m1_3060_ext` b′ pushed 10-28). PC idle: no `lightbound.exe`/`python`, no
+`C:\dev\GPU_HOLD.txt`, working tree clean (only the old untracked `results-14102026.zip`).
+`origin/main` still e4525b1 (no DECISIONS #37, no new PC task); the Mac has not merged d4a70d7 yet.
+Open for the Mac: record #37 (user said "b", b′ ran), and decide on the duty ≈ 0.72 and the
+run-to-run FAIL of `m1_3060_ext` (keep / re-run). GitHub login (GCM, `jttarigan`) verified 10-30.
+**Windows Update pause expires 2026-11-05 07:48 UTC** — re-pause before any new run (and before the
+4060 Ti step D). On resume: `git fetch`, read the newest `docs/PC_TASK_*.md` on `origin/main`.
